@@ -18,7 +18,7 @@ int check_drop(int n, Dictionary *Dict, Tuple *T, int sol_size, int **cover, int
 void kick(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int *sol_size, int **puzzle, int **enable, int *score, int **cover);
 void shuffle(int arr[], int size);
 void display(Dictionary *Dict, int **puzzle, int *score, int sol_size, int n);
-int move(int n, Dictionary *Dict, 
+int move(int n, Dictionary *Dict,
     Tuple *T, int t_size, int *Sol, int ****InvT,
     int **puzzle, int *score, int sol_size, int **enable, int **cover);
 int check_move(int n, int **puzzle, int **enable, int **cover, int direction);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   float white = 0; //白マス数
 
   clock_t start = clock();//開始時間
-  
+
   if (argc < 6) {
     fprintf(stderr, "usage: %s (n)(filename)(seed)(filetype)(movetype)\n", argv[0]);
     exit(EXIT_FAILURE);
@@ -72,11 +72,11 @@ int main(int argc, char *argv[]) {
   readDict(&Dict, argv[2], type);
 
   /*** InvTの領域を確保 ***/
-  for (div=0;div<2;div++) {
+  for(div=0;div<2;div++) {
     InvT[div] = (int***)malloc(Dict.m*sizeof(int**));
-    for (k=0;k<Dict.m;k++) {
+    for(k=0;k<Dict.m;k++) {
       InvT[div][k] = (int**)malloc(Dict.n*sizeof(int*));
-      for (i=0;i<Dict.n;i++) {
+      for(i=0;i<Dict.n;i++) {
         InvT[div][k][i] = (int*)malloc(Dict.n*sizeof(int));
       }
     }
@@ -95,15 +95,16 @@ int main(int argc, char *argv[]) {
         i_max = n - 1;
         j_max = n - Dict.len[k];
       }
-      for (i = 0; i <= i_max; i++) // 行ごとに
+      for (i = 0; i <= i_max; i++) { // 行ごとに
         for (j = 0; j <= j_max; j++) { // 列ごとに
           T[t].div = div;
           T[t].k = k;
           T[t].i = i;
           T[t].j = j;
-    InvT[div][k][i][j] = t;
+          InvT[div][k][i][j] = t;
           t++;
         }
+      }
     }
   }
   t_size = t;
@@ -148,14 +149,14 @@ int main(int argc, char *argv[]) {
   for (t = 0; t < t_size; t++) {
     Sol[t] = False;
   }
-  
+
   //乱数のシードを設定
   srand(atoi(argv[3]));
-  
+
   //ランダムにaddするために必要な配列
   int *arr_rand;
   arr_rand = (int*)malloc(t_size * sizeof(int));
-  for (p=0;p<t_size;p++) {
+  for(p=0;p<t_size;p++) {
     arr_rand[p] = p;
   }
   shuffle(arr_rand,t_size);
@@ -193,8 +194,7 @@ int main(int argc, char *argv[]) {
     if ((double)(clock()-start)/CLOCKS_PER_SEC > 120) {
       printf("time has come\n");
       break;
-    }
-    else if (sol_size==Dict.m) {
+    } else if(sol_size==Dict.m) {
       printf("all words are used\n");
       break;
     }
@@ -216,16 +216,16 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-    
+
     //連結性が崩れるまでdrop
     breakConnection(n, &Dict, T, t_size, Sol, &sol_size, t, puzzle, enable, &score, cover);
-    
+
     //kickする
     kick(n, &Dict, T, t_size, Sol, &sol_size, puzzle, enable, &score, cover);
 
     //移動できる方向をランダムで選び、平行移動する
-    if (movetype==1) {
-      if (move(n, &Dict, T, t_size, Sol, InvT, puzzle, &score, sol_size, enable, cover) == True) {
+    if(movetype==1) {
+      if(move(n, &Dict, T, t_size, Sol, InvT, puzzle, &score, sol_size, enable, cover) == True) {
         moveCount++;
       }
     }
@@ -334,8 +334,7 @@ int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, i
       //haitteta[p] = puzzle[T[t].i+p][T[t].j];
       puzzle[T[t].i + p][T[t].j] = Dict->x[T[t].k][p];
       //printf("<p=%d, %d>",p,Dict->x[T[t].k][p]);
-    }
-    else{
+    } else {
       //haitteta[p] = puzzle[T[t].i][T[t].j + p];
       puzzle[T[t].i][T[t].j + p] = Dict->x[T[t].k][p];
     }
@@ -347,8 +346,7 @@ int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, i
     for (k = 0; k < length; k++) {
       if (T[t].div == 0) {
         puzzle[T[t].i + k][T[t].j] = haitteta[k];
-      }
-      else {
+      } else {
         puzzle[T[t].i][T[t].j + k] = haitteta[k];
       }
     }
@@ -363,8 +361,7 @@ int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, i
     if (T[t].i + length < n) {
       enable[T[t].i + length][T[t].j] = False;
     }
-  }
-  else {
+  } else {
     if (T[t].j - 1 >= 0) {
       enable[T[t].i][T[t].j - 1] = False;
     }
@@ -372,19 +369,18 @@ int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, i
       enable[T[t].i][T[t].j + length] = False;
     }
   }
-  
+
   //cover配列を更新
   if (T[t].div == 0) {
     for (p = 0; p < length; p++) {
       cover[T[t].i + p][T[t].j]++;
     }
-  }
-  else {
+  } else {
     for (p = 0; p < length; p++) {
       cover[T[t].i][T[t].j + p]++;
     }
   }
-  
+
   //cover配列の表示
   /*for (p = 0; p < n; p++) {
       for (q = 0; q < n; q++) {
@@ -392,25 +388,24 @@ int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, i
       }
       printf("\n");
     }
-  */  
-  
- 
-  
+  */
+
+
+
   //カバー配列の表示
  /*
   for (p = 0; p < n; p++) {
     for (q = 0; q < n; q++) {
       if (enable[p][q] == False) {
         printf("F ");
-      }
-      else {
+      } else {
         printf("T ");
       }
     }
     printf("\n");
   }
 */
-  
+
   // 詰め込みが可能と判定された場合:
   Sol[t] = True;
   *score = calc(n, Dict, puzzle, cover, 0);
@@ -438,60 +433,103 @@ int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
       for (q = 0; q < n; q++) {
         score += cover[p][q];
       }
+      return score;
     }
-    return score;
-  }
-        
 
-  int *word;
-  int length=0;
-  int matching = False;
-  int inDict=0;//パズルにある単語で辞書内にある単語と一致する数
-  int penalty=0;
-  
-  word = (int*)malloc(n * sizeof(int));
-  
-//文字列が辞書内にあるかを調べる
-  //縦
-  for (p = 0; p < n; p++) {
-    for (q = 0; q < n; q ++) {
-      if ((p == 0 && puzzle[p][q] != False) || (p > 0 && puzzle[p - 1][q] == False && puzzle[p][q] != False)) {
-        for (r=0;r<n-p;r++) {
-          if (puzzle[p+r][q]== False) {
-            break;  
+    int *word;
+    int length=0;
+    int matching = False;
+    int inDict=0;//パズルにある単語で辞書内にある単語と一致する数
+    int penalty=0;
+
+    word = (int*)malloc(n * sizeof(int));
+
+  //文字列が辞書内にあるかを調べる
+    //縦
+    for (p = 0; p < n; p++) {
+      for (q = 0; q < n; q ++) {
+        if ((p == 0 && puzzle[p][q] != False) || (p > 0 && puzzle[p - 1][q] == False && puzzle[p][q] != False)) {
+          for(r=0;r<n-p;r++) {
+            if(puzzle[p+r][q]== False) {
+              break;
+            } else {
+              word[r] = puzzle[p+r][q];
+              length++;
+            }
           }
-          else{
-            word[r] = puzzle[p+r][q];
-            length++;
+          /*debug
+          for(r=0;r<length;r++) {
+            printf("word[%d] = %d ",r,word[r]);
           }
-        }
-        /*debug
-        for (r=0;r<length;r++) {
-          printf("word[%d] = %d ",r,word[r]);
           printf("\n");
           printf("length=%d\n",length);
-        }
-        */
-        
-        //wordが辞書内にあるかをチェック
-        for (r=0; r<Dict->m; r++) {
-          if (length == Dict->len[r]) {
-            for (s=0; s<length; s++) {
-              if (word[s] == Dict->x[r][s]) {
-                matching = True;
-              }
-              else {
-                matching = False;
-                break;
+          */
+
+          //wordが辞書内にあるかをチェック
+          for(r=0; r<Dict->m; r++) {
+            if(length == Dict->len[r]) {
+              for(s=0; s<length; s++) {
+                if(word[s] == Dict->x[r][s]) {
+                  matching = True;
+                } else {
+                  matching = False;
+                  break;
+                }
               }
             }
+            if(matching == True) {
+              inDict += length;
+              break;
+            }
           }
-          if (matching == True) {
-            inDict += length;
-            break;
+          if(matching == False && length>1) {
+            penalty += length;
           }
+          length=0;
+          //printf("matching=%d inDict=%d penalty=%d\n",matching,inDict,penalty);
+          matching = False;
         }
-        if (matching == False && length>1) {
+      }
+    }
+
+    //横
+    for (q = 0; q < n; q++) {
+      for (p = 0; p < n; p ++) {
+        if ((q == 0 && puzzle[p][q] != False) || (q > 0 && puzzle[p][q-1] == False && puzzle[p][q] != False)) {
+          for(r=0;r<n-q;r++) {
+            if(puzzle[p][q+r] == False) {
+              break;
+            } else {
+              word[r] = puzzle[p][q+r];
+              length++;
+            }
+          }
+          /*debug
+          for(r=0;r<length;r++) {
+            printf("word[%d] = %d ",r,word[r]);
+          }
+          printf("\n");
+          printf("length=%d\n",length);
+          */
+
+          //wordが辞書内にあるかをチェック
+          for (r=0; r<Dict->m; r++) {
+            if(length == Dict->len[r]) {
+              for (s=0; s<length; s++) {
+                if(word[s] == Dict->x[r][s]) {
+                  matching = True;
+                } else {
+                  matching = False;
+                  break;
+                }
+              }
+           }
+           if(matching == True) {
+             inDict += length;
+             break;
+           }
+        }
+        if(matching == False && length>1) {
           penalty += length;
         }
         length=0;
@@ -501,55 +539,6 @@ int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
     }
   }
 
-  //横
-  for (q = 0; q < n; q++) {
-    for (p = 0; p < n; p ++) {
-      if ((q == 0 && puzzle[p][q] != False) || (q > 0 && puzzle[p][q-1] == False && puzzle[p][q] != False)) {
-        for (r=0;r<n-q;r++) {
-          if (puzzle[p][q+r] == False) {
-            break;  
-          }
-          else {
-            word[r] = puzzle[p][q+r];
-            length++;
-          }
-        }
-        /*debug
-        for (r=0;r<length;r++) {
-          printf("word[%d] = %d ",r,word[r]);
-        }
-        printf("\n");
-        printf("length=%d\n",length);
-        */
-        
-        //wordが辞書内にあるかをチェック
-        for (r=0; r<Dict->m; r++) {
-          if (length == Dict->len[r]) {
-            for (s=0; s<length; s++) {
-              if (word[s] == Dict->x[r][s]) {
-                matching = True;
-              }
-              else {
-                matching = False;
-                break;
-              }
-            }
-          }
-          if (matching == True) {
-            inDict += length;
-            break;
-          }
-        }
-        if (matching == False && length>1) {
-          penalty += length;
-        }
-        length=0;
-        //printf("matching=%d inDict=%d penalty=%d\n",matching,inDict,penalty);
-        matching = False;
-      }
-    }
-  }
- 
   //printf("inDict=%d,penalty=%d\n",inDict,penalty);
 
   free(word); // <--原口追加 (8/11)
@@ -578,21 +567,18 @@ int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, 
       }
       if (cover[T[t].i + p][T[t].j] == 2) {
         tmp = False;
-      }
-      else {
+      } else {
         tmp = True;
       }
     }
-  }
-  else {
+  } else {
     for (p = 0; p < length; p++) {
       if (tmp == False && cover[T[t].i][T[t].j + p] == 2) {
         return sol_size;
       }
       if (cover[T[t].i][T[t].j + p] == 2) {
         tmp = False;
-      }
-      else {
+      } else {
         tmp = True;
       }
     }
@@ -606,8 +592,7 @@ int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, 
         puzzle[T[t].i + p][T[t].j] = False;
       }
     }
-  }
-  else {
+  } else {
     for (p = 0; p < length; p++) {
       cover[T[t].i][T[t].j + p] --;
       if (cover[T[t].i][T[t].j + p] == 0) {
@@ -623,12 +608,11 @@ int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, 
   printf("--- dropped ---\n");
   printf("[");
   for (p = 0; p < length; p++) {
-    if (Dict->en == False) {
-      printf("%s", decoder(Dict->inv[Dict->x[T[t].k][p]] + MINCODE_JA));
-    }
-    else {
-      printf("%c", Dict->inv[Dict->x[T[t].k][p]] + MINCODE_EN);
-    }
+      if (Dict->en == False) {
+        printf("%s", decoder(Dict->inv[Dict->x[T[t].k][p]] + MINCODE_JA));
+      } else {
+        printf("%c", Dict->inv[Dict->x[T[t].k][p]] + MINCODE_EN);
+      }
   }
   printf("] i=%d, j=%d\n",T[t].i,T[t].j);
   */
@@ -651,8 +635,7 @@ int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, 
     //上解除
     if (remove == True) {
       enable[T[t].i - 1][T[t].j] = True;
-    }
-    else {
+    } else {
       remove = True;
     }
   }
@@ -692,8 +675,7 @@ int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, 
     //左解除
     if (remove == True) {
       enable[T[t].i][T[t].j-1] = True;
-    }
-    else {
+    } else {
       remove = True;
     }
   }
@@ -716,8 +698,8 @@ int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, 
       enable[T[t].i][T[t].j + length] = True;
     }
   }
-  
-  //Solの更新   
+
+  //Solの更新
   Sol[t] = False;
 
   *score = newScore;
@@ -764,8 +746,7 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
         crossing = False;
         break;
       }
-    }
-    else if (T[t].div == 1 && puzzle[T[t].i][T[t].j + p] != False) {
+    } else if (T[t].div == 1 && puzzle[T[t].i][T[t].j + p] != False) {
       crossing = True;
       if (puzzle[T[t].i][T[t].j + p] != Dict->x[T[t].k][p]) {
         //printf("puzzle=%d, Dict=%d\n", puzzle[T[t].i][T[t].j + p], Dict->x[T[t].k][p]);
@@ -789,8 +770,7 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
             crossing = False;
             break;
           }
-        }
-        else {
+        } else {
           if (enable[T[t].i][T[t].j + p] == False) {
             // printf("!! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict->x[T[t].k][p] );
             crossing = False;
@@ -815,8 +795,7 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
     for (q = 0; q < n; q++) {
       if (enable[p][q] == False) {
         printf("F ");
-      }
-      else {
+      } else {
         printf("T ");
       }
     }
@@ -829,8 +808,7 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
   for (p = 0; p < length; p++) {
     if (Dict->en == False) {
       printf("%s", decoder(Dict->inv[Dict->x[T[t].k][p]] + MINCODE_JA));
-    }
-    else {
+    } else {
       printf("%c", Dict->inv[Dict->x[T[t].k][p]] + MINCODE_EN);
     }
   }
@@ -849,8 +827,7 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
       if (T[t].j < n-1 && puzzle[T[t].i + p][T[t].j + 1] != False) {
         return False;
       }
-    }
-    else if (T[t].div == 1 && puzzle[T[t].i][T[t].j + p] == False) {
+    } else if (T[t].div == 1 && puzzle[T[t].i][T[t].j + p] == False) {
       //上
       if (T[t].i > 0 && puzzle[T[t].i - 1][T[t].j + p] != False) {
         return False;
@@ -863,8 +840,7 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
   }
 
   //単語を配置するマスに禁止マスがある場合add不可
-  //縦
-  if (T[t].div == 0) {
+  if (T[t].div == 0) { //縦
     for (p = 0; p < length; p++) {
       if (enable[T[t].i + p][T[t].j] == False) {
         return False;
@@ -877,9 +853,7 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
     if (T[t].i + length < n && puzzle[T[t].i + length][T[t].j] != False) {
       return False;
     }
-  }
-  //横
-  else {
+  } else { //横
     for (p = 0; p < length; p++) {
       if (enable[T[t].i][T[t].j + p] == False) {
         return False;
@@ -892,8 +866,8 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
     if (T[t].j + length < n && puzzle[T[t].i][T[t].j + length] != False) {
       return False;
     }
-  } 
-  
+  }
+
   //詰め込み可能ならTrue
   return True;
 }
@@ -926,33 +900,29 @@ int check_drop(int n, Dictionary *Dict, Tuple *T, int sol_size, int **cover, int
       }
       if (cover[T[t].i + p][T[t].j] == 2) {
         tmp = False;
-      }
-      else {
+      } else {
         tmp = True;
       }
     }
-  }
-  else {
+  } else {
     for (p = 0; p < length; p++) {
       if (tmp == False && cover[T[t].i][T[t].j + p] == 2) {
         goto END_FALSE;
       }
       if (cover[T[t].i][T[t].j + p] == 2) {
         tmp = False;
-      }
-      else {
+      } else {
         tmp = True;
       }
     }
   }
-      
+
   //単語を抜いた後のカバー配列
   if (T[t].div == 0) {
     for (p = 0; p < length; p++) {
       cover[T[t].i + p][T[t].j] -= 1;
     }
-  }
-  else {
+  } else {
     for (p = 0; p < length; p++) {
       cover[T[t].i][T[t].j + p] -= 1;
     }
@@ -963,8 +933,7 @@ int check_drop(int n, Dictionary *Dict, Tuple *T, int sol_size, int **cover, int
     for (q = 0; q < n; q++) {
       if (cover[p][q] == 0) {
         cover_dfs[p][q] = -1;
-      }
-      else {
+      } else {
         cover_dfs[p][q] = 0;
       }
     }
@@ -978,21 +947,18 @@ int check_drop(int n, Dictionary *Dict, Tuple *T, int sol_size, int **cover, int
       for (p = 0; p < length; p++) {
         cover[T[t].i + p][T[t].j] += 1;
       }
-    }
-    else {
+    } else {
       for (p = 0; p < length; p++) {
         cover[T[t].i][T[t].j + p] += 1;
       }
     }
     goto END_TRUE;
-  }
-  else {
+  } else {
     if (T[t].div == 0) {
       for (p = 0; p < length; p++) {
         cover[T[t].i + p][T[t].j] += 1;
       }
-    }
-    else {
+    } else {
       for (p = 0; p < length; p++) {
         cover[T[t].i][T[t].j + p] += 1;
       }
@@ -1019,26 +985,25 @@ END_FALSE:
 /*************************kick*****************************/
 //連結性が崩れている場合、scoreが一番大きい部分だけを残しdropする
 void kick(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int *sol_size, int **puzzle, int **enable, int *score, int **cover) {
-  
+
   if (*sol_size == 0) {
     return;
   }
 
   int p, q,r, t, connected, num=0;
   int **cover_dfs;
-  
+
   cover_dfs = (int**)malloc(n * sizeof(int*));
   for (p = 0; p < n; p++) {
     cover_dfs[p] = (int*)malloc(n * sizeof(int));
   }
-  
+
   //cover_dfsを作成
   for (p = 0; p<n; p++) {
     for (q = 0; q < n; q++) {
       if (cover[p][q] == 0) {
         cover_dfs[p][q] = -1;
-      }
-      else {
+      } else {
         cover_dfs[p][q] = 0;
       }
     }
@@ -1091,7 +1056,6 @@ void kick(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int *sol_size
       if (r == *sol_size) {
         break;
       }
-      
     }
   }
 
@@ -1119,16 +1083,13 @@ void display(Dictionary *Dict, int **puzzle, int *score, int sol_size, int n) {
       if (puzzle[p][q] >= 0) {
         if (Dict->en == False) {
           printf("%s", decoder(Dict->inv[puzzle[p][q]] + MINCODE_JA));
-        }
-        else {
+        } else {
           printf("%c ", Dict->inv[puzzle[p][q]] + MINCODE_EN);
         }
-      }
-      else {
+      } else {
         if (Dict->en == False) {
           printf("□");
-        }
-        else {
+        } else {
           printf("- ");
         }
       }
@@ -1140,10 +1101,10 @@ void display(Dictionary *Dict, int **puzzle, int *score, int sol_size, int n) {
 
 /****************連結成分を移動できる方向の内ランダムに平行移動する*****************/
 
-int move(int n, Dictionary *Dict, 
+int move(int n, Dictionary *Dict,
     Tuple *T, int t_size, int *Sol, int ****InvT,
     int **puzzle, int *score, int sol_size, int **enable, int **cover) {
-  
+
   if (sol_size == 0) {
     return False;
   }
@@ -1151,15 +1112,15 @@ int move(int n, Dictionary *Dict,
   int p, q, r, move;
   int direction[4] = {0, 1, 2, 3}; //0:上 1:下 2:左 3:右
   int a = False, t,s,div,i,j,k,*I;
-  
+
   //方向を決める
   shuffle(direction, 4);
-  
+
   move = check_move(n, puzzle, enable, cover, direction[0]);
   if (move == 0) {
     return False;
   }
-   
+
   a = direction[p];
 
   /*
@@ -1169,8 +1130,7 @@ int move(int n, Dictionary *Dict,
     for (q = 0; q < n; q++) {
       if (enable[p][q] == False) {
         printf("F ");
-      }
-      else {
+      } else {
         printf("T ");
       }
     }
@@ -1182,117 +1142,115 @@ int move(int n, Dictionary *Dict,
   //平行移動する
   if (a != False) {
     //printf("--- moved (a:%d, move:%d)---\n", a, move);
-    switch (a) {
-      case 0://上
-        //移動
-        for (p = 0; p < n - move; p++) {
-          for (q = 0; q < n; q++) {
-            puzzle[p][q] = puzzle[p + move][q];
-            cover[p][q] = cover[p + move][q];
-            enable[p][q] = enable[p + move][q];
+    switch(a) {
+    case 0://上
+      //移動
+      for (p = 0; p < n - move; p++) {
+        for (q = 0; q < n; q++) {
+          puzzle[p][q] = puzzle[p + move][q];
+          cover[p][q] = cover[p + move][q];
+          enable[p][q] = enable[p + move][q];
+        }
+      }
+      //削除
+      for (p = n - 1; p > n - move - 1; p--) {
+        for (q = 0; q < n; q++) {
+          puzzle[p][q] = False;
+          cover[p][q] = 0;
+          enable[p][q] = True;
+        }
+      }
+      //禁止マス再設定
+      if (move != n - 1) {
+        for (p = 0; p < n; p++) {
+          if (puzzle[n - move - 1][p] != False && puzzle[n - move - 2][p] != False) {
+            enable[n - move][p] = False;
           }
         }
-        //削除
-        for (p = n - 1; p > n - move - 1; p--) {
-          for (q = 0; q < n; q++) {
-            puzzle[p][q] = False;
-            cover[p][q] = 0;
-            enable[p][q] = True;
-          }
-        }
-        //禁止マス再設定
-        if (move != n - 1) {
-          for (p = 0; p < n; p++) {
-            if (puzzle[n - move - 1][p] != False && puzzle[n - move - 2][p] != False) {
-              enable[n - move][p] = False;
-            }
-          }
-        }
-        break;
-      
-      case 1://下
-        //移動
-        for (p = n - 1; p >= move; p--) {
-          for (q = 0; q < n; q++) {
-            puzzle[p][q] = puzzle[p - move][q];
-            cover[p][q] = cover[p - move][q];
-            enable[p][q] = enable[p - move][q];
-          }
-        }
-        //削除
-        for (p = 0; p < move; p++) {
-          for (q = 0; q < n; q++) {
-            puzzle[p][q] = False;
-            cover[p][q] = 0;
-            enable[p][q] = True;
-          }
-        }
-        //禁止マス再設定
-        if (move != n - 1) {
-          for (p = 0; p < n; p++) {
-            if (puzzle[move][p] != False && puzzle[move + 1][p] != False) {
-              enable[move - 1][p] = False;
-            }
-          }
-        }
-        break;
+      }
 
-      case 2://左
-        //移動
-        for (p = 0; p < n - move; p++) {
-          for (q = 0; q < n; q++) {
-            puzzle[q][p] = puzzle[q][p + move];
-            cover[q][p] = cover[q][p + move];
-            enable[q][p] = enable[q][p + move];
-          }
-        }
-        //削除
-        for (p = n - 1; p > n - move - 1; p--) {
-          for (q = 0; q < n; q++) {
-            puzzle[q][p] = False;
-            cover[q][p] = 0;
-            enable[q][p] = True;
-          }
-        }
-        //禁止マス再設定
-        if (move != n - 1) {
-          for (p = 0; p < n; p++) {
-            if (puzzle[p][n - move - 1] != False && puzzle[p][n - move - 2] != False) {
-              enable[p][n - move] = False;
-            }
-          }
-        }
-        break;
+      break;
 
-      case 3://右
-        //移動
-        for (p = n - 1; p >= move; p--) {
-          for (q = 0; q < n; q++) {
-            puzzle[q][p] = puzzle[q][p - move];
-            cover[q][p] = cover[q][p - move];
-            enable[q][p] = enable[q][p - move];
+    case 1://下
+      //移動
+      for (p = n - 1; p >= move; p--) {
+        for (q = 0; q < n; q++) {
+          puzzle[p][q] = puzzle[p - move][q];
+          cover[p][q] = cover[p - move][q];
+          enable[p][q] = enable[p - move][q];
+        }
+      }
+      //削除
+      for (p = 0; p < move; p++) {
+        for (q = 0; q < n; q++) {
+          puzzle[p][q] = False;
+          cover[p][q] = 0;
+          enable[p][q] = True;
+        }
+      }
+      //禁止マス再設定
+      if (move != n - 1) {
+        for (p = 0; p < n; p++) {
+          if (puzzle[move][p] != False && puzzle[move + 1][p] != False) {
+            enable[move - 1][p] = False;
           }
         }
-        //削除
-        for (p = 0; p < move; p++) {
-          for (q = 0; q < n; q++) {
-            puzzle[q][p] = False;
-            cover[q][p] = 0;
-            enable[q][p] = True;
+      }
+      break;
+    case 2://左
+      //移動
+      for (p = 0; p < n - move; p++) {
+        for (q = 0; q < n; q++) {
+          puzzle[q][p] = puzzle[q][p + move];
+          cover[q][p] = cover[q][p + move];
+          enable[q][p] = enable[q][p + move];
+        }
+      }
+      //削除
+      for (p = n - 1; p > n - move - 1; p--) {
+        for (q = 0; q < n; q++) {
+          puzzle[q][p] = False;
+          cover[q][p] = 0;
+          enable[q][p] = True;
+        }
+      }
+      //禁止マス再設定
+      if (move != n - 1) {
+        for (p = 0; p < n; p++) {
+          if (puzzle[p][n - move - 1] != False && puzzle[p][n - move - 2] != False) {
+            enable[p][n - move] = False;
           }
         }
-        //禁止マス再設定
-        if (move != n - 1) {
-          for (p = 0; p < n; p++) {
-            if (puzzle[p][move] != False && puzzle[p][move + 1] != False) {
-              enable[p][move - 1] = False;
-            }
+      }
+      break;
+    case 3://右
+      //移動
+      for (p = n - 1; p >= move; p--) {
+        for (q = 0; q < n; q++) {
+          puzzle[q][p] = puzzle[q][p - move];
+          cover[q][p] = cover[q][p - move];
+          enable[q][p] = enable[q][p - move];
+        }
+      }
+      //削除
+      for (p = 0; p < move; p++) {
+        for (q = 0; q < n; q++) {
+          puzzle[q][p] = False;
+          cover[q][p] = 0;
+          enable[q][p] = True;
+        }
+      }
+      //禁止マス再設定
+      if (move != n - 1) {
+        for (p = 0; p < n; p++) {
+          if (puzzle[p][move] != False && puzzle[p][move + 1] != False) {
+            enable[p][move - 1] = False;
           }
         }
-        break;
-
-      default:
-        printf("error\n");
+      }
+      break;
+    default:
+      printf("error\n");
     }
     /*
     printf("After\n");
@@ -1301,8 +1259,7 @@ int move(int n, Dictionary *Dict,
       for (q = 0; q < n; q++) {
         if (enable[p][q] == False) {
           printf("F ");
-        }
-        else {
+        } else {
           printf("T ");
         }
       }
@@ -1314,22 +1271,22 @@ int move(int n, Dictionary *Dict,
     // Solを更新
     I = (int*)malloc(sol_size*sizeof(int));
     s = 0;
-    for (t=0;t<t_size;t++) {
-      if (Sol[t]==True) {
+    for(t=0;t<t_size;t++) {
+      if(Sol[t]==True) {
         I[s] = t;
         s++;
       }
     }
-    if (s!=sol_size) {
-     fprintf(stderr,"error: something is strange.\n");
-     exit(1);
+    if(s!=sol_size) {
+      fprintf(stderr,"error: something is strange.\n");
+      exit(1);
     }
 
-    //printf("\tupdate Sol...(t_size=%d, a=%d, move=%d)\n", t_size, a, move);
-    for (p=0;p<sol_size;p++) {
+    //printf("  update Sol...(t_size=%d, a=%d, move=%d)\n", t_size, a, move);
+    for(p=0;p<sol_size;p++) {
       t = I[p];
 
-      //printf("\tt=%d\t",t); fflush(stdout);
+      //printf("  t=%d  ",t); fflush(stdout);
 
       Sol[t] = False;
       div = T[t].div;
@@ -1337,24 +1294,24 @@ int move(int n, Dictionary *Dict,
       i = T[t].i;
       j = T[t].j;
 
-      //printf("(%d,%d,%d,%d)\t",div,k,i,j); fflush(stdout);
+      //printf("(%d,%d,%d,%d)  ",div,k,i,j); fflush(stdout);
 
-      switch (a) {
-        case 0: //上
-          i -= move;
-          break;
-        case 1: //下
-          i += move;
-          break;
-        case 2: //左
-          j -= move;
-          break;
-        case 3: //右
-          j += move;
-          break;
+      switch(a) {
+      case 0: //上
+        i = i-move;
+        break;
+      case 1: //下
+        i = i+move;
+        break;
+      case 2: //左
+        j = j-move;
+        break;
+      case 3: //右
+        j = j+move;
+        break;
       }
 
-      //printf("---> (%d,%d,%d,%d)\t",div,k,i,j); fflush(stdout);
+      //printf("---> (%d,%d,%d,%d)  ",div,k,i,j); fflush(stdout);
 
       s = InvT[div][k][i][j];
 
@@ -1362,9 +1319,9 @@ int move(int n, Dictionary *Dict,
 
       Sol[s] = True;
     }
-    //printf("\tdone.\n\n");
-  } 
- 
+    //printf("  done.\n\n");
+  }
+
 
   //display(Dict, puzzle, score, sol_size, n);
 
@@ -1376,88 +1333,77 @@ int check_move(int n, int **puzzle, int **enable, int **cover, int direction) {
   int p, q, move=0, canMove = False;
 
   switch (direction) {
-    case 0:
-      for (p = 0; p < n; p++) {
-        for (q = 0; q < n; q++) {
-          if (cover[p][q] == 0) {
-            canMove = True;
-          }
-          else {
-            canMove = False;
-            break;
-          }
-        }
-        if (canMove == True) {
-          move++;
-        }
-        else {
+  case 0:
+    for (p = 0; p < n; p++) {
+      for (q = 0; q < n; q++) {
+        if (cover[p][q] == 0) {
+          canMove = True;
+        } else {
+          canMove = False;
           break;
         }
       }
-      break;
-    
-    case 1:
-      for (p = n-1; p >= 0; p--) {
-        for (q = 0; q < n; q++) {
-          if (cover[p][q] == 0) {
-            canMove = True;
-          }
-          else {
-            canMove = False;
-            break;
-          }
-        }
-        if (canMove == True) {
-          move++;
-        }
-        else {
-          break;
-        }
+      if (canMove == True) {
+        move++;
+      } else {
+        break;
       }
-      break;
+    }
+    break;
 
-    case 2:
-      for (p = 0; p < n; p++) {
-        for (q = 0; q < n; q++) {
-          if (cover[q][p] == 0) {
-            canMove = True;
-          }
-          else {
-            canMove = False;
-            break;
-          }
-        }
-        if (canMove == True) {
-          move++;
-        }
-        else {
+  case 1:
+    for (p = n-1; p >= 0; p--) {
+      for (q = 0; q < n; q++) {
+        if (cover[p][q] == 0) {
+          canMove = True;
+        } else {
+          canMove = False;
           break;
         }
       }
-      break;
-
-    case 3:
-      for (p = n - 1; p >= 0; p--) {
-        for (q = 0; q < n; q++) {
-          if (cover[q][p] == 0) {
-            canMove = True;
-          }
-          else {
-            canMove = False;
-            break;
-          }
-        }
-        if (canMove == True) {
-          move++;
-        }
-        else {
+      if (canMove == True) {
+        move++;
+      } else {
+        break;
+      }
+    }
+    break;
+  case 2:
+    for (p = 0; p < n; p++) {
+      for (q = 0; q < n; q++) {
+        if (cover[q][p] == 0) {
+          canMove = True;
+        } else {
+          canMove = False;
           break;
         }
       }
-      break;
-
-    default:
-      printf("error!\n");
+      if (canMove == True) {
+        move++;
+      } else {
+        break;
+      }
+    }
+    break;
+  case 3:
+    for (p = n - 1; p >= 0; p--) {
+      for (q = 0; q < n; q++) {
+        if (cover[q][p] == 0) {
+          canMove = True;
+        } else {
+          canMove = False;
+          break;
+        }
+      }
+      if (canMove == True) {
+        move++;
+      } else {
+        break;
+      }
+    }
+    break;
+  default:
+    printf("error!\n");
   }
 
   return move;
@@ -1483,7 +1429,7 @@ void breakConnection(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, in
   for (p = 0; p < n; p++) {
     cover_dfs[p] = (int*)malloc(n * sizeof(int));
   }
-  
+
   //ランダム順にdropするための配列
   arr_drop = (int*)malloc(*sol_size * sizeof(int));
   for (p = 0; p < *sol_size; p++) {
@@ -1512,8 +1458,7 @@ void breakConnection(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, in
       for (r = 0; r < n; r++) {
         if (cover[q][r] == 0) {
           cover_dfs[q][r] = -1;
-        }
-        else {
+        } else {
           cover_dfs[q][r] = 0;
         }
       }
@@ -1525,7 +1470,7 @@ void breakConnection(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, in
       break;
     }
   }
-  
+
   //メモリ解放
   for (p = 0; p < n; p++) {
     free(cover_dfs[p]);
