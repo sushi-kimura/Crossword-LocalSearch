@@ -444,7 +444,7 @@ int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
 
     word = (int*)malloc(n * sizeof(int));
 
-  //文字列が辞書内にあるかを調べる
+    //文字列が辞書内にあるかを調べる
     //縦
     for (p = 0; p < n; p++) {
       for (q = 0; q < n; q ++) {
@@ -523,18 +523,19 @@ int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
                   break;
                 }
               }
-           }
-           if(matching == True) {
-             inDict += length;
-             break;
-           }
+            }
+            if(matching == True) {
+              inDict += length;
+              break;
+            }
+          }
+          if(matching == False && length>1) {
+            penalty += length;
+          }
+          length=0;
+          //printf("matching=%d inDict=%d penalty=%d\n",matching,inDict,penalty);
+          matching = False;
         }
-        if(matching == False && length>1) {
-          penalty += length;
-        }
-        length=0;
-        //printf("matching=%d inDict=%d penalty=%d\n",matching,inDict,penalty);
-        matching = False;
       }
     }
   }
