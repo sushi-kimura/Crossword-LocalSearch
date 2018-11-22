@@ -72,11 +72,11 @@ int main(int argc, char *argv[]) {
   readDict(&Dict, argv[2], type);
 
   /*** InvTの領域を確保 ***/
-  for(div=0;div<2;div++) {
+  for (div=0;div<2;div++) {
     InvT[div] = (int***)malloc(Dict.m*sizeof(int**));
-    for(k=0;k<Dict.m;k++) {
+    for (k=0;k<Dict.m;k++) {
       InvT[div][k] = (int**)malloc(Dict.n*sizeof(int*));
-      for(i=0;i<Dict.n;i++) {
+      for (i=0;i<Dict.n;i++) {
         InvT[div][k][i] = (int*)malloc(Dict.n*sizeof(int));
       }
     }
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
   //ランダムにaddするために必要な配列
   int *arr_rand;
   arr_rand = (int*)malloc(t_size * sizeof(int));
-  for(p=0;p<t_size;p++) {
+  for (p=0;p<t_size;p++) {
     arr_rand[p] = p;
   }
   shuffle(arr_rand,t_size);
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
     if ((double)(clock()-start)/CLOCKS_PER_SEC > 120) {
       printf("time has come\n");
       break;
-    } else if(sol_size==Dict.m) {
+    } else if (sol_size==Dict.m) {
       printf("all words are used\n");
       break;
     }
@@ -224,8 +224,8 @@ int main(int argc, char *argv[]) {
     kick(n, &Dict, T, t_size, Sol, &sol_size, puzzle, enable, &score, cover);
 
     //移動できる方向をランダムで選び、平行移動する
-    if(movetype==1) {
-      if(move(n, &Dict, T, t_size, Sol, InvT, puzzle, &score, sol_size, enable, cover) == True) {
+    if (movetype==1) {
+      if (move(n, &Dict, T, t_size, Sol, InvT, puzzle, &score, sol_size, enable, cover) == True) {
         moveCount++;
       }
     }
@@ -435,107 +435,107 @@ int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
       }
       return score;
     }
+  }
 
-    int *word;
-    int length=0;
-    int matching = False;
-    int inDict=0;//パズルにある単語で辞書内にある単語と一致する数
-    int penalty=0;
+  int *word;
+  int length=0;
+  int matching = False;
+  int inDict=0;//パズルにある単語で辞書内にある単語と一致する数
+  int penalty=0;
 
-    word = (int*)malloc(n * sizeof(int));
+  word = (int*)malloc(n * sizeof(int));
 
-    //文字列が辞書内にあるかを調べる
-    //縦
-    for (p = 0; p < n; p++) {
-      for (q = 0; q < n; q ++) {
-        if ((p == 0 && puzzle[p][q] != False) || (p > 0 && puzzle[p - 1][q] == False && puzzle[p][q] != False)) {
-          for(r=0;r<n-p;r++) {
-            if(puzzle[p+r][q]== False) {
-              break;
-            } else {
-              word[r] = puzzle[p+r][q];
-              length++;
-            }
+  //文字列が辞書内にあるかを調べる
+  //縦
+  for (p = 0; p < n; p++) {
+    for (q = 0; q < n; q ++) {
+      if ((p == 0 && puzzle[p][q] != False) || (p > 0 && puzzle[p - 1][q] == False && puzzle[p][q] != False)) {
+        for (r=0;r<n-p;r++) {
+          if (puzzle[p+r][q]== False) {
+            break;
+          } else {
+            word[r] = puzzle[p+r][q];
+            length++;
           }
-          /*debug
-          for(r=0;r<length;r++) {
-            printf("word[%d] = %d ",r,word[r]);
-          }
-          printf("\n");
-          printf("length=%d\n",length);
-          */
+        }
+        /*debug
+        for (r=0;r<length;r++) {
+          printf("word[%d] = %d ",r,word[r]);
+        }
+        printf("\n");
+        printf("length=%d\n",length);
+        */
 
-          //wordが辞書内にあるかをチェック
-          for(r=0; r<Dict->m; r++) {
-            if(length == Dict->len[r]) {
-              for(s=0; s<length; s++) {
-                if(word[s] == Dict->x[r][s]) {
-                  matching = True;
-                } else {
-                  matching = False;
-                  break;
-                }
+        //wordが辞書内にあるかをチェック
+        for (r=0; r<Dict->m; r++) {
+          if (length == Dict->len[r]) {
+            for (s=0; s<length; s++) {
+              if (word[s] == Dict->x[r][s]) {
+                matching = True;
+              } else {
+                matching = False;
+                break;
               }
             }
-            if(matching == True) {
-              inDict += length;
-              break;
-            }
           }
-          if(matching == False && length>1) {
-            penalty += length;
+          if (matching == True) {
+            inDict += length;
+            break;
           }
-          length=0;
-          //printf("matching=%d inDict=%d penalty=%d\n",matching,inDict,penalty);
-          matching = False;
         }
+        if (matching == False && length>1) {
+          penalty += length;
+        }
+        length=0;
+        //printf("matching=%d inDict=%d penalty=%d\n",matching,inDict,penalty);
+        matching = False;
       }
     }
+  }
 
-    //横
-    for (q = 0; q < n; q++) {
-      for (p = 0; p < n; p ++) {
-        if ((q == 0 && puzzle[p][q] != False) || (q > 0 && puzzle[p][q-1] == False && puzzle[p][q] != False)) {
-          for(r=0;r<n-q;r++) {
-            if(puzzle[p][q+r] == False) {
-              break;
-            } else {
-              word[r] = puzzle[p][q+r];
-              length++;
-            }
+  //横
+  for (q = 0; q < n; q++) {
+    for (p = 0; p < n; p ++) {
+      if ((q == 0 && puzzle[p][q] != False) || (q > 0 && puzzle[p][q-1] == False && puzzle[p][q] != False)) {
+        for (r=0;r<n-q;r++) {
+          if (puzzle[p][q+r] == False) {
+            break;
+          } else {
+            word[r] = puzzle[p][q+r];
+            length++;
           }
-          /*debug
-          for(r=0;r<length;r++) {
-            printf("word[%d] = %d ",r,word[r]);
-          }
-          printf("\n");
-          printf("length=%d\n",length);
-          */
+        }
+        /*debug
+        for (r=0;r<length;r++) {
+          printf("word[%d] = %d ",r,word[r]);
+        }
+        printf("\n");
+        printf("length=%d\n",length);
+        */
 
-          //wordが辞書内にあるかをチェック
-          for (r=0; r<Dict->m; r++) {
-            if(length == Dict->len[r]) {
-              for (s=0; s<length; s++) {
-                if(word[s] == Dict->x[r][s]) {
-                  matching = True;
-                } else {
-                  matching = False;
-                  break;
-                }
+        //wordが辞書内にあるかをチェック
+        for (r=0; r<Dict->m; r++) {
+          if (length == Dict->len[r]) {
+            for (s=0; s<length; s++) {
+              if (word[s] == Dict->x[r][s]) {
+                matching = True;
+              } else {
+                matching = False;
+                break;
               }
             }
-            if(matching == True) {
-              inDict += length;
-              break;
-            }
           }
-          if(matching == False && length>1) {
-            penalty += length;
+          if (matching == True) {
+            inDict += length;
+            break;
           }
-          length=0;
-          //printf("matching=%d inDict=%d penalty=%d\n",matching,inDict,penalty);
-          matching = False;
         }
+        if (matching == False && length>1) {
+          penalty += length;
+        }
+        length=0;
+        //printf("matching=%d inDict=%d penalty=%d\n",matching,inDict,penalty);
+        matching = False;
       }
     }
   }
@@ -1143,7 +1143,7 @@ int move(int n, Dictionary *Dict,
   //平行移動する
   if (a != False) {
     //printf("--- moved (a:%d, move:%d)---\n", a, move);
-    switch(a) {
+    switch (a) {
     case 0://上
       //移動
       for (p = 0; p < n - move; p++) {
@@ -1272,19 +1272,19 @@ int move(int n, Dictionary *Dict,
     // Solを更新
     I = (int*)malloc(sol_size*sizeof(int));
     s = 0;
-    for(t=0;t<t_size;t++) {
-      if(Sol[t]==True) {
+    for (t=0;t<t_size;t++) {
+      if (Sol[t]==True) {
         I[s] = t;
         s++;
       }
     }
-    if(s!=sol_size) {
+    if (s!=sol_size) {
       fprintf(stderr,"error: something is strange.\n");
       exit(1);
     }
 
     //printf("  update Sol...(t_size=%d, a=%d, move=%d)\n", t_size, a, move);
-    for(p=0;p<sol_size;p++) {
+    for (p=0;p<sol_size;p++) {
       t = I[p];
 
       //printf("  t=%d  ",t); fflush(stdout);
@@ -1297,7 +1297,7 @@ int move(int n, Dictionary *Dict,
 
       //printf("(%d,%d,%d,%d)  ",div,k,i,j); fflush(stdout);
 
-      switch(a) {
+      switch (a) {
       case 0: //上
         i = i-move;
         break;
