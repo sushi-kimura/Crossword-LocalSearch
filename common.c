@@ -8,14 +8,14 @@
 #include "common.h"
 
 /******************** add **********************/
-int add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
+int add(int sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
   int p, q, k;
   //int *haitteta;
   int canAdd;
   int length = Dict.len[T[t].k];
 
   //単語が詰め込み可能であるかどうか
-  canAdd = check_add(t_size, Sol, sol_size, t, puzzle, enable);
+  canAdd = check_add(sol_size, t, puzzle, enable);
   if (canAdd == False) {
     return sol_size;
   }
@@ -241,7 +241,7 @@ int calc(int **puzzle, int **cover, int mode) {
 
 /******************** drop **********************/
 //指定された単語を黒白白パターンが崩れない限り削除する
-int drop(int t_size, int *Sol, int sol_size, int **puzzle, int **enable, int *score, int **cover, int t) {
+int drop(int sol_size, int **puzzle, int **enable, int *score, int **cover, int t) {
   int p,q,newScore;
   int length = Dict.len[T[t].k];
   int canDrop = True, remove = True;
@@ -403,7 +403,7 @@ int drop(int t_size, int *Sol, int sol_size, int **puzzle, int **enable, int *sc
 
 /*************************check_add*****************************/
 //add出来るならTrue,できないならFalseを返す
-int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **enable) {
+int check_add(int sol_size, int t, int **puzzle, int **enable) {
   int p, q, k;
   int crossing = False;
   int length = Dict.len[T[t].k];
@@ -677,7 +677,7 @@ END_FALSE:
 
 /*************************kick*****************************/
 //連結性が崩れている場合、scoreが一番大きい部分だけを残しdropする
-void kick(int t_size, int *Sol, int *sol_size, int **puzzle, int **enable, int *score, int **cover) {
+void kick(int *sol_size, int **puzzle, int **enable, int *score, int **cover) {
 
   if (*sol_size == 0) {
     return;
@@ -742,7 +742,7 @@ void kick(int t_size, int *Sol, int *sol_size, int **puzzle, int **enable, int *
       for (t = 0; t < t_size; t++) {
         if (Sol[t] == True) {
           if (cover_dfs[T[t].i][T[t].j] > 0 && cover_dfs[T[t].i][T[t].j] != num + 1) {
-            *sol_size = drop(t_size, Sol, *sol_size, puzzle, enable, score, cover, t);
+            *sol_size = drop(*sol_size, puzzle, enable, score, cover, t);
           }
         }
       }
@@ -794,8 +794,7 @@ void display(int **puzzle, int *score, int sol_size, int n) {
 
 /****************連結成分を移動できる方向の内ランダムに平行移動する*****************/
 
-int move(int t_size, int *Sol, int ****InvT,
-    int **puzzle, int *score, int sol_size, int **enable, int **cover) {
+int move(int ****InvT,int **puzzle, int *score, int sol_size, int **enable, int **cover) {
 
   if (sol_size == 0) {
     return False;
@@ -1102,7 +1101,7 @@ int check_move(int **puzzle, int **enable, int **cover, int direction) {
 }
 
 /*******利益計算*******/
-int calc_profit(int t_size, int *Sol) {
+int calc_profit() {
   int p, profit=0;
   for (p = 0; p < t_size; p++) {
     if (Sol[p] == True) {
@@ -1113,7 +1112,7 @@ int calc_profit(int t_size, int *Sol) {
 }
 
 /********連結性が崩れるまでdrop*******/
-void breakConnection(int t_size, int *Sol, int *sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
+void breakConnection(int *sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
   int p, q, r, count, *arr_drop, **cover_dfs;
 
   //連結性確認用配列
@@ -1138,7 +1137,7 @@ void breakConnection(int t_size, int *Sol, int *sol_size, int t, int **puzzle, i
       if (Sol[q] == True) {
         //printf("p=%d, q=%d, Sol[q]=%d, arr_drop[p]=%d\n", p, q, Sol[q], arr_drop[p]);
         if (count == arr_drop[p]) {
-          *sol_size = drop(t_size, Sol, *sol_size, puzzle, enable, score, cover, q);
+          *sol_size = drop(*sol_size, puzzle, enable, score, cover, q);
           break;
         }
         count++;
