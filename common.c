@@ -8,14 +8,14 @@
 #include "common.h"
 
 /******************** add **********************/
-int add(int sol_size, int t, int *score) {
+int add(int t) {
   int p, q, k;
   //int *haitteta;
   int canAdd;
   int length = Dict.len[T[t].k];
 
   //単語が詰め込み可能であるかどうか
-  canAdd = check_add(sol_size, t);
+  canAdd = check_add(t);
   if (canAdd == False) {
     return sol_size;
   }
@@ -35,7 +35,7 @@ int add(int sol_size, int t, int *score) {
   /*
   //解が改善しなかった場合は終了
   int newScore = calc(0);
-  if (newScore < *score) {
+  if (newScore < score) {
     for (k = 0; k < length; k++) {
       if (T[t].div == 0) {
         puzzle[T[t].i + k][T[t].j] = haitteta[k];
@@ -100,11 +100,11 @@ int add(int sol_size, int t, int *score) {
 
   // 詰め込みが可能と判定された場合:
   Sol[t] = True;
-  *score = calc(0);
+  score = calc(0);
 
   //puzzleの表示
   //printf("--- added ---\n\n");
-  //display(score, sol_size+1);
+  //display(sol_size+1);
 
   return sol_size+1;
 
@@ -241,7 +241,7 @@ int calc(int mode) {
 
 /******************** drop **********************/
 //指定された単語を黒白白パターンが崩れない限り削除する
-int drop(int sol_size, int *score, int t) {
+int drop(int t) {
   int p,q,newScore;
   int length = Dict.len[T[t].k];
   int canDrop = True, remove = True;
@@ -395,15 +395,15 @@ int drop(int sol_size, int *score, int t) {
   //Solの更新
   Sol[t] = False;
 
-  *score = newScore;
-  //display(score, sol_size-1);
+  score = newScore;
+  //display(sol_size-1);
   return sol_size - 1;
 }
 
 
 /*************************check_add*****************************/
 //add出来るならTrue,できないならFalseを返す
-int check_add(int sol_size, int t) {
+int check_add(int t) {
   int p, q, k;
   int crossing = False;
   int length = Dict.len[T[t].k];
@@ -567,7 +567,7 @@ int check_add(int sol_size, int t) {
 
 /*************************check_drop*****************************/
 //指定された単語がdrop可ならTrue,不可ならFalseを返す
-int check_drop(int sol_size, int t) {
+int check_drop(int t) {
   int p,q;
   int **cover_dfs;
   int connected;
@@ -677,9 +677,9 @@ END_FALSE:
 
 /*************************kick*****************************/
 //連結性が崩れている場合、scoreが一番大きい部分だけを残しdropする
-void kick(int *sol_size, int *score) {
+void kick() {
 
-  if (*sol_size == 0) {
+  if (sol_size == 0) {
     return;
   }
 
@@ -738,15 +738,15 @@ void kick(int *sol_size, int *score) {
     //num部分をすべてdrop
 
     while (1) {
-      r = *sol_size;
+      r = sol_size;
       for (t = 0; t < t_size; t++) {
         if (Sol[t] == True) {
           if (cover_dfs[T[t].i][T[t].j] > 0 && cover_dfs[T[t].i][T[t].j] != num + 1) {
-            *sol_size = drop(*sol_size, score, t);
+            sol_size = drop(t);
           }
         }
       }
-      if (r == *sol_size) {
+      if (r == sol_size) {
         break;
       }
     }
@@ -769,7 +769,7 @@ void shuffle(int arr[], int size) {
 }
 
 /*************パズルを表示する**************/
-void display(int *score, int sol_size) {
+void display(int sol_size) {
   int p, q;
   for (p = 0; p < n; p++) {
     for (q = 0; q < n; q++) {
@@ -789,12 +789,12 @@ void display(int *score, int sol_size) {
     }
     printf("\n");
   }
-  printf("score:%d sol_size:%d\n\n", *score, sol_size);
+  printf("score:%d sol_size:%d\n\n", score, sol_size);
 }
 
 /****************連結成分を移動できる方向の内ランダムに平行移動する*****************/
 
-int move(int ****InvT, int *score, int sol_size) {
+int move(int ****InvT) {
 
   if (sol_size == 0) {
     return False;
@@ -1014,7 +1014,7 @@ int move(int ****InvT, int *score, int sol_size) {
   }
 
 
-  //display(score, sol_size);
+  //display(sol_size);
 
   return True;
 }
@@ -1112,7 +1112,7 @@ int calc_profit() {
 }
 
 /********連結性が崩れるまでdrop*******/
-void breakConnection(int *sol_size, int t, int *score) {
+void breakConnection(int t) {
   int p, q, r, count, *arr_drop, **cover_dfs;
 
   //連結性確認用配列
@@ -1122,22 +1122,22 @@ void breakConnection(int *sol_size, int t, int *score) {
   }
 
   //ランダム順にdropするための配列
-  arr_drop = (int*)malloc(*sol_size * sizeof(int));
-  for (p = 0; p < *sol_size; p++) {
+  arr_drop = (int*)malloc(sol_size * sizeof(int));
+  for (p = 0; p < sol_size; p++) {
     arr_drop[p] = p;
   }
 
-  shuffle(arr_drop, *sol_size);
+  shuffle(arr_drop, sol_size);
 
   //連結性が崩れるまでdrop
-  for (p = 0; p < *sol_size; p++) {
+  for (p = 0; p < sol_size; p++) {
     //1つdrop
     count = 0;
     for (q = 0; q < t_size; q++) {
       if (Sol[q] == True) {
         //printf("p=%d, q=%d, Sol[q]=%d, arr_drop[p]=%d\n", p, q, Sol[q], arr_drop[p]);
         if (count == arr_drop[p]) {
-          *sol_size = drop(*sol_size, score, q);
+          sol_size = drop(q);
           break;
         }
         count++;

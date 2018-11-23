@@ -20,10 +20,8 @@ int main(int argc, char *argv[]) {
   int t = 0;        // タプル集合におけるタプルの添え字
   int code;       // 文字コード
   int ***InvT[2];   // Tの逆写像 InvT[div][k][i][j] は該当するタプルの T における添字
-  int sol_size = 0; // 解 Sol に属するタプルの個数
   int profit=0;     //重みの総和
   int moveCount = 0; //moveした回数
-  int score = 0;   //目的関数値
   int time1, time2; //処理時間計測用
   int improveCount = 0; //解の改善回数
   float white = 0; //白マス数
@@ -148,7 +146,7 @@ int main(int argc, char *argv[]) {
   while (tmp != sol_size) {
     tmp = sol_size;
     for (t = 0; t < t_size; t++) {
-      sol_size = add(sol_size, arr_rand[t], &score);
+      sol_size = add(arr_rand[t]);
     }
   }
   profit = calc_profit();
@@ -162,7 +160,7 @@ int main(int argc, char *argv[]) {
   }
 
   clock_t now = clock();//現在時間
-  display(&score, sol_size);
+  display(sol_size);
   printf("white rate:%f\n", 100 * white / (n*n));
   printf("Processing time : %f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
 
@@ -201,14 +199,14 @@ int main(int argc, char *argv[]) {
     }
 
     //連結性が崩れるまでdrop
-    breakConnection(&sol_size, t, &score);
+    breakConnection(t);
 
     //kickする
-    kick(&sol_size, &score);
+    kick();
 
     //移動できる方向をランダムで選び、平行移動する
     if (movetype==1) {
-      if (move(InvT, &score, sol_size) == True) {
+      if (move(InvT) == True) {
         moveCount++;
       }
     }
@@ -219,7 +217,7 @@ int main(int argc, char *argv[]) {
     while (tmp != sol_size) {
       tmp = sol_size;
       for (t = 0; t < t_size; t++) {
-        sol_size = add(sol_size, arr_rand[t], &score);
+        sol_size = add(arr_rand[t]);
       }
     }
 
@@ -242,7 +240,7 @@ int main(int argc, char *argv[]) {
         improveCount++;
       }
       printf("--- improved[%d] ---\n\n", improveCount);
-      display(&score, sol_size);
+      display(sol_size);
       now = clock();//現在時間
       printf("white rate:%f\n", 100 * white / (n*n));
       printf("Processing time : %f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
@@ -269,7 +267,7 @@ int main(int argc, char *argv[]) {
 
   //最終的なpuzzleの表示
   printf("--- COMPLETE ---\n\n");
-  display(&score, sol_size);
+  display(sol_size);
   printf("profit:%d\n", profit);
   now = clock();//現在時間
   printf("Processing time:%f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
