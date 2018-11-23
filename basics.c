@@ -32,14 +32,14 @@ int getDictSize(FILE *fp){
 Boolean isEnglish(FILE *fp){
   char x;
   fscanf(fp,"%c",&x);
-
+  
   printf("<%d>\n",x);
 
   if(x>=0)
     return True;
   return False;
 }
-
+ 
 /***** initialize a dictionary *****/
 void initDict(Dictionary *D, int n, char *fname){
   FILE *fp;
@@ -78,7 +78,7 @@ void initDict(Dictionary *D, int n, char *fname){
   for(l=0;l<D->letters;l++)
     D->dist[l] = 0;
   D->reduce = (int*)malloc(D->letters*sizeof(int));
-  D->reds = 0;
+  D->reds = 1;
   D->inv = (int*)malloc(D->letters*sizeof(int));
 }
 
@@ -87,7 +87,7 @@ void initDict(Dictionary *D, int n, char *fname){
 void readDict(Dictionary *D, char *fname, int type){
   FILE *fp;
   int l,i,j;
-  // read the English/Japanese dictionary
+  // read the English/Japanese dictionary 
   fp = openFile(fname,"r");
   if (D->en == True) {
     if (type == 0)
@@ -132,8 +132,8 @@ void readDictEn(Dictionary *D, FILE *fp){
     for(l=0;l<D->len[i];l++){
       code = toupper( str[l] );
       if(code < MINCODE_EN || code > MAXCODE_EN){
-	       fprintf( stderr, "error: invalid English dictionary (%s)\n", str );
-	       exit(EXIT_FAILURE);
+	fprintf( stderr, "error: invalid English dictionary (%s)\n", str );
+	exit(EXIT_FAILURE);
       }
       code = code-MINCODE_EN;
       D->w[i][l] = code;
@@ -151,7 +151,7 @@ void readDictEnWithWeight(Dictionary *D, FILE *fp){
     /* if(strlen(str)>D->n)
        continue; */
     if(strlen(str)>D->n){
-      if(fscanf(fp,"%s",profit)==EOF){ // dummy
+      if(fscanf(fp,"%s",profit)==EOF){ // dummy 
 	fprintf(stderr, "error: dictionary is strange.\n");
 	exit(1);
       }
@@ -169,8 +169,8 @@ void readDictEnWithWeight(Dictionary *D, FILE *fp){
     for(l=0;l<D->len[i];l++){
       code = toupper( str[l] );
       if(code < MINCODE_EN || code > MAXCODE_EN){
-	       fprintf( stderr, "error: invalid English dictionary (%s)\n", str );
-	       exit(EXIT_FAILURE);
+	fprintf( stderr, "error: invalid English dictionary (%s)\n", str );
+	exit(EXIT_FAILURE);
       }
       code = code-MINCODE_EN;
       D->w[i][l] = code;
@@ -182,6 +182,7 @@ void readDictEnWithWeight(Dictionary *D, FILE *fp){
 }
 
 /*** 日本語のほうは原口のソースを参考にすること ***/
+
 /***** read the Japanese dictionary (in original letters) *****/
 void readDictJa(Dictionary *D, FILE *fp){
   char x,y,z;
@@ -277,8 +278,8 @@ int getConnectedComponents( int n, int **G ){
   for(i=0;i<n;i++)
     for(j=0;j<n;j++)
       if( G[i][j] == 0 ){
-	       DFS( n, G, i, j, m );
-	       m++;
+	DFS( n, G, i, j, m );
+	m++;
       }
 
 #ifdef DEBUG
@@ -304,3 +305,4 @@ void DFS( int n, int **G, int i, int j, int m ){
   if( j<n-1 && G[i][j+1] == 0 )
     DFS( n, G, i, j+1, m );
 }
+
