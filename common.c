@@ -104,7 +104,7 @@ int add(int sol_size, int t, int **puzzle, int **enable, int *score, int **cover
 
   //puzzleの表示
   //printf("--- added ---\n\n");
-  //display(puzzle, score, sol_size+1);
+  //display(puzzle, score, sol_size+1, n);
 
   return sol_size+1;
 
@@ -396,7 +396,7 @@ int drop(int sol_size, int **puzzle, int **enable, int *score, int **cover, int 
   Sol[t] = False;
 
   *score = newScore;
-  //display(score, sol_size-1);
+  //display(score, sol_size-1, n);
   return sol_size - 1;
 }
 
@@ -769,7 +769,7 @@ void shuffle(int arr[], int size) {
 }
 
 /*************パズルを表示する**************/
-void display(int **puzzle, int *score, int sol_size) {
+void display(int **puzzle, int *score, int sol_size, int n) {
   int p, q;
   for (p = 0; p < n; p++) {
     for (q = 0; q < n; q++) {
@@ -1014,7 +1014,7 @@ int move(int ****InvT,int **puzzle, int *score, int sol_size, int **enable, int 
   }
 
 
-  //display(puzzle, score, sol_size);
+  //display(puzzle, score, sol_size, n);
 
   return True;
 }
