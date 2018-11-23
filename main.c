@@ -12,16 +12,16 @@
 #define False -2
 
 int main(int argc, char *argv[]) {
-  Dictionary Dict;
+  //Dictionary Dict;
   int div;        // 縦横の添え字
-  int n;          // 盤面の次数
+  //int n;          // 盤面の次数
   int i;          // 行の添え字
   int j;          // 列の添え字
   int k;          // 単語の添え字
   int d;          // 単語における文字の添え字
   int t = 0;        // タプル集合におけるタプルの添え字
   int code;       // 文字コード
-  Tuple *T;       // すべての可能なタプル集合
+  //Tuple *T;       // すべての可能なタプル集合
   int ***InvT[2];   // Tの逆写像 InvT[div][k][i][j] は該当するタプルの T における添字
   int *Sol;       // 解であるタプルの添字集合
   int t_size;     // T に属するタプルの個数
@@ -156,10 +156,10 @@ int main(int argc, char *argv[]) {
   while (tmp != sol_size) {
     tmp = sol_size;
     for (t = 0; t < t_size; t++) {
-      sol_size = add(n, &Dict, T, t_size, Sol, sol_size, arr_rand[t], puzzle, enable, &score, cover);
+      sol_size = add(t_size, Sol, sol_size, arr_rand[t], puzzle, enable, &score, cover);
     }
   }
-  profit = calc_profit(&Dict, T, t_size, Sol);
+  profit = calc_profit(t_size, Sol);
 
   for (p = 0; p < n; p++) {
     for (q = 0; q < n; q++) {
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
   }
 
   clock_t now = clock();//現在時間
-  display(&Dict, puzzle, &score, sol_size, n);
+  display(puzzle, &score, sol_size, n);
   printf("white rate:%f\n", 100 * white / (n*n));
   printf("Processing time : %f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
 
@@ -209,14 +209,14 @@ int main(int argc, char *argv[]) {
     }
 
     //連結性が崩れるまでdrop
-    breakConnection(n, &Dict, T, t_size, Sol, &sol_size, t, puzzle, enable, &score, cover);
+    breakConnection(t_size, Sol, &sol_size, t, puzzle, enable, &score, cover);
 
     //kickする
-    kick(n, &Dict, T, t_size, Sol, &sol_size, puzzle, enable, &score, cover);
+    kick(t_size, Sol, &sol_size, puzzle, enable, &score, cover);
 
     //移動できる方向をランダムで選び、平行移動する
     if (movetype==1) {
-      if (move(n, &Dict, T, t_size, Sol, InvT, puzzle, &score, sol_size, enable, cover) == True) {
+      if (move(t_size, Sol, InvT, puzzle, &score, sol_size, enable, cover) == True) {
         moveCount++;
       }
     }
@@ -227,11 +227,11 @@ int main(int argc, char *argv[]) {
     while (tmp != sol_size) {
       tmp = sol_size;
       for (t = 0; t < t_size; t++) {
-        sol_size = add(n, &Dict, T, t_size, Sol, sol_size, arr_rand[t], puzzle, enable, &score, cover);
+        sol_size = add(t_size, Sol, sol_size, arr_rand[t], puzzle, enable, &score, cover);
       }
     }
 
-    profit = calc_profit(&Dict, T, t_size, Sol);
+    profit = calc_profit(t_size, Sol);
 
     white = 0;
     for (p = 0; p < n; p++) {
@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
         improveCount++;
       }
       printf("--- improved[%d] ---\n\n", improveCount);
-      display(&Dict, puzzle, &score, sol_size, n);
+      display(puzzle, &score, sol_size, n);
       now = clock();//現在時間
       printf("white rate:%f\n", 100 * white / (n*n));
       printf("Processing time : %f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
 
   //最終的なpuzzleの表示
   printf("--- COMPLETE ---\n\n");
-  display(&Dict, puzzle, &score, sol_size, n);
+  display(puzzle, &score, sol_size, n);
   printf("profit:%d\n", profit);
   now = clock();//現在時間
   printf("Processing time:%f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);

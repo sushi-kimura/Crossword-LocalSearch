@@ -8,14 +8,14 @@
 #include "common.h"
 
 /******************** add **********************/
-int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
+int add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
   int p, q, k;
   //int *haitteta;
   int canAdd;
-  int length = Dict->len[T[t].k];
+  int length = Dict.len[T[t].k];
 
   //単語が詰め込み可能であるかどうか
-  canAdd = check_add(n, Dict, T, t_size, Sol, sol_size, t, puzzle, enable);
+  canAdd = check_add(t_size, Sol, sol_size, t, puzzle, enable);
   if (canAdd == False) {
     return sol_size;
   }
@@ -25,16 +25,16 @@ int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, i
   for (p = 0; p < length; p++) {
     if (T[t].div == 0) {
       //haitteta[p] = puzzle[T[t].i+p][T[t].j];
-      puzzle[T[t].i + p][T[t].j] = Dict->x[T[t].k][p];
-      //printf("<p=%d, %d>",p,Dict->x[T[t].k][p]);
+      puzzle[T[t].i + p][T[t].j] = Dict.x[T[t].k][p];
+      //printf("<p=%d, %d>",p,Dict.x[T[t].k][p]);
     } else {
       //haitteta[p] = puzzle[T[t].i][T[t].j + p];
-      puzzle[T[t].i][T[t].j + p] = Dict->x[T[t].k][p];
+      puzzle[T[t].i][T[t].j + p] = Dict.x[T[t].k][p];
     }
   }
   /*
   //解が改善しなかった場合は終了
-  int newScore = calc(n, Dict, puzzle, cover, 0);
+  int newScore = calc(puzzle, cover, 0);
   if (newScore < *score) {
     for (k = 0; k < length; k++) {
       if (T[t].div == 0) {
@@ -100,11 +100,11 @@ int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, i
 
   // 詰め込みが可能と判定された場合:
   Sol[t] = True;
-  *score = calc(n, Dict, puzzle, cover, 0);
+  *score = calc(puzzle, cover, 0);
 
   //puzzleの表示
   //printf("--- added ---\n\n");
-  //display(Dict, puzzle, score, sol_size+1, n);
+  //display(puzzle, score, sol_size+1, n);
 
   return sol_size+1;
 
@@ -116,7 +116,7 @@ END:
 
 /******************** calc **********************/
 //mode=0のときはcover配列上の値の合計を返す。
-int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
+int calc(int **puzzle, int **cover, int mode) {
   int p, q, r, s;
   int score=0;
 
@@ -159,10 +159,10 @@ int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
         */
 
         //wordが辞書内にあるかをチェック
-        for (r=0; r<Dict->m; r++) {
-          if (length == Dict->len[r]) {
+        for (r=0; r<Dict.m; r++) {
+          if (length == Dict.len[r]) {
             for (s=0; s<length; s++) {
-              if (word[s] == Dict->x[r][s]) {
+              if (word[s] == Dict.x[r][s]) {
                 matching = True;
               } else {
                 matching = False;
@@ -206,10 +206,10 @@ int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
         */
 
         //wordが辞書内にあるかをチェック
-        for (r=0; r<Dict->m; r++) {
-          if (length == Dict->len[r]) {
+        for (r=0; r<Dict.m; r++) {
+          if (length == Dict.len[r]) {
             for (s=0; s<length; s++) {
-              if (word[s] == Dict->x[r][s]) {
+              if (word[s] == Dict.x[r][s]) {
                 matching = True;
               } else {
                 matching = False;
@@ -241,9 +241,9 @@ int calc(int n, Dictionary *Dict, int **puzzle, int **cover, int mode) {
 
 /******************** drop **********************/
 //指定された単語を黒白白パターンが崩れない限り削除する
-int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, int **puzzle, int **enable, int *score, int **cover, int t) {
+int drop(int t_size, int *Sol, int sol_size, int **puzzle, int **enable, int *score, int **cover, int t) {
   int p,q,newScore;
-  int length = Dict->len[T[t].k];
+  int length = Dict.len[T[t].k];
   int canDrop = True, remove = True;
 
   //sol_size=0のときはdrop不可
@@ -295,16 +295,16 @@ int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, 
   }
 
   //scoreの更新
-  newScore = calc(n, Dict, puzzle, cover, 0);
+  newScore = calc(puzzle, cover, 0);
   //puzzleの表示
   /*
   printf("--- dropped ---\n");
   printf("[");
   for (p = 0; p < length; p++) {
-      if (Dict->en == False) {
-        printf("%s", decoder(Dict->inv[Dict->x[T[t].k][p]] + MINCODE_JA));
+      if (Dict.en == False) {
+        printf("%s", decoder(Dict.inv[Dict.x[T[t].k][p]] + MINCODE_JA));
       } else {
-        printf("%c", Dict->inv[Dict->x[T[t].k][p]] + MINCODE_EN);
+        printf("%c", Dict.inv[Dict.x[T[t].k][p]] + MINCODE_EN);
       }
   }
   printf("] i=%d, j=%d\n",T[t].i,T[t].j);
@@ -396,17 +396,17 @@ int drop(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, 
   Sol[t] = False;
 
   *score = newScore;
-  //display(Dict, puzzle, score, sol_size-1, n);
+  //display(score, sol_size-1, n);
   return sol_size - 1;
 }
 
 
 /*************************check_add*****************************/
 //add出来るならTrue,できないならFalseを返す
-int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, int t, int **puzzle, int **enable) {
+int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **enable) {
   int p, q, k;
   int crossing = False;
-  int length = Dict->len[T[t].k];
+  int length = Dict.len[T[t].k];
 
   //ひとつも単語が使われてない時はTrue
   if (sol_size == 0) {
@@ -434,15 +434,15 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
   for (p = 0; p < length; p++) {
     if (T[t].div == 0 && puzzle[T[t].i + p][T[t].j] != False) {
       crossing = True;
-      if (puzzle[T[t].i + p][T[t].j] != Dict->x[T[t].k][p]) {
-        //printf("puzzle=%d, Dict=%d\n", puzzle[T[t].i + p][T[t].j], Dict->x[T[t].k][p]);
+      if (puzzle[T[t].i + p][T[t].j] != Dict.x[T[t].k][p]) {
+        //printf("puzzle=%d, Dict=%d\n", puzzle[T[t].i + p][T[t].j], Dict.x[T[t].k][p]);
         crossing = False;
         break;
       }
     } else if (T[t].div == 1 && puzzle[T[t].i][T[t].j + p] != False) {
       crossing = True;
-      if (puzzle[T[t].i][T[t].j + p] != Dict->x[T[t].k][p]) {
-        //printf("puzzle=%d, Dict=%d\n", puzzle[T[t].i][T[t].j + p], Dict->x[T[t].k][p]);
+      if (puzzle[T[t].i][T[t].j + p] != Dict.x[T[t].k][p]) {
+        //printf("puzzle=%d, Dict=%d\n", puzzle[T[t].i][T[t].j + p], Dict.x[T[t].k][p]);
         crossing = False;
         break;
       }
@@ -453,25 +453,25 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
       for (p = 0; p < length; p++) {
         if (T[t].div == 0) {
           if (enable[T[t].i + p][T[t].j] == False) {
-            //printf("! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i+p][T[t].j], Dict->x[T[t].k][p] );
+            //printf("! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i+p][T[t].j], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
           if (puzzle[T[t].i + p][T[t].j] != False &&
-            puzzle[T[t].i + p][T[t].j] != Dict->x[T[t].k][p]) {
-            //printf("# <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i+p][T[t].j], Dict->x[T[t].k][p] );
+            puzzle[T[t].i + p][T[t].j] != Dict.x[T[t].k][p]) {
+            //printf("# <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i+p][T[t].j], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
         } else {
           if (enable[T[t].i][T[t].j + p] == False) {
-            // printf("!! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict->x[T[t].k][p] );
+            // printf("!! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
           if (puzzle[T[t].i][T[t].j + p] != False &&
-            puzzle[T[t].i][T[t].j + p] != Dict->x[T[t].k][p]) {
-            //printf("## <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict->x[T[t].k][p] );
+            puzzle[T[t].i][T[t].j + p] != Dict.x[T[t].k][p]) {
+            //printf("## <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
@@ -499,10 +499,10 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
   /*
   printf("[");
   for (p = 0; p < length; p++) {
-    if (Dict->en == False) {
-      printf("%s", decoder(Dict->inv[Dict->x[T[t].k][p]] + MINCODE_JA));
+    if (Dict.en == False) {
+      printf("%s", decoder(Dict.inv[Dict.x[T[t].k][p]] + MINCODE_JA));
     } else {
-      printf("%c", Dict->inv[Dict->x[T[t].k][p]] + MINCODE_EN);
+      printf("%c", Dict.inv[Dict.x[T[t].k][p]] + MINCODE_EN);
     }
   }
   printf("] i=%d, j=%d, div=%d\n", T[t].i, T[t].j, T[t].div);
@@ -567,12 +567,12 @@ int check_add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_s
 
 /*************************check_drop*****************************/
 //指定された単語がdrop可ならTrue,不可ならFalseを返す
-int check_drop(int n, Dictionary *Dict, Tuple *T, int sol_size, int **cover, int t) {
+int check_drop(int sol_size, int **cover, int t) {
   int p,q;
   int **cover_dfs;
   int connected;
   int canDrop = False;
-  int length = Dict->len[T[t].k];
+  int length = Dict.len[T[t].k];
 
   //sol_size=0のときはdrop不可
   if (sol_size == 0) {
@@ -677,7 +677,7 @@ END_FALSE:
 
 /*************************kick*****************************/
 //連結性が崩れている場合、scoreが一番大きい部分だけを残しdropする
-void kick(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int *sol_size, int **puzzle, int **enable, int *score, int **cover) {
+void kick(int t_size, int *Sol, int *sol_size, int **puzzle, int **enable, int *score, int **cover) {
 
   if (*sol_size == 0) {
     return;
@@ -742,7 +742,7 @@ void kick(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int *sol_size
       for (t = 0; t < t_size; t++) {
         if (Sol[t] == True) {
           if (cover_dfs[T[t].i][T[t].j] > 0 && cover_dfs[T[t].i][T[t].j] != num + 1) {
-            *sol_size = drop(n, Dict, T, t_size, Sol, *sol_size, puzzle, enable, score, cover, t);
+            *sol_size = drop(t_size, Sol, *sol_size, puzzle, enable, score, cover, t);
           }
         }
       }
@@ -769,18 +769,18 @@ void shuffle(int arr[], int size) {
 }
 
 /*************パズルを表示する**************/
-void display(Dictionary *Dict, int **puzzle, int *score, int sol_size, int n) {
+void display(int **puzzle, int *score, int sol_size, int n) {
   int p, q;
   for (p = 0; p < n; p++) {
     for (q = 0; q < n; q++) {
       if (puzzle[p][q] >= 0) {
-        if (Dict->en == False) {
-          printf("%s", decoder(Dict->inv[puzzle[p][q]] + MINCODE_JA));
+        if (Dict.en == False) {
+          printf("%s", decoder(Dict.inv[puzzle[p][q]] + MINCODE_JA));
         } else {
-          printf("%c ", Dict->inv[puzzle[p][q]] + MINCODE_EN);
+          printf("%c ", Dict.inv[puzzle[p][q]] + MINCODE_EN);
         }
       } else {
-        if (Dict->en == False) {
+        if (Dict.en == False) {
           printf("□");
         } else {
           printf("- ");
@@ -794,8 +794,7 @@ void display(Dictionary *Dict, int **puzzle, int *score, int sol_size, int n) {
 
 /****************連結成分を移動できる方向の内ランダムに平行移動する*****************/
 
-int move(int n, Dictionary *Dict,
-    Tuple *T, int t_size, int *Sol, int ****InvT,
+int move(int t_size, int *Sol, int ****InvT,
     int **puzzle, int *score, int sol_size, int **enable, int **cover) {
 
   if (sol_size == 0) {
@@ -809,7 +808,7 @@ int move(int n, Dictionary *Dict,
   //方向を決める
   shuffle(direction, 4);
 
-  move = check_move(n, puzzle, enable, cover, direction[0]);
+  move = check_move(puzzle, enable, cover, direction[0]);
   if (move == 0) {
     return False;
   }
@@ -1016,13 +1015,13 @@ int move(int n, Dictionary *Dict,
   }
 
 
-  //display(Dict, puzzle, score, sol_size, n);
+  //display(puzzle, score, sol_size, n);
 
   return True;
 }
 
 /***********指定された方向に何マス平行移動できるかを返す関数************/
-int check_move(int n, int **puzzle, int **enable, int **cover, int direction) {
+int check_move(int **puzzle, int **enable, int **cover, int direction) {
   int p, q, move=0, canMove = False;
 
   switch (direction) {
@@ -1103,18 +1102,18 @@ int check_move(int n, int **puzzle, int **enable, int **cover, int direction) {
 }
 
 /*******利益計算*******/
-int calc_profit(Dictionary *Dict, Tuple *T, int t_size, int *Sol) {
+int calc_profit(int t_size, int *Sol) {
   int p, profit=0;
   for (p = 0; p < t_size; p++) {
     if (Sol[p] == True) {
-      profit += Dict->p[T[p].k];
+      profit += Dict.p[T[p].k];
     }
   }
   return profit;
 }
 
 /********連結性が崩れるまでdrop*******/
-void breakConnection(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int *sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
+void breakConnection(int t_size, int *Sol, int *sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
   int p, q, r, count, *arr_drop, **cover_dfs;
 
   //連結性確認用配列
@@ -1139,7 +1138,7 @@ void breakConnection(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, in
       if (Sol[q] == True) {
         //printf("p=%d, q=%d, Sol[q]=%d, arr_drop[p]=%d\n", p, q, Sol[q], arr_drop[p]);
         if (count == arr_drop[p]) {
-          *sol_size = drop(n, Dict, T, t_size, Sol, *sol_size, puzzle, enable, score, cover, q);
+          *sol_size = drop(t_size, Sol, *sol_size, puzzle, enable, score, cover, q);
           break;
         }
         count++;
