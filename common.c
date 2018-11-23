@@ -131,8 +131,8 @@ int calc(int **puzzle, int **cover, int mode) {
 
   int *word;
   int length=0;
-  int matching = False;
-  int inDict=0;//パズルにある単語で辞書内にある単語と一致する数
+  int matching=False;
+  int inDict=0; //パズルにある単語で辞書内にある単語と一致する数
   int penalty=0;
 
   word = (int*)malloc(n * sizeof(int));

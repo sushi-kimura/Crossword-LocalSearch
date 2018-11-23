@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
   int *Sol;       // 解であるタプルの添字集合
   int t_size;     // T に属するタプルの個数
   int sol_size = 0; // 解 Sol に属するタプルの個数
-  int profit=0;     //重みの総和
+  int profit = 0;     //重みの総和
   int moveCount = 0; //moveした回数
   int score = 0;   //目的関数値
   int time1, time2; //処理時間計測用

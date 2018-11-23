@@ -1,7 +1,9 @@
 /******************** common.h ********************/
+/***** Global variables ******/
 int n;
 Dictionary Dict;
 Tuple *T;       // すべての可能なタプル集合
+
 /***** subroutines *****/
 int add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **enable, int *score, int **cover);
 int drop(int t_size, int *Sol, int sol_size, int **puzzle, int **enable, int *score, int **cover, int t);
@@ -18,3 +20,10 @@ void breakConnection(int t_size, int *Sol, int *sol_size, int t, int **puzzle, i
 
 /***** Fortran subroutines *****/
 extern void addab_(int *a, int *b);
+extern void addab2c_(int *a, int *b, int *c);
+/* << how to use fortran subroutine in C program. >>
+// prease write this code on main.c:
+  int a=5, b=10, c;
+  addab2c_(&a,&b,&c);
+  printf("c: %d\n",c);
+*/
