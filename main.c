@@ -125,9 +125,14 @@ int main(int argc, char *argv[]) {
 
   //cover配列の準備
   int **cover;
-  cover = (int**)calloc(n, sizeof(int*));
+  cover = (int**)malloc(n * sizeof(int*));
   for (p = 0; p < n; p++) {
-    cover[p] = (int*)calloc(n, sizeof(int));
+    cover[p] = (int*)malloc(n * sizeof(int));
+  }
+  for (p = 0; p < n; p++) {
+      for (q = 0; q < n; q++) {
+          cover[p][q] = 0;
+      }
   }
 
   /*** 解の準備 ***/
