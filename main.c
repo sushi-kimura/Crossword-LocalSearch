@@ -12,16 +12,13 @@
 #define False -2
 
 int main(int argc, char *argv[]) {
-  //Dictionary Dict;
   int div;        // 縦横の添え字
-  //int n;          // 盤面の次数
   int i;          // 行の添え字
   int j;          // 列の添え字
   int k;          // 単語の添え字
   int d;          // 単語における文字の添え字
   int t = 0;        // タプル集合におけるタプルの添え字
   int code;       // 文字コード
-  //Tuple *T;       // すべての可能なタプル集合
   int ***InvT[2];   // Tの逆写像 InvT[div][k][i][j] は該当するタプルの T における添字
   int *Sol;       // 解であるタプルの添字集合
   int t_size;     // T に属するタプルの個数
