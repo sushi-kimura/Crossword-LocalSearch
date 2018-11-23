@@ -91,8 +91,6 @@ int main(int argc, char *argv[]) {
   t_size = t;
 
   //パズルの盤面と禁止マスの準備
-  int **puzzle;
-  int **enable;
   int **tmp_puzzle;
   int **tmp_cover;
   int **tmp_enable;
@@ -119,7 +117,6 @@ int main(int argc, char *argv[]) {
   }
 
   //cover配列の準備
-  int **cover;
   cover = (int**)malloc(n * sizeof(int*));
   for (p = 0; p < n; p++) {
     cover[p] = (int*)malloc(n * sizeof(int));
@@ -151,7 +148,7 @@ int main(int argc, char *argv[]) {
   while (tmp != sol_size) {
     tmp = sol_size;
     for (t = 0; t < t_size; t++) {
-      sol_size = add(sol_size, arr_rand[t], puzzle, enable, &score, cover);
+      sol_size = add(sol_size, arr_rand[t], &score);
     }
   }
   profit = calc_profit();
@@ -165,7 +162,7 @@ int main(int argc, char *argv[]) {
   }
 
   clock_t now = clock();//現在時間
-  display(puzzle, &score, sol_size);
+  display(&score, sol_size);
   printf("white rate:%f\n", 100 * white / (n*n));
   printf("Processing time : %f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
 
@@ -204,14 +201,14 @@ int main(int argc, char *argv[]) {
     }
 
     //連結性が崩れるまでdrop
-    breakConnection(&sol_size, t, puzzle, enable, &score, cover);
+    breakConnection(&sol_size, t, &score);
 
     //kickする
-    kick(&sol_size, puzzle, enable, &score, cover);
+    kick(&sol_size, &score);
 
     //移動できる方向をランダムで選び、平行移動する
     if (movetype==1) {
-      if (move(InvT, puzzle, &score, sol_size, enable, cover) == True) {
+      if (move(InvT, &score, sol_size) == True) {
         moveCount++;
       }
     }
@@ -222,7 +219,7 @@ int main(int argc, char *argv[]) {
     while (tmp != sol_size) {
       tmp = sol_size;
       for (t = 0; t < t_size; t++) {
-        sol_size = add(sol_size, arr_rand[t], puzzle, enable, &score, cover);
+        sol_size = add(sol_size, arr_rand[t], &score);
       }
     }
 
@@ -245,7 +242,7 @@ int main(int argc, char *argv[]) {
         improveCount++;
       }
       printf("--- improved[%d] ---\n\n", improveCount);
-      display(puzzle, &score, sol_size);
+      display(&score, sol_size);
       now = clock();//現在時間
       printf("white rate:%f\n", 100 * white / (n*n));
       printf("Processing time : %f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
@@ -272,7 +269,7 @@ int main(int argc, char *argv[]) {
 
   //最終的なpuzzleの表示
   printf("--- COMPLETE ---\n\n");
-  display(puzzle, &score, sol_size);
+  display(&score, sol_size);
   printf("profit:%d\n", profit);
   now = clock();//現在時間
   printf("Processing time:%f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
