@@ -7,15 +7,12 @@
 #include "basics.h"
 #include "common.h"
 
-#define True -1
-#define False -2
 /******************** add **********************/
 int add(int n, Dictionary *Dict, Tuple *T, int t_size, int *Sol, int sol_size, int t, int **puzzle, int **enable, int *score, int **cover) {
   int p, q, k;
   //int *haitteta;
   int canAdd;
   int length = Dict->len[T[t].k];
-
 
   //単語が詰め込み可能であるかどうか
   canAdd = check_add(n, Dict, T, t_size, Sol, sol_size, t, puzzle, enable);
