@@ -19,7 +19,7 @@ int check_add(int t);
 int check_drop(int t);
 void kick();
 void shuffle(int arr[], int size);
-void display();
+void display(int sol_size);
 int move(int ****InvT);
 int check_move(int direction);
 int calc_profit();

@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
   }
 
   clock_t now = clock();//現在時間
-  display();
+  display(sol_size);
   printf("white rate:%f\n", 100 * white / (n*n));
   printf("Processing time : %f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
 
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
         improveCount++;
       }
       printf("--- improved[%d] ---\n\n", improveCount);
-      display();
+      display(sol_size);
       now = clock();//現在時間
       printf("white rate:%f\n", 100 * white / (n*n));
       printf("Processing time : %f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
 
   //最終的なpuzzleの表示
   printf("--- COMPLETE ---\n\n");
-  display();
+  display(sol_size);
   printf("profit:%d\n", profit);
   now = clock();//現在時間
   printf("Processing time:%f[s]\n", (double)(now - start) / CLOCKS_PER_SEC);
