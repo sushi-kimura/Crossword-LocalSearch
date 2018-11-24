@@ -671,7 +671,7 @@ void kick(int t_size, int *Sol, int *sol_size, int **puzzle, int **enable, int *
     return;
   }
 
-  int p, q,r, t, connected, num=0;
+  int p, q, r, t, connected, num=0;
   int **cover_dfs;
 
   cover_dfs = (int**)malloc(n * sizeof(int*));
