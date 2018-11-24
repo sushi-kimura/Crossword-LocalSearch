@@ -17,6 +17,8 @@ int move(int t_size, int *Sol, int ****InvT, int **puzzle, int *score, int sol_s
 int check_move(int **puzzle, int **enable, int **cover, int direction);
 int calc_profit(int t_size, int *Sol);
 void breakConnection(int t_size, int *Sol, int *sol_size, int t, int **puzzle, int **enable, int *score, int **cover);
+int black_connection_max(int **cover);
+int black_max_count(int **cover, int connection_count);
 
 /***** Fortran subroutines *****/
 extern void addab_(int *a, int *b);

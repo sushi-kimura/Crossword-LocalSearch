@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
     kick(t_size, Sol, &sol_size, puzzle, enable, &score, cover);
 
     //移動できる方向をランダムで選び、平行移動する
-    if (movetype==1) {
+    if (movetype == 1) {
       if (move(t_size, Sol, InvT, puzzle, &score, sol_size, enable, cover) == True) {
         moveCount++;
       }
@@ -240,12 +240,13 @@ int main(int argc, char *argv[]) {
     }
 
     //改善していれば繰り返す
-    if ((white > tmp_white) || (white == tmp_white && score >= tmp_score)) {
+    //if ((white > tmp_white) || (white == tmp_white && score >= tmp_score)) {
+    int tmp_black_count = black_connection_max(tmp_cover);
+    int black_count = black_connection_max(cover);
+    if (black_count < tmp_black_count || (black_count == tmp_black_count && black_max_count(cover, black_count) < black_max_count(tmp_cover, black_count))) {
       changed = False;
       //改善解の表示
-      if (white > tmp_white) {
-        improveCount++;
-      }
+      improveCount++;
       printf("--- improved[%d] ---\n\n", improveCount);
       display(puzzle, &score, sol_size, n);
       now = clock();//現在時間

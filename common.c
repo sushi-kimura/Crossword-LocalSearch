@@ -781,9 +781,7 @@ void display(int **puzzle, int *score, int sol_size, int n) {
 }
 
 /****************連結成分を移動できる方向の内ランダムに平行移動する*****************/
-
-int move(int t_size, int *Sol, int ****InvT,
-    int **puzzle, int *score, int sol_size, int **enable, int **cover) {
+int move(int t_size, int *Sol, int ****InvT, int **puzzle, int *score, int sol_size, int **enable, int **cover) {
 
   if (sol_size == 0) {
     return False;
@@ -1157,4 +1155,109 @@ void breakConnection(int t_size, int *Sol, int *sol_size, int t, int **puzzle, i
   }
   free(cover_dfs);
   free(arr_drop);
+}
+
+/*************************黒マスの最大連結数を返す*****************************/
+int black_connection_max(int **cover) {
+
+  int p, q, connected, max=0;
+  int **cover_dfs;
+
+  cover_dfs = (int**)malloc(n * sizeof(int*));
+  for (p = 0; p < n; p++) {
+    cover_dfs[p] = (int*)malloc(n * sizeof(int));
+  }
+
+  //cover_dfsを作成
+  for (p = 0; p < n; p++) {
+    for (q = 0; q < n; q++) {
+      if (cover[p][q] == 0) {
+        cover_dfs[p][q] = 0;
+      } else {
+        cover_dfs[p][q] = -1;
+      }
+    }
+  }
+
+  //連結成分に採番
+  connected = getConnectedComponents(n, cover_dfs);
+
+  int *arr_score;
+  arr_score = (int*)calloc(n*n/2 , sizeof(int*));
+
+  //連結成分ごとのスコアを計算
+  for (p = 0; p < n; p++) {
+    for (q = 0; q < n; q++) {
+      if (cover_dfs[p][q] > 0) {
+        arr_score[cover_dfs[p][q] - 1] ++;
+      }
+    }
+  }
+
+  //スコアが一番大きい成分の番号を決定
+  for (p = 0; p < n*n/2; p++) {
+    if (arr_score[p] > max) {
+      max = arr_score[p];
+    }
+  }
+
+  for (p = 0; p < n; p++) {
+    free(cover_dfs[p]);
+  }
+  free(cover_dfs);
+  free(arr_score);
+
+  return max;
+}
+
+/*************************指定された黒マス連結成分の総数を返す*****************************/
+int black_max_count(int **cover, int connection_count) {
+
+  int p, q, connected, count=0;
+  int **cover_dfs;
+
+  cover_dfs = (int**)malloc(n * sizeof(int*));
+  for (p = 0; p < n; p++) {
+    cover_dfs[p] = (int*)malloc(n * sizeof(int));
+  }
+
+  //cover_dfsを作成
+  for (p = 0; p < n; p++) {
+    for (q = 0; q < n; q++) {
+      if (cover[p][q] == 0) {
+        cover_dfs[p][q] = 0;
+      } else {
+        cover_dfs[p][q] = -1;
+      }
+    }
+  }
+
+  //連結成分に採番
+  connected = getConnectedComponents(n, cover_dfs);
+
+  int *arr_score;
+  arr_score = (int*)calloc(n*n/2 , sizeof(int*));
+
+  //連結成分ごとのスコアを計算
+  for (p = 0; p < n; p++) {
+    for (q = 0; q < n; q++) {
+      if (cover_dfs[p][q] > 0) {
+        arr_score[cover_dfs[p][q] - 1] ++;
+      }
+    }
+  }
+
+  //スコアが一番大きい成分の番号を決定
+  for (p = 0; p < n*n/2; p++) {
+    if (arr_score[p] == connection_count) {
+      count++;
+    }
+  }
+
+  for (p = 0; p < n; p++) {
+    free(cover_dfs[p]);
+  }
+  free(cover_dfs);
+  free(arr_score);
+  return count;
 }
