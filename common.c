@@ -448,37 +448,25 @@ int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **ena
       }
     }
   }
-  for (p = 0; p < length; p++) {
-    if (crossing == True) {
+
+  if (crossing == True) {
       for (p = 0; p < length; p++) {
-        if (T[t].div == 0) {
+        if (T[t].div == 0) { //縦
           if (enable[T[t].i+p][T[t].j] == False) {
             //printf("! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i+p][T[t].j], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
-          if (puzzle[T[t].i+p][T[t].j] != False &&
-            puzzle[T[t].i+p][T[t].j] != Dict.x[T[t].k][p]) {
-            //printf("# <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i+p][T[t].j], Dict.x[T[t].k][p] );
-            crossing = False;
-            break;
-          }
-        } else {
+        } else { //横
           if (enable[T[t].i][T[t].j+p] == False) {
             // printf("!! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict.x[T[t].k][p] );
-            crossing = False;
-            break;
-          }
-          if (puzzle[T[t].i][T[t].j+p] != False &&
-            puzzle[T[t].i][T[t].j+p] != Dict.x[T[t].k][p]) {
-            //printf("## <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
         }
       }
     }
-  }
+
   if (crossing == False) {
     return False;
   }
