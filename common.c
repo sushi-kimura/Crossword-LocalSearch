@@ -452,25 +452,25 @@ int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **ena
     if (crossing == True) {
       for (p = 0; p < length; p++) {
         if (T[t].div == 0) {
-          if (enable[T[t].i + p][T[t].j] == False) {
+          if (enable[T[t].i+p][T[t].j] == False) {
             //printf("! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i+p][T[t].j], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
-          if (puzzle[T[t].i + p][T[t].j] != False &&
-            puzzle[T[t].i + p][T[t].j] != Dict.x[T[t].k][p]) {
+          if (puzzle[T[t].i+p][T[t].j] != False &&
+            puzzle[T[t].i+p][T[t].j] != Dict.x[T[t].k][p]) {
             //printf("# <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i+p][T[t].j], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
         } else {
-          if (enable[T[t].i][T[t].j + p] == False) {
+          if (enable[T[t].i][T[t].j+p] == False) {
             // printf("!! <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict.x[T[t].k][p] );
             crossing = False;
             break;
           }
-          if (puzzle[T[t].i][T[t].j + p] != False &&
-            puzzle[T[t].i][T[t].j + p] != Dict.x[T[t].k][p]) {
+          if (puzzle[T[t].i][T[t].j+p] != False &&
+            puzzle[T[t].i][T[t].j+p] != Dict.x[T[t].k][p]) {
             //printf("## <p=%d (%d,%d) k=%d: %d %d>", p, T[t].i, T[t].j, T[t].k, puzzle[T[t].i][T[t].j+p], Dict.x[T[t].k][p] );
             crossing = False;
             break;
@@ -511,22 +511,22 @@ int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **ena
 
   //交差部分以外のマスで隣に文字が入っている場合、add不可（？）
   for (p = 0; p < length; p++) {
-    if (T[t].div == 0 && puzzle[T[t].i + p][T[t].j] == False) {
+    if (T[t].div == 0 && puzzle[T[t].i+p][T[t].j] == False) {
       //左
-      if (T[t].j > 0 && puzzle[T[t].i + p][T[t].j - 1] != False) {
+      if (T[t].j > 0 && puzzle[T[t].i+p][T[t].j-1] != False) {
         return False;
       }
       //右
-      if (T[t].j < n-1 && puzzle[T[t].i + p][T[t].j + 1] != False) {
+      if (T[t].j < n-1 && puzzle[T[t].i+p][T[t].j+1] != False) {
         return False;
       }
-    } else if (T[t].div == 1 && puzzle[T[t].i][T[t].j + p] == False) {
+    } else if (T[t].div == 1 && puzzle[T[t].i][T[t].j+p] == False) {
       //上
-      if (T[t].i > 0 && puzzle[T[t].i - 1][T[t].j + p] != False) {
+      if (T[t].i > 0 && puzzle[T[t].i-1][T[t].j+p] != False) {
         return False;
       }
       //下
-      if (T[t].i < n-1 && puzzle[T[t].i + 1][T[t].j + p] != False) {
+      if (T[t].i < n-1 && puzzle[T[t].i+1][T[t].j+p] != False) {
         return False;
       }
     }
@@ -535,12 +535,12 @@ int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **ena
   //単語を配置するマスに禁止マスがある場合add不可
   if (T[t].div == 0) { //縦
     for (p = 0; p < length; p++) {
-      if (enable[T[t].i + p][T[t].j] == False) {
+      if (enable[T[t].i+p][T[t].j] == False) {
         return False;
       }
     }
     //単語の前後に既に文字が入っている場合add不可
-    if (T[t].i > 0 && puzzle[T[t].i - 1][T[t].j] != False) {
+    if (T[t].i > 0 && puzzle[T[t].i-1][T[t].j] != False) {
       return False;
     }
     if (T[t].i + length < n && puzzle[T[t].i + length][T[t].j] != False) {
@@ -548,12 +548,12 @@ int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **ena
     }
   } else { //横
     for (p = 0; p < length; p++) {
-      if (enable[T[t].i][T[t].j + p] == False) {
+      if (enable[T[t].i][T[t].j+p] == False) {
         return False;
       }
     }
     //単語の前後に既に文字が入っている場合add不可
-    if (T[t].j > 0 && puzzle[T[t].i][T[t].j - 1] != False) {
+    if (T[t].j > 0 && puzzle[T[t].i][T[t].j-1] != False) {
       return False;
     }
     if (T[t].j + length < n && puzzle[T[t].i][T[t].j + length] != False) {
