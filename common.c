@@ -531,7 +531,7 @@ int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **ena
     if (T[t].i > 0 && puzzle[T[t].i-1][T[t].j] != False) {
       return False;
     }
-    if (T[t].i + length < n && puzzle[T[t].i + length][T[t].j] != False) {
+    if (T[t].i+length < n && puzzle[T[t].i + length][T[t].j] != False) {
       return False;
     }
   } else { //横
@@ -544,7 +544,7 @@ int check_add(int t_size, int *Sol, int sol_size, int t, int **puzzle, int **ena
     if (T[t].j > 0 && puzzle[T[t].i][T[t].j-1] != False) {
       return False;
     }
-    if (T[t].j + length < n && puzzle[T[t].i][T[t].j + length] != False) {
+    if (T[t].j+length < n && puzzle[T[t].i][T[t].j + length] != False) {
       return False;
     }
   }
