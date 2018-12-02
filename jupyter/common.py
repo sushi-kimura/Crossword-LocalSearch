@@ -6,10 +6,6 @@ import itertools
 import sys
 import copy
 
-from IPython.display import display
-from PIL import Image
-from IPython.display import HTML
-
 class Puzzle():
     def __init__(self, width, height, msg=True):
         self.width = width
