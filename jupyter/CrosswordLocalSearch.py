@@ -15,11 +15,10 @@ from common import *
 
 # Set variables
 fpath = "../dict/countries.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports
-width = 10
-height = 10
-randomSeed = 10
+width = 15
+height = 15
+randomSeed = 1
 withweight = False
-takemove = True
 
 # Set a seed
 seed(seed = randomSeed)

@@ -18,6 +18,7 @@ class Puzzle():
         self.usedPlcIdx = np.full(width*height, -1, dtype = "int64")
         self.solSize = 0
         self.initSol = False
+        self.dictType = None
 
         ## Message
         if msg == True:
@@ -169,8 +170,11 @@ class Puzzle():
 
     ### show
     def show(self, ndarray):
-        ndarr = np.where(ndarray == "", " ", ndarray)
-        print(ndarr)
+        if self.dictType == "English":
+            ndarr = np.where(ndarray == "", "-", ndarray)
+        elif self.dictType == "Japanese" or self.dictType == "Kanji":
+            ndarr = np.where(ndarray == "", "⬜︎", ndarray)
+        print("\n".join([" ".join(map(str, l)) for l in ndarr]))
 
     ### DFS
     def DFS(self, i, j, ccl):
@@ -189,6 +193,7 @@ class Puzzle():
         if dictionary is None or placeable is None or objFunc is None or optimizer is None:
             sys.stderr.write("error: usage .compile(dictionary, placeable, objFunc, optimizer)")
             sys.exit()
+        self.dictType = dictionary.dictType
         self.objFunc = objFunc
         self.optimizer = optimizer
         self.optimizer.puzzle = self
@@ -507,6 +512,7 @@ class Optimizer():
             print("Interim solution:")
             self.puzzle.show(self.puzzle.cell)
         for ep in range(1,epock+1):
+            print("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
             print("Epock %d/%d" % (ep, epock))
             ## Obtain a neighbor solution
             # Copy the Puzzle object and objective function
