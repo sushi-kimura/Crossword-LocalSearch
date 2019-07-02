@@ -892,7 +892,8 @@ setattr(Puzzle, "drop", drop)
 # これによって、初期解の情報をある程度保ちつつ、単語を減らしたことになります。  
 # そこまでできたら、初期解を得た時と同じように、今の盤面に配置可能な単語をランダムに配置していき、
 # これ以上配置できなくなった時点を「近傍解」とします。  
-# それでは、近傍解を得るための`getNeighborSolution`メソッドを実装します：
+# それでは、近傍解を得るための`getNeighborSolution`メソッドを実装します。  
+# この関数は近傍解のPuzzleオブジェクトを返します。その際、引数に与えたPuzzleオブジェクトには何もしません。
 
 def getNeighborSolution(self, puzzle):   
     """
@@ -901,67 +902,70 @@ def getNeighborSolution(self, puzzle):
     # If solSize = 0, return
     if puzzle.solSize == 0:
         return
+
+    # Copy for returned object
+    _puzzle = copy.deepcopy(puzzle)
     
     # Make a random index of solSize  
-    randomIndex = np.arange(puzzle.solSize)
+    randomIndex = np.arange(_puzzle.solSize)
     np.random.shuffle(randomIndex)
     
     # Drop words until connectivity collapses
-    tmpUsedPlcIdx = copy.deepcopy(puzzle.usedPlcIdx)
+    tmpUsedPlcIdx = copy.deepcopy(_puzzle.usedPlcIdx)
     for r, p in enumerate(tmpUsedPlcIdx[randomIndex]):
         # Get div, i, j, k, wLen
-        div = puzzle.plc.div[p]
-        i = puzzle.plc.i[p]
-        j = puzzle.plc.j[p]
-        k = puzzle.plc.k[p]
-        wLen = len(puzzle.dic[puzzle.plc.k[p]]["word"])
+        div = _puzzle.plc.div[p]
+        i = _puzzle.plc.i[p]
+        j = _puzzle.plc.j[p]
+        k = _puzzle.plc.k[p]
+        wLen = len(_puzzle.dic[_puzzle.plc.k[p]]["word"])
         # If '2' is aligned in the cover array, the word can not be dropped
         if div == 0:
-            if not np.any(np.diff(np.where(puzzle.cover[i:i+wLen,j] == 2)[0]) == 1):
-                puzzle.drop(div, i, j, k)
+            if not np.any(np.diff(np.where(_puzzle.cover[i:i+wLen,j] == 2)[0]) == 1):
+                _puzzle.drop(div, i, j, k)
         if div == 1:
-            if not np.any(np.diff(np.where(puzzle.cover[i,j:j+wLen] == 2)[0])==1):
-                puzzle.drop(div, i, j, k)
+            if not np.any(np.diff(np.where(_puzzle.cover[i,j:j+wLen] == 2)[0])==1):
+                _puzzle.drop(div, i, j, k)
         
         # End with connectivity breakdown
-        puzzle.coverDFS = np.where(puzzle.cover >= 1, 1, 0)
+        _puzzle.coverDFS = np.where(_puzzle.cover >= 1, 1, 0)
         ccl = 2
-        for i, j in itertools.product(range(puzzle.height), range(puzzle.width)):
-            if puzzle.coverDFS[i,j] == 1:
-                puzzle.DFS(i, j, ccl)
+        for i, j in itertools.product(range(_puzzle.height), range(_puzzle.width)):
+            if _puzzle.coverDFS[i,j] == 1:
+                _puzzle.DFS(i, j, ccl)
                 ccl += 1
         if ccl-2 >= 2:
             break
 
     # Kick
     # If solSize = 0 after droping, return
-    if puzzle.solSize == 0:
+    if _puzzle.solSize == 0:
         return
     
     # Define 'largestCCL' witch has the largest score(fillCount+crossCount)
     cclScores = np.zeros(ccl-2, dtype="int64")
     for c in range(ccl-2):
-        cclScores[c] = np.sum(np.where(puzzle.coverDFS == c+2, puzzle.cover, 0))
+        cclScores[c] = np.sum(np.where(_puzzle.coverDFS == c+2, _puzzle.cover, 0))
     largestCCL = np.argmax(cclScores) + 2
     
     # Erase elements except CCL ('kick' in C-program)
-    for idx, p in enumerate(puzzle.usedPlcIdx[:puzzle.solSize]):
+    for idx, p in enumerate(_puzzle.usedPlcIdx[:_puzzle.solSize]):
         if p == -1:
             continue
-        if puzzle.coverDFS[puzzle.plc.i[p], puzzle.plc.j[p]] != largestCCL:
-            puzzle.drop(puzzle.plc.div[p], puzzle.plc.i[p], puzzle.plc.j[p], puzzle.plc.k[p], isKick=True)
+        if _puzzle.coverDFS[_puzzle.plc.i[p], _puzzle.plc.j[p]] != largestCCL:
+            _puzzle.drop(_puzzle.plc.div[p], _puzzle.plc.i[p], _puzzle.plc.j[p], _puzzle.plc.k[p], isKick=True)
     
     # Make a random index of plc    
-    randomIndex = np.arange(puzzle.plc.size)
+    randomIndex = np.arange(_puzzle.plc.size)
     np.random.shuffle(randomIndex)
     
     # Add as much as possible 
     solSizeTmp = None
-    while puzzle.solSize != solSizeTmp:
-        solSizeTmp = puzzle.solSize
+    while _puzzle.solSize != solSizeTmp:
+        solSizeTmp = _puzzle.solSize
         for t in randomIndex:
-            puzzle.add(puzzle.plc.div[t], puzzle.plc.i[t], puzzle.plc.j[t], puzzle.plc.k[t])
-    return
+            _puzzle.add(_puzzle.plc.div[t], _puzzle.plc.i[t], _puzzle.plc.j[t], _puzzle.plc.k[t])
+    return _puzzle
 setattr(Optimizer, "getNeighborSolution", getNeighborSolution)
 
 
@@ -987,13 +991,9 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
     for ep in range(epoch):
         _puzzle.epoch += 1
         print(">>> Epoch %d/%d" % (_puzzle.epoch, goalEpoch))
-        ## Obtain a neighbor solution
-        # Copy the Puzzle object as Interim solution
-        newPuzzle = copy.deepcopy(_puzzle)
-    
-        # Get neigh solution by drop->kick->add
-        self.getNeighborSolution(newPuzzle)
-    
+        # Get neighbor solution by drop->kick->add
+        newPuzzle = self.getNeighborSolution(_puzzle)
+        
         # Repeat if the score is high
         for funcNum in range(len(_puzzle.objFunc)):
             prevScore = _puzzle.objFunc.getScore(_puzzle, funcNum)
