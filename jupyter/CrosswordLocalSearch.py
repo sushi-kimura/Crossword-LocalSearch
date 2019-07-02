@@ -1271,7 +1271,6 @@ def jump(self, idx):
             tmp_puzzle.add(div, i, j, tmp_puzzle.dic.data[k])
         else:
             tmp_puzzle.drop(div, i, j, k, isKick=False)
-        tmp_puzzle.show()
     tmp_puzzle.history = copy.deepcopy(self.history)
     return tmp_puzzle
 setattr(Puzzle, "jump", jump)
