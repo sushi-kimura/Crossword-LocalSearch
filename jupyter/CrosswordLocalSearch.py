@@ -31,12 +31,12 @@
 #   * `withWeight` : 辞書に重みを付すかどうか(bool)
 #   * `puzzleTitle` : パズルのタイトル（デフォルトは「スケルトンパズル」）
 
-fpath = f"../dict/typhoon.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
+fpath = f"../dict/pokemon.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
 width = 15
 height = 15
-randomSeed = 6
+randomSeed = 10
 withWeight = False
-puzzleTitle = "台風パズル" # default:スケルトンパズル
+puzzleTitle = "ポケモンパズル" # default:スケルトンパズル
 
 # ***
 #
@@ -1091,7 +1091,7 @@ def solve(self, epoch):
     print(" --- done")
 setattr(Puzzle, "solve", solve)
 
-sample_puzzle.solve(epoch=15)
+sample_puzzle.solve(epoch=100)
 
 # 最後に表示された解が局所最適解です。  
 # 初期解に比べ、解が目的関数に沿って改善されていれば成功です。  
@@ -1332,13 +1332,17 @@ print ("e_time:{0}".format(e_time) + "[s]")
 # パズルの巻き戻し・早送り機能を使って、作業履歴を最初から順番に画像化し、
 # 外部ファイルを用いてそれを動画化します。
 
-tmpPuzzle = sample_puzzle.jump(0)
-tmpPuzzle.saveAnswerImage(f"fig/animation/typ_15_15_s6_0000.png")
-for histNum in range(len(sample_puzzle.history)):
-    tmpPuzzle = tmpPuzzle.getNext()
-    tmpPuzzle.saveAnswerImage(f"fig/animation/typ_15_15_s6_{str(histNum+1).zfill(4)}.png")
+# +
+# tmpPuzzle = sample_puzzle.jump(0)
+# tmpPuzzle.saveAnswerImage(f"fig/animation/0000.png")
+# for histNum in range(len(sample_puzzle.history)):
+#     tmpPuzzle = tmpPuzzle.getNext()
+#     tmpPuzzle.saveAnswerImage(f"fig/animation/{str(histNum+1).zfill(4)}.png")
 
-# !python ../python/script/movie_maker.py "fig/animation/" 10
-# !mv out.mov fig/animation
+# +
+# 画像が長方形のため、現在はうまくいかない
+# # !python ../python/script/movie_maker.py "fig/animation/" 10
+# # !mv out.mov fig/animation
+# -
 
 
