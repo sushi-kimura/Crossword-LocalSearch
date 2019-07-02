@@ -768,6 +768,9 @@ print("scores: %s" % objFunc.getScore(sample_puzzle, all=True))
 # ここで、解の改善過程を目的関数値の推移として記録するための`logging`メソッドを実装します。  
 
 def logging(self):
+    """
+    This method logs the current objective function values
+    """
     if self.objFunc is None:
         raise RuntimeError("Logging method must be executed after compilation method")
     if self.log is None:
