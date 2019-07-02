@@ -831,9 +831,11 @@ def drop(self, div, i, j, k, isKick=False):
         where = np.where(self.cover[i,j:j+wLen] == 0)[0]
         iall = np.full(where.size, i, dtype="int64")
         self.cell[iall,j+where] = ""
-    # Update usedPlcIdx and solSize
-    self.usedWords[indexOfUsedPlcIdx] = ""
-    self.usedPlcIdx[indexOfUsedPlcIdx] = -1
+    # Update usedWords, usedPlcIdx, solSize, totalWeight
+    self.usedWords = np.delete(self.usedWords, indexOfUsedPlcIdx) #delete
+    self.usedWords = np.append(self.usedWords, "") # append
+    self.usedPlcIdx = np.delete(self.usedPlcIdx, indexOfUsedPlcIdx) # delete
+    self.usedPlcIdx = np.append(self.usedPlcIdx, -1) #append
     self.solSize -= 1
     self.totalWeight -= weight
     # Insert data to history
@@ -902,7 +904,8 @@ def getNeighborSolution(self, puzzle):
     np.random.shuffle(randomIndex)
     
     # Drop words until connectivity collapses
-    for r, p in enumerate(puzzle.usedPlcIdx[randomIndex]):
+    tmpUsedPlcIdx = copy.deepcopy(puzzle.usedPlcIdx)
+    for r, p in enumerate(tmpUsedPlcIdx[randomIndex]):
         # Get div, i, j, k, wLen
         div = puzzle.plc.div[p]
         i = puzzle.plc.i[p]
@@ -926,12 +929,6 @@ def getNeighborSolution(self, puzzle):
                 ccl += 1
         if ccl-2 >= 2:
             break
-    # Stuff the deleted index
-    whereDelete = np.where(puzzle.usedPlcIdx == -1)[0]
-    for p in whereDelete:
-        puzzle.usedWords = np.append(np.delete(puzzle.usedWords, p), "")
-        puzzle.usedPlcIdx = np.append(np.delete(puzzle.usedPlcIdx, p), -1)
-        whereDelete -= 1
 
     # Kick
     # If solSize = 0 after droping, return
@@ -950,20 +947,13 @@ def getNeighborSolution(self, puzzle):
             continue
         if puzzle.coverDFS[puzzle.plc.i[p], puzzle.plc.j[p]] != largestCCL:
             puzzle.drop(puzzle.plc.div[p], puzzle.plc.i[p], puzzle.plc.j[p], puzzle.plc.k[p], isKick=True)
-
-    # Stuff the deleted index
-    whereDelete = np.where(puzzle.usedPlcIdx == -1)[0]
-    for p in whereDelete:
-        puzzle.usedWords = np.append(np.delete(puzzle.usedWords, p), "")
-        puzzle.usedPlcIdx = np.append(np.delete(puzzle.usedPlcIdx, p), -1)
-        whereDelete -= 1
     
     # Make a random index of plc    
     randomIndex = np.arange(puzzle.plc.size)
     np.random.shuffle(randomIndex)
     
     # Add as much as possible 
-    solSizeTmp = -1
+    solSizeTmp = None
     while puzzle.solSize != solSizeTmp:
         solSizeTmp = puzzle.solSize
         for t in randomIndex:
@@ -1002,7 +992,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
         self.getNeighborSolution(newPuzzle)
     
         # Repeat if the score is high
-        for funcNum in range(len(_puzzle.objFunc.registeredFuncs)):
+        for funcNum in range(len(_puzzle.objFunc)):
             prevScore = _puzzle.objFunc.getScore(_puzzle, funcNum)
             newScore = newPuzzle.objFunc.getScore(newPuzzle, funcNum)
             if newScore > prevScore:
