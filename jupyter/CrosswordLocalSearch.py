@@ -477,18 +477,18 @@ setattr(Puzzle, "isEnabledAdd", isEnabledAdd)
 
 # 準備ができたので、所望の単語をパズルに配置する`add`メソッドを定義します。
 # `add`メソッドは次の機能を持ちます：
-#   * `add`メソッドの引数は [単語を置く向き, 頭文字のy座標, 頭文字のx座標, 置きたい単語(wordData) ] で指定します。
+#   * `add`メソッドの引数は [単語を置く向き, 頭文字のy座標, 頭文字のx座標, 単語番号 ] で指定します。
 #   * 指定した位置に単語が置ける場合は置き、置けない場合は何もしません。
 #
 # 実際に、`add`メソッドを定義しましょう：
 
 ### add
-def add(self, div, i, j, wordData):
+def add(self, div, i, j, k):
     """
     This method places a word at arbitrary positions. If it can not be arranged, nothing is done.
     """
-    word = wordData['word']
-    weight = wordData['weight']
+    word = self.dic[k]['word']
+    weight = self.dic[k]['weight']
     # Get the word length
     wLen = len(word)
 
@@ -523,13 +523,13 @@ def add(self, div, i, j, wordData):
     # Update properties
     for val in self.dic.data:
         if val['word'] == word:
-            wordIndex = self.dic.data.index(val)
+            wordIdx = self.dic.data.index(val)
             break
-    self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIndex]
+    self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIdx]
     self.usedWords[self.solSize] = word
     self.solSize += 1
     self.totalWeight += weight
-    self.history.append((1, wordIndex, div, i, j))
+    self.history.append((1, wordIdx, div, i, j))
     self.historyIdx +=1
     return
 # Set attribute to Puzzle class  
@@ -564,7 +564,7 @@ def firstSolve(self, dictionary, placeable):
     while self.solSize != solSizeTmp:
         solSizeTmp = self.solSize
         for t in randomIndex:
-            self.add(self.plc.div[t], self.plc.i[t], self.plc.j[t], self.dic[self.plc.k[t]])
+            self.add(self.plc.div[t], self.plc.i[t], self.plc.j[t], self.plc.k[t])
     self.initSol = True
 setattr(Puzzle, "firstSolve", firstSolve)
 
@@ -967,7 +967,7 @@ def getNeighborSolution(self, puzzle):
     while puzzle.solSize != solSizeTmp:
         solSizeTmp = puzzle.solSize
         for t in randomIndex:
-            puzzle.add(puzzle.plc.div[t], puzzle.plc.i[t], puzzle.plc.j[t], puzzle.dic[puzzle.plc.k[t]])
+            puzzle.add(puzzle.plc.div[t], puzzle.plc.i[t], puzzle.plc.j[t], puzzle.plc.k[t])
     return
 setattr(Optimizer, "getNeighborSolution", getNeighborSolution)
 
@@ -1268,7 +1268,7 @@ def jump(self, idx):
     tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
     for code, k, div, i, j in self.history[:idx]:
         if code == 1:
-            tmp_puzzle.add(div, i, j, tmp_puzzle.dic.data[k])
+            tmp_puzzle.add(div, i, j, k)
         else:
             tmp_puzzle.drop(div, i, j, k, isKick=False)
     tmp_puzzle.history = copy.deepcopy(self.history)
