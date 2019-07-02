@@ -1201,6 +1201,8 @@ def saveImage(self, data, fpath):
     ax1.set_title(label="*** "+self.puzzleTitle+" ***", fontproperties=fp, size=20)
     # Draw word list
     words = [word for word in self.usedWords if word != ""]
+    if words == []:
+        words = [""]
     words.sort()
     words = sorted(words, key=len)
     
@@ -1216,6 +1218,7 @@ def saveImage(self, data, fpath):
         cell.set_text_props(fontproperties=fp, size=18)
     plt.tight_layout()
     plt.savefig(fpath)
+    plt.close()
 setattr(Puzzle, "saveImage", saveImage)
 
 def saveProblemImage(self, fpath):
@@ -1322,5 +1325,20 @@ pickled_puzzle.show()
 
 e_time = time.time() - start
 print ("e_time:{0}".format(e_time) + "[s]")
+
+# ---
+# ## （番外編）解の軌跡をアニメーション化
+# 解の軌跡をアニメーション化してみましょう。
+# パズルの巻き戻し・早送り機能を使って、作業履歴を最初から順番に画像化し、
+# 外部ファイルを用いてそれを動画化します。
+
+tmpPuzzle = sample_puzzle.jump(0)
+tmpPuzzle.saveAnswerImage(f"fig/animation/typ_15_15_s6_0000.png")
+for histNum in range(len(sample_puzzle.history)):
+    tmpPuzzle = tmpPuzzle.getNext()
+    tmpPuzzle.saveAnswerImage(f"fig/animation/typ_15_15_s6_{str(histNum+1).zfill(4)}.png")
+
+# !python ../python/script/movie_maker.py "fig/animation/" 10
+# !mv out.mov fig/animation
 
 

@@ -9,14 +9,17 @@
   fps: 出力する動画の1秒あたりのフレーム数
 """
 import glob
+import sys
+
 import cv2
 
 # Settings
-imagedir = "output/optflow_vorticity/"
+imagedir = sys.argv[1]
+fps = int(sys.argv[2]) #12
 input_ext = "png"
 codec = ["m", "p", "4", "v"]
 output = "out.mov"
-fps = 12
+
 
 # Open images
 files = sorted(glob.glob(imagedir+'/*.'+ input_ext))
