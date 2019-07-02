@@ -31,12 +31,12 @@
 #   * `withWeight` : 辞書に重みを付すかどうか(bool)
 #   * `puzzleTitle` : パズルのタイトル（デフォルトは「スケルトンパズル」）
 
-fpath = f"../dict/pokemon.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
+fpath = f"../dict/typhoon.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
 width = 15
 height = 15
-randomSeed = 10
+randomSeed = 6
 withWeight = False
-puzzleTitle = "ポケモンパズル" # default:スケルトンパズル
+puzzleTitle = "台風パズル" # default:スケルトンパズル
 
 # ***
 #
@@ -538,9 +538,26 @@ setattr(Puzzle, "add", add)
 
 # さあ、`add`メソッドが定義できました。  
 # 早速パズルを生成して、初期解を作りましょう。  
-# `Puzzle`オブジェクトの初期解を得るための`firstSolve`メソッドを定義し、その中で`add`メソッドを呼ぶことにします。
+# まずはランダムに選んだ単語を可能なだけパズルに置いていく`addToLimit`メソッドを用意し、`Puzzle`オブジェクトの初期解を得るための`firstSolve`メソッドの中でそれを呼び、初期解を得るメソッドとして実装します。
 #   * `firstSolve`メソッドの引数は [ `Dictionary`オブジェクト, `Placeable`オブジェクト ] です。
-#   * `firstSolve`メソッドにより、初期解が`Puzzle`オブジェクトの`sol`プロパティに保存されます。
+#   * `firstSolve`メソッドにより、初期解が`Puzzle`オブジェクトの`cell`プロパティに保存されます。
+
+# +
+def addToLimit(self):
+    """
+    This method adds the words as much as possible 
+    """
+    # Make a random index of plc
+    randomIndex = np.arange(self.plc.size)
+    np.random.shuffle(randomIndex)
+    # Add as much as possible
+    solSizeTmp = None
+    while self.solSize != solSizeTmp:
+        solSizeTmp = self.solSize
+        for r in randomIndex:
+            self.add(self.plc.div[r], self.plc.i[r], self.plc.j[r], self.plc.k[r])
+    return
+setattr(Puzzle, "addToLimit", addToLimit)
 
 def firstSolve(self, dictionary, placeable):
     """
@@ -555,18 +572,11 @@ def firstSolve(self, dictionary, placeable):
     # Save initial seed number
     self.initSeed = np.random.get_state()[1][0]
     
-    # Make a random index of plc
-    randomIndex = np.arange(self.plc.size)
-    np.random.shuffle(randomIndex)
-    
-    # Add as much as possible 
-    solSizeTmp = -1
-    while self.solSize != solSizeTmp:
-        solSizeTmp = self.solSize
-        for t in randomIndex:
-            self.add(self.plc.div[t], self.plc.i[t], self.plc.j[t], self.plc.k[t])
+    # Add as much as possible
+    self.addToLimit()
     self.initSol = True
 setattr(Puzzle, "firstSolve", firstSolve)
+# -
 
 sample_puzzle.firstSolve(sample_dic, sample_plc)
 
@@ -893,78 +903,90 @@ setattr(Puzzle, "drop", drop)
 # そこまでできたら、初期解を得た時と同じように、今の盤面に配置可能な単語をランダムに配置していき、
 # これ以上配置できなくなった時点を「近傍解」とします。  
 # それでは、近傍解を得るための`getNeighborSolution`メソッドを実装します。  
-# この関数は近傍解のPuzzleオブジェクトを返します。その際、引数に与えたPuzzleオブジェクトには何もしません。
+# この関数は近傍解のPuzzleオブジェクトを返します。その際、引数に与えたPuzzleオブジェクトには何もしません。  
+# 実装においては、連結性が崩れるまで順番に単語を抜いていく`collapse`メソッドと、連結性が崩れた状態での使用を前提として一番大きな島以外をすべて消す`kick`メソッドを準備し、それらを`getNeighborSolution`メソッド内で呼ぶ形にします。
+
+# +
+def collapse(self):
+    """
+    This method collapses connectivity of the puzzle
+    """
+    # If solSize = 0, return
+    if self.solSize == 0:
+        return
+    
+    # Make a random index of solSize  
+    randomIndex = np.arange(self.solSize)
+    np.random.shuffle(randomIndex)
+    
+    # Drop words until connectivity collapses
+    tmpUsedPlcIdx = copy.deepcopy(self.usedPlcIdx)
+    for r, p in enumerate(tmpUsedPlcIdx[randomIndex]):
+        # Get div, i, j, k, wLen
+        div = self.plc.div[p]
+        i = self.plc.i[p]
+        j = self.plc.j[p]
+        k = self.plc.k[p]
+        wLen = len(self.dic[self.plc.k[p]]["word"])
+        # If '2' is aligned in the cover array, the word can not be dropped
+        if div == 0:
+            if not np.any(np.diff(np.where(self.cover[i:i+wLen,j] == 2)[0]) == 1):
+                self.drop(div, i, j, k)
+        if div == 1:
+            if not np.any(np.diff(np.where(self.cover[i,j:j+wLen] == 2)[0]) == 1):
+                self.drop(div, i, j, k)
+        
+        # End with connectivity breakdown
+        self.coverDFS = np.where(self.cover >= 1, 1, 0)
+        self.ccl = 2
+        for i, j in itertools.product(range(self.height), range(self.width)):
+            if self.coverDFS[i,j] == 1:
+                self.DFS(i, j, self.ccl)
+                self.ccl += 1
+        if self.ccl-2 >= 2:
+            break
+setattr(Puzzle, "collapse", collapse)
+
+def kick(self):
+    """
+    This method kicks elements except largest CCL
+    """
+    # If solSize = 0, return
+    if self.solSize == 0:
+        return
+
+    # Define 'largestCCL' witch has the largest score(fillCount+crossCount)
+    cclScores = np.zeros(self.ccl-2, dtype="int64")
+    for c in range(self.ccl-2):
+        cclScores[c] = np.sum(np.where(self.coverDFS == c+2, self.cover, 0))
+    largestCCL = np.argmax(cclScores) + 2
+    
+    # Erase elements except CCL ('kick' in C-program)
+    for idx, p in enumerate(self.usedPlcIdx[:self.solSize]):
+        if p == -1:
+            continue
+        if self.coverDFS[self.plc.i[p], self.plc.j[p]] != largestCCL:
+            self.drop(self.plc.div[p], self.plc.i[p], self.plc.j[p], self.plc.k[p], isKick=True)
+setattr(Puzzle, "kick", kick)
+
+
+# -
 
 def getNeighborSolution(self, puzzle):   
     """
     This method gets the neighborhood solution
     """
-    # If solSize = 0, return
-    if puzzle.solSize == 0:
-        return
-
-    # Copy for returned object
+    # Copy the puzzle
     _puzzle = copy.deepcopy(puzzle)
-    
-    # Make a random index of solSize  
-    randomIndex = np.arange(_puzzle.solSize)
-    np.random.shuffle(randomIndex)
-    
-    # Drop words until connectivity collapses
-    tmpUsedPlcIdx = copy.deepcopy(_puzzle.usedPlcIdx)
-    for r, p in enumerate(tmpUsedPlcIdx[randomIndex]):
-        # Get div, i, j, k, wLen
-        div = _puzzle.plc.div[p]
-        i = _puzzle.plc.i[p]
-        j = _puzzle.plc.j[p]
-        k = _puzzle.plc.k[p]
-        wLen = len(_puzzle.dic[_puzzle.plc.k[p]]["word"])
-        # If '2' is aligned in the cover array, the word can not be dropped
-        if div == 0:
-            if not np.any(np.diff(np.where(_puzzle.cover[i:i+wLen,j] == 2)[0]) == 1):
-                _puzzle.drop(div, i, j, k)
-        if div == 1:
-            if not np.any(np.diff(np.where(_puzzle.cover[i,j:j+wLen] == 2)[0])==1):
-                _puzzle.drop(div, i, j, k)
-        
-        # End with connectivity breakdown
-        _puzzle.coverDFS = np.where(_puzzle.cover >= 1, 1, 0)
-        ccl = 2
-        for i, j in itertools.product(range(_puzzle.height), range(_puzzle.width)):
-            if _puzzle.coverDFS[i,j] == 1:
-                _puzzle.DFS(i, j, ccl)
-                ccl += 1
-        if ccl-2 >= 2:
-            break
-
+    # Drop words until connectivity collapse
+    _puzzle.collapse()
     # Kick
-    # If solSize = 0 after droping, return
-    if _puzzle.solSize == 0:
-        return
-    
-    # Define 'largestCCL' witch has the largest score(fillCount+crossCount)
-    cclScores = np.zeros(ccl-2, dtype="int64")
-    for c in range(ccl-2):
-        cclScores[c] = np.sum(np.where(_puzzle.coverDFS == c+2, _puzzle.cover, 0))
-    largestCCL = np.argmax(cclScores) + 2
-    
-    # Erase elements except CCL ('kick' in C-program)
-    for idx, p in enumerate(_puzzle.usedPlcIdx[:_puzzle.solSize]):
-        if p == -1:
-            continue
-        if _puzzle.coverDFS[_puzzle.plc.i[p], _puzzle.plc.j[p]] != largestCCL:
-            _puzzle.drop(_puzzle.plc.div[p], _puzzle.plc.i[p], _puzzle.plc.j[p], _puzzle.plc.k[p], isKick=True)
-    
+    _puzzle.kick()
     # Make a random index of plc    
     randomIndex = np.arange(_puzzle.plc.size)
     np.random.shuffle(randomIndex)
-    
     # Add as much as possible 
-    solSizeTmp = None
-    while _puzzle.solSize != solSizeTmp:
-        solSizeTmp = _puzzle.solSize
-        for t in randomIndex:
-            _puzzle.add(_puzzle.plc.div[t], _puzzle.plc.i[t], _puzzle.plc.j[t], _puzzle.plc.k[t])
+    _puzzle.addToLimit()
     return _puzzle
 setattr(Optimizer, "getNeighborSolution", getNeighborSolution)
 
@@ -1091,7 +1113,7 @@ def solve(self, epoch):
     print(" --- done")
 setattr(Puzzle, "solve", solve)
 
-sample_puzzle.solve(epoch=100)
+sample_puzzle.solve(epoch=10)
 
 # 最後に表示された解が局所最適解です。  
 # 初期解に比べ、解が目的関数に沿って改善されていれば成功です。  
