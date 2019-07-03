@@ -187,14 +187,20 @@ class Dictionary():
             print(f" - dictionary type   : {self.dictType}")
             print(f" - top of dictionary : {self[0]}")
 
-    def __getitem__(self, i):
-        return self.data.iloc[i].to_dict()
+    def __getitem__(self, key):
+        if type(key) is int:
+            return self.data.iloc[key].to_dict()
+        if type(key) is str:
+            return self.data[key]
     
     def __str__(self):
         return self.name
     
     def __len__(self):
         return self.size
+    
+    def getK(self, word):
+        return np.where(sample_dic['word'] == word)[0][0]
 
 
 sample_dic = Dictionary(fpath)
@@ -249,7 +255,7 @@ def calcWeight(self, msg=True):
     """
     Calculate word weights in the dictionary.
     """
-    mergedWords = "".join(self.data["word"])
+    mergedWords = "".join(self.data['word'])
     counts = collections.Counter(mergedWords)
     for i in range(len(self.data.index)):
         for char in self.data['word'][i]:
@@ -313,11 +319,11 @@ class Placeable():
         for div in range(2):
             for k in range(dic.size):
                 if div == 0:
-                    iMax = self.height - len(dic[k]['word']) + 1
+                    iMax = self.height - len(dic['word'][k]) + 1
                     jMax = self.width
                 elif div == 1:
                     iMax = self.height
-                    jMax = self.width - len(dic[k]['word']) + 1
+                    jMax = self.width - len(dic['word'][k]) + 1
                 for i in range(iMax):
                     for j in range(jMax):
                         self.div[self.size] = div
@@ -488,8 +494,8 @@ def add(self, div, i, j, k):
     """
     This method places a word at arbitrary positions. If it can not be arranged, nothing is done.
     """
-    word = self.dic[k]['word']
-    weight = self.dic[k]['weight']
+    word = self.dic['word'][k]
+    weight = self.dic['weight'][k]
     # Get the word length
     wLen = len(word)
 
@@ -825,8 +831,8 @@ def drop(self, div, i, j, k, isKick=False):
     p = self.plc.invP[div, i, j, k]
     indexOfUsedPlcIdx = np.where(self.usedPlcIdx == p)[0][0]
     
-    wLen = len(self.dic[self.plc.k[p]]["word"])
-    weight = self.dic[self.plc.k[p]]["weight"]
+    wLen = len(self.dic["word"][self.plc.k[p]])
+    weight = self.dic["weight"][self.plc.k[p]]
     # Pull out a word
     if div == 0:
         self.cover[i:i+wLen,j] -= 1
@@ -921,7 +927,7 @@ def collapse(self):
         i = self.plc.i[p]
         j = self.plc.j[p]
         k = self.plc.k[p]
-        wLen = len(self.dic[self.plc.k[p]]["word"])
+        wLen = len(self.dic["word"][self.plc.k[p]])
         # If '2' is aligned in the cover array, the word can not be dropped
         if div == 0:
             if not np.any(np.diff(np.where(self.cover[i:i+wLen,j] == 2)[0]) == 1):
