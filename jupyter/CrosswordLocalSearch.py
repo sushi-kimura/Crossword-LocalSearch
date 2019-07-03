@@ -816,17 +816,10 @@ setattr(Puzzle, "logging", logging)
 #
 # ここで一旦、盤面に置かれた単語を抜く処理を`drop`メソッドとして実装します：
 
-# 準備ができたので、所望の単語をパズルに配置する`add`メソッドを定義します。
-# `add`メソッドは次の機能を持ちます：
-#   * `add`メソッドの引数は [単語を置く向き, 頭文字のy座標, 頭文字のx座標, 置きたい単語(wordData) ] で指定します。
-#   * 指定した位置に単語が置ける場合は置き、置けない場合は何もしません。
-#
-# 実際に、`add`メソッドを定義しましょう：
-
 def drop(self, div, i, j, k, isKick=False):
     """
     This method removes the specified word from the puzzle.
-    Note: This word pulls out the specified word without taking it into consideration, which may break the connectivity of the puzzle or cause LAOS / US / USA problems.
+    Note: This method pulls out the specified word without taking it into consideration, which may break the connectivity of the puzzle or cause LAOS / US / USA problems.
     """
     # Get p, IndexOfUsedPlcIdx, wLen, weight
     p = self.plc.invP[div, i, j, k]
@@ -983,9 +976,6 @@ def getNeighborSolution(self, puzzle):
     _puzzle.collapse()
     # Kick
     _puzzle.kick()
-    # Make a random index of plc    
-    randomIndex = np.arange(_puzzle.plc.size)
-    np.random.shuffle(randomIndex)
     # Add as much as possible 
     _puzzle.addToLimit()
     return _puzzle
@@ -1295,10 +1285,14 @@ def jump(self, idx):
 setattr(Puzzle, "jump", jump)
 
 def getPrev(self, n=1):
+    if (self.historyIdx - n < 0):
+        return self.jump(0)
     return self.jump(self.historyIdx - n)
 setattr(Puzzle, "getPrev", getPrev)
 
 def getNext(self, n=1):
+    if (self.historyIdx + n > len(self.history)):
+        return self.getLatest()
     return self.jump(self.historyIdx + n)
 setattr(Puzzle, "getNext", getNext)
 
@@ -1367,6 +1361,3 @@ print ("e_time:{0}".format(e_time) + "[s]")
 # 画像が長方形のため、現在はうまくいかない
 # # !python ../python/script/movie_maker.py "fig/animation/" 10
 # # !mv out.mov fig/animation
-# -
-
-
