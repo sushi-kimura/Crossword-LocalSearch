@@ -185,11 +185,11 @@ class Dictionary():
             print(f" - file path         : {self.fpath}")
             print(f" - dictionary size   : {self.size}")
             print(f" - dictionary type   : {self.dictType}")
-            print(f" - top of dictionary : {self[0]}")
+            print(f" - top of dictionary : {self[0].to_dict()}")
 
     def __getitem__(self, key):
         if type(key) is int:
-            return self.data.iloc[key].to_dict()
+            return self.data.iloc[key]
         if type(key) is str:
             return self.data[key]
     
@@ -827,9 +827,9 @@ def drop(self, div, i, j, k, isKick=False):
     This method removes the specified word from the puzzle.
     Note: This method pulls out the specified word without taking it into consideration, which may break the connectivity of the puzzle or cause LAOS / US / USA problems.
     """
-    # Get p, IndexOfUsedPlcIdx, wLen, weight
+    # Get p, pidx
     p = self.plc.invP[div, i, j, k]
-    indexOfUsedPlcIdx = np.where(self.usedPlcIdx == p)[0][0]
+    pidx = np.where(self.usedPlcIdx == p)[0][0]
     
     wLen = len(self.dic["word"][self.plc.k[p]])
     weight = self.dic["weight"][self.plc.k[p]]
@@ -845,9 +845,9 @@ def drop(self, div, i, j, k, isKick=False):
         iall = np.full(where.size, i, dtype="int64")
         self.cell[iall,j+where] = ""
     # Update usedWords, usedPlcIdx, solSize, totalWeight
-    self.usedWords = np.delete(self.usedWords, indexOfUsedPlcIdx) #delete
+    self.usedWords = np.delete(self.usedWords, pidx) #delete
     self.usedWords = np.append(self.usedWords, "") # append
-    self.usedPlcIdx = np.delete(self.usedPlcIdx, indexOfUsedPlcIdx) # delete
+    self.usedPlcIdx = np.delete(self.usedPlcIdx, pidx) # delete
     self.usedPlcIdx = np.append(self.usedPlcIdx, -1) #append
     self.solSize -= 1
     self.totalWeight -= weight
