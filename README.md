@@ -7,4 +7,4 @@ Crossword-LocalSearchは, クロスワード（厳密にはスケルトンパズ
 saikoro2007(Github)
 
 ## Contribute
-もしバグや改善点を見つけた場合は, 我々にご一報ください.
+How_to_contribute.mdをご覧ください。
