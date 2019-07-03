@@ -20,13 +20,12 @@ input_ext = "png"
 codec = ["m", "p", "4", "v"]
 output = "out.mov"
 
-
 # Open images
 files = sorted(glob.glob(imagedir+'/*.'+ input_ext))
 images = list(map(lambda file: cv2.imread(file), files))
 
 fourcc = cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])
-video = cv2.VideoWriter(output, fourcc, fps, (images[0].shape[0], images[0].shape[1]))
+video = cv2.VideoWriter(output, fourcc, fps, (images[0].shape[1], images[0].shape[0]))
 
 # Sage as movie
 for img in images:
