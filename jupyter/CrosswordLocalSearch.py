@@ -176,9 +176,10 @@ class Dictionary():
             if len(line) == 1:
                 line.append(0)
             line[1] = int(line[1])
+            line.append(len(line[0]))
             return line
         dic_list = list(map(removeNewLineCode, self.data))
-        self.data = pd.DataFrame(dic_list, columns=['word', 'weight'])
+        self.data = pd.DataFrame(dic_list, columns=['word', 'weight', 'len'])
 
         ## Message
         if msg == True:
@@ -257,8 +258,10 @@ def calcWeight(self, msg=True):
     """
     mergedWords = "".join(self.data['word'])
     counts = collections.Counter(mergedWords)
-    for i in range(len(self.data.index)):
-        for char in self.data['word'][i]:
+
+    values = self.data['word'].values
+    for i in range(self.data.shape[0]):
+        for char in values[i]:
             self.data.loc[i, 'weight'] += counts[char]
             
     if msg:
@@ -319,11 +322,11 @@ class Placeable():
         for div in range(2):
             for k in range(dic.size):
                 if div == 0:
-                    iMax = self.height - len(dic['word'][k]) + 1
+                    iMax = self.height - dic["len"][k] + 1
                     jMax = self.width
                 elif div == 1:
                     iMax = self.height
-                    jMax = self.width - len(dic['word'][k]) + 1
+                    jMax = self.width - dic["len"][k] + 1
                 for i in range(iMax):
                     for j in range(jMax):
                         self.div[self.size] = div
@@ -496,8 +499,7 @@ def add(self, div, i, j, k):
     """
     word = self.dic['word'][k]
     weight = self.dic['weight'][k]
-    # Get the word length
-    wLen = len(word)
+    wLen =  self.dic['len'][k]
 
     # Judge whether adding is enabled
     if self.isEnabledAdd(div, i, j, word, wLen) == False:
@@ -528,10 +530,7 @@ def add(self, div, i, j, k):
         self.cover[i, j:j+wLen] += 1
     
     # Update properties
-    for idx, data in self.dic.data.iterrows():
-        if data['word'] == word:
-            wordIdx = idx
-            break
+    wordIdx = sample_dic.data[sample_dic["word"] == word].index[0]
     self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIdx]
     self.usedWords[self.solSize] = word
     self.solSize += 1
@@ -831,7 +830,7 @@ def drop(self, div, i, j, k, isKick=False):
     p = self.plc.invP[div, i, j, k]
     pidx = np.where(self.usedPlcIdx == p)[0][0]
     
-    wLen = len(self.dic["word"][self.plc.k[p]])
+    wLen = self.dic["len"][self.plc.k[p]]
     weight = self.dic["weight"][self.plc.k[p]]
     # Pull out a word
     if div == 0:
@@ -927,7 +926,7 @@ def collapse(self):
         i = self.plc.i[p]
         j = self.plc.j[p]
         k = self.plc.k[p]
-        wLen = len(self.dic["word"][self.plc.k[p]])
+        wLen = self.dic["len"][self.plc.k[p]]
         # If '2' is aligned in the cover array, the word can not be dropped
         if div == 0:
             if not np.any(np.diff(np.where(self.cover[i:i+wLen,j] == 2)[0]) == 1):
@@ -1129,7 +1128,7 @@ def showLog(self, title="Objective Function's time series", grid=True, figsize=N
     """
     if self.log is None:
         raise RuntimeError("Puzzle has no log")
-    return sample_puzzle.log.plot(subplots=True, title=title, grid=grid, figsize=figsize)
+    return self.log.plot(subplots=True, title=title, grid=grid, figsize=figsize)
 setattr(Puzzle, "showLog", showLog)
 
 sample_puzzle.showLog(figsize=(7,6))
@@ -1311,7 +1310,7 @@ setattr(Puzzle, "getLatest", getLatest)
 
 tmp_puzzle = sample_puzzle.jump(2)
 tmp_puzzle.show()
-tmp_puzzle = tmp_puzzle.getPrev(1)
+tmp_puzzle = tmp_puzzle.getPrev()
 tmp_puzzle.show()
 tmp_puzzle = tmp_puzzle.getNext(2)
 tmp_puzzle.show()
@@ -1364,6 +1363,5 @@ print ("e_time:{0}".format(e_time) + "[s]")
 #     tmpPuzzle.saveAnswerImage(f"fig/animation/{str(histNum+1).zfill(4)}.png")
 
 # +
-# 画像が長方形のため、現在はうまくいかない
 # # !python ../python/script/movie_maker.py "fig/animation/" 10
 # # !mv out.mov fig/animation
