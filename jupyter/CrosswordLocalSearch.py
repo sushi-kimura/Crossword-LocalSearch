@@ -146,7 +146,9 @@ sample_puzzle = Puzzle(width, height, puzzleTitle)
 #   * fpath : 入力データのファイルパス
 #   * size : 辞書の大きさ(単語数)
 #   * dictType : 辞書のタイプ("English"/"Japanese")
-#   * data : 入力データ配列
+#   * words : 単語配列
+#   * weights : 重み配列
+#   * wLens : 単語長配列
 
 class Dictionary():
     def __init__(self, fpath, msg=True):
@@ -179,20 +181,26 @@ class Dictionary():
             line.append(len(line[0]))
             return line
         dic_list = list(map(removeNewLineCode, self.data))
-        self.data = pd.DataFrame(dic_list, columns=['word', 'weight', 'len'])
+        self.words = [d[0] for d in dic_list]
+        self.weights = [d[1] for d in dic_list]
+        self.wLens = [d[2] for d in dic_list]
 
         ## Message
         if msg == True:
             print(f" - file path         : {self.fpath}")
             print(f" - dictionary size   : {self.size}")
             print(f" - dictionary type   : {self.dictType}")
-            print(f" - top of dictionary : {self[0].to_dict()}")
+            print(f" - top of dictionary : {self[0]}")
 
     def __getitem__(self, key):
-        if type(key) is int:
-            return self.data.iloc[key]
-        if type(key) is str:
-            return self.data[key]
+        if type(key) in (int, np.int64):
+            return {'word': self.words[key], 'weight': self.weights[key], 'len': self.wLens[key]}
+        if str == 'word':
+            return self.words
+        if str == 'weight':
+            return self.weights
+        if str == 'wLen':
+            return self.wLens
     
     def __str__(self):
         return self.name
@@ -201,7 +209,7 @@ class Dictionary():
         return self.size
     
     def getK(self, word):
-        return np.where(sample_dic['word'] == word)[0][0]
+        return np.where(self.words == word)[0][0]
 
 
 sample_dic = Dictionary(fpath)
@@ -215,9 +223,9 @@ def deleteUnusableWords(self, msg=True):
     This method checks words in the dictionary and erases words that can not cross any other words.
     """
     self.removedWords = []
-    mergedWords = "".join(self.data["word"])
+    mergedWords = "".join(self.words)
     counts = collections.Counter(mergedWords)
-    for word in self.data["word"][:]:
+    for word in self.words[:]:
         charValue = 0
         for char in set(word):
             charValue += counts[char]
@@ -256,20 +264,20 @@ def calcWeight(self, msg=True):
     """
     Calculate word weights in the dictionary.
     """
-    mergedWords = "".join(self.data['word'])
+    mergedWords = "".join(self.words)
     counts = collections.Counter(mergedWords)
 
-    values = self.data['word'].values
-    for i in range(self.data.shape[0]):
-        for char in values[i]:
-            self.data.loc[i, 'weight'] += counts[char]
+    for i, word in enumerate(self.words):
+        for char in word:
+            self.weights[i] += counts[char]
             
     if msg:
         print("All weights are calculated.")
         print("TOP 5 characters:")
         print(counts.most_common()[:5])
+        idx = sorted(range(self.size), key=lambda k: self.weights[k], reverse=True)[:5]
         print("TOP 5 words:")
-        print(self.data.sort_values("weight", ascending=False)[:5])
+        print(np.array(self.words)[idx])
 setattr(Dictionary, "calcWeight", calcWeight)
 
 if not withWeight:
@@ -322,11 +330,11 @@ class Placeable():
         for div in range(2):
             for k in range(dic.size):
                 if div == 0:
-                    iMax = self.height - dic["len"][k] + 1
+                    iMax = self.height - dic.wLens[k] + 1
                     jMax = self.width
                 elif div == 1:
                     iMax = self.height
-                    jMax = self.width - dic["len"][k] + 1
+                    jMax = self.width - dic.wLens[k] + 1
                 for i in range(iMax):
                     for j in range(jMax):
                         self.div[self.size] = div
@@ -497,9 +505,9 @@ def add(self, div, i, j, k):
     """
     This method places a word at arbitrary positions. If it can not be arranged, nothing is done.
     """
-    word = self.dic['word'][k]
-    weight = self.dic['weight'][k]
-    wLen =  self.dic['len'][k]
+    word = self.dic.words[k]
+    weight = self.dic.weights[k]
+    wLen = self.dic.wLens[k]
 
     # Judge whether adding is enabled
     if self.isEnabledAdd(div, i, j, word, wLen) == False:
@@ -530,13 +538,13 @@ def add(self, div, i, j, k):
         self.cover[i, j:j+wLen] += 1
     
     # Update properties
-    wordIdx = sample_dic.data[sample_dic["word"] == word].index[0]
+    wordIdx = self.dic.words.index(word)
     self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIdx]
-    self.usedWords[self.solSize] = word
+    self.usedWords[self.solSize] = k
     self.solSize += 1
     self.totalWeight += weight
     self.history.append((1, wordIdx, div, i, j))
-    self.historyIdx +=1
+    self.historyIdx += 1
     return
 # Set attribute to Puzzle class  
 setattr(Puzzle, "add", add)
@@ -577,7 +585,6 @@ def firstSolve(self, dictionary, placeable):
         
     # Save initial seed number
     self.initSeed = np.random.get_state()[1][0]
-    
     # Add as much as possible
     self.addToLimit()
     self.initSol = True
@@ -830,8 +837,8 @@ def drop(self, div, i, j, k, isKick=False):
     p = self.plc.invP[div, i, j, k]
     pidx = np.where(self.usedPlcIdx == p)[0][0]
     
-    wLen = self.dic["len"][self.plc.k[p]]
-    weight = self.dic["weight"][self.plc.k[p]]
+    wLen = self.dic.wLens[k]
+    weight = self.dic.weights[k]
     # Pull out a word
     if div == 0:
         self.cover[i:i+wLen,j] -= 1
@@ -926,7 +933,7 @@ def collapse(self):
         i = self.plc.i[p]
         j = self.plc.j[p]
         k = self.plc.k[p]
-        wLen = self.dic["len"][self.plc.k[p]]
+        wLen = self.dic.wLens[self.plc.k[p]]
         # If '2' is aligned in the cover array, the word can not be dropped
         if div == 0:
             if not np.any(np.diff(np.where(self.cover[i:i+wLen,j] == 2)[0]) == 1):
@@ -1347,7 +1354,7 @@ pickled_puzzle.show()
 # このノートの作者は辞書内の単語の重み付けや、単語の重要性評価による作業時間の短縮などの機能を追記する予定です。
 
 e_time = time.time() - start
-print ("e_time:{0}".format(e_time) + "[s]")
+print ("e_time:{0}" + format(e_time) + "[s]")
 
 # ---
 # ## （番外編）解の軌跡をアニメーション化
