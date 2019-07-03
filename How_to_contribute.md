@@ -1,5 +1,5 @@
 # How to contribute
-***
+
 ### 1. Anaconda環境の構築
  - [Anacondaのホームページ](https://www.anaconda.com/distribution/)にアクセスする
  - 適切なOSとバージョンを選択し、ダウンロードする（どれをダウンロードすればいいか分からない場合は各自で調べてください。）
