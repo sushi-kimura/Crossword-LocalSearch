@@ -176,8 +176,9 @@ class Dictionary():
             if len(line) == 1:
                 line.append(0)
             line[1] = int(line[1])
-            return dict(zip(["word", "weight"], line))
-        self.data = list(map(removeNewLineCode, self.data))
+            return line
+        dic_list = list(map(removeNewLineCode, self.data))
+        self.data = pd.DataFrame(dic_list, columns=['word', 'weight'])
 
         ## Message
         if msg == True:
@@ -187,7 +188,7 @@ class Dictionary():
             print(f" - top of dictionary : {self[0]}")
 
     def __getitem__(self, i):
-        return self.data[i]
+        return self.data.iloc[i].to_dict()
     
     def __str__(self):
         return self.name
@@ -207,18 +208,18 @@ def deleteUnusableWords(self, msg=True):
     This method checks words in the dictionary and erases words that can not cross any other words.
     """
     self.removedWords = []
-    mergedWords = "".join([d.get("word") for d in self.data])
+    mergedWords = "".join(self.data["word"])
     counts = collections.Counter(mergedWords)
-    for word in self.data[:]:
+    for word in self.data["word"][:]:
         charValue = 0
-        for char in set(word["word"]):
+        for char in set(word):
             charValue += counts[char]
-        if charValue == len(word["word"]):
+        if charValue == len(word):
             self.removedWords.append(word)
             self.data.remove(word)
             self.size -= 1
             if msg:
-                print(f"'{word['word']}' can not cross with any other words")
+                print(f"'{word}' can not cross with any other words")
 setattr(Dictionary, "deleteUnusableWords", deleteUnusableWords)
 
 sample_dic.deleteUnusableWords()
@@ -248,18 +249,18 @@ def calcWeight(self, msg=True):
     """
     Calculate word weights in the dictionary.
     """
-    mergedWords = "".join([d.get("word") for d in self.data])
+    mergedWords = "".join(self.data["word"])
     counts = collections.Counter(mergedWords)
-    for word in self.data:
-        for char in word["word"]:
-            word["weight"] += counts[char]
+    for i in range(len(self.data.index)):
+        for char in self.data['word'][i]:
+            self.data.loc[i, 'weight'] += counts[char]
             
     if msg:
         print("All weights are calculated.")
-        print("TOP 5 characters")
+        print("TOP 5 characters:")
         print(counts.most_common()[:5])
-        print("TOP 5 words")
-        print(sorted(self.data, key=lambda d:d["weight"], reverse=True)[:5])
+        print("TOP 5 words:")
+        print(self.data.sort_values("weight", ascending=False)[:5])
 setattr(Dictionary, "calcWeight", calcWeight)
 
 if not withWeight:
@@ -521,9 +522,9 @@ def add(self, div, i, j, k):
         self.cover[i, j:j+wLen] += 1
     
     # Update properties
-    for val in self.dic.data:
-        if val['word'] == word:
-            wordIdx = self.dic.data.index(val)
+    for idx, data in self.dic.data.iterrows():
+        if data['word'] == word:
+            wordIdx = idx
             break
     self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIdx]
     self.usedWords[self.solSize] = word
@@ -1314,8 +1315,9 @@ tmp_puzzle = tmp_puzzle.getPrev(1)
 tmp_puzzle.show()
 tmp_puzzle = tmp_puzzle.getNext(2)
 tmp_puzzle.show()
-#tmp_puzzle = tmp_puzzle.getLatest()
-#tmp_puzzle.show()
+tmp_puzzle = tmp_puzzle.getLatest()
+tmp_puzzle.show()
+
 
 # ---
 # ## PuzzleオブジェクトのPickle化
