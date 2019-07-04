@@ -146,9 +146,9 @@ sample_puzzle = Puzzle(width, height, puzzleTitle)
 #   * fpath : 入力データのファイルパス
 #   * size : 辞書の大きさ(単語数)
 #   * dictType : 辞書のタイプ("English"/"Japanese")
-#   * words : 単語配列
-#   * weights : 重み配列
-#   * wLens : 単語長配列
+#   * word : 単語配列
+#   * weight : 重み配列
+#   * wLen : 単語長配列
 
 class Dictionary():
     def __init__(self, fpath, msg=True):
@@ -158,17 +158,16 @@ class Dictionary():
         ## Read
         print(" - READING DICTIONARY...")
         file = open(self.fpath, 'r', encoding='utf-8')
-        self.data = file.readlines()
+        data = file.readlines()
         file.close()
         # Get a size of dictionary
-        self.size = len(self.data)
-        # Check dictionary type(English/Japanese)
-        uniName = unicodedata.name(self.data[0][0])[0:10]
+        self.size = len(data)
+        # Check dictionary type(English/Japanese/'Kanji')
+        uniName = unicodedata.name(data[0][0])[0:10]
         if "HIRAGANA" in uniName or "KATAKANA" in uniName:
             self.dictType = "Japanese"
         elif "LATIN" in uniName:
             self.dictType = "English"
-            #self.data = [s.upper() for s in self.data]
         elif "CJK" in uniName:
             self.dictType = "Kanji"
 
@@ -178,12 +177,11 @@ class Dictionary():
             if len(line) == 1:
                 line.append(0)
             line[1] = int(line[1])
-            line.append(len(line[0]))
             return line
-        dic_list = list(map(removeNewLineCode, self.data))
-        self.words = [d[0] for d in dic_list]
-        self.weights = [d[1] for d in dic_list]
-        self.wLens = [d[2] for d in dic_list]
+        dic_list = list(map(removeNewLineCode, data))
+        self.word = [d[0] for d in dic_list]
+        self.weight = [d[1] for d in dic_list]
+        self.wLen = [len(w) for w in self.word]
 
         ## Message
         if msg == True:
@@ -193,7 +191,7 @@ class Dictionary():
             print(f" - top of dictionary : {self[0]}")
 
     def __getitem__(self, key):
-        return {'word': self.words[key], 'weight': self.weights[key], 'len': self.wLens[key]}
+        return {'word': self.word[key], 'weight': self.weight[key], 'len': self.wLen[key]}
     
     def __str__(self):
         return self.name
@@ -202,7 +200,7 @@ class Dictionary():
         return self.size
     
     def getK(self, word):
-        return np.where(self.words == word)[0][0]
+        return np.where(self.word == word)[0][0]
 
 
 sample_dic = Dictionary(fpath)
@@ -216,20 +214,20 @@ def deleteUnusableWords(self, msg=True):
     This method checks words in the dictionary and erases words that can not cross any other words.
     """
     self.removedWords = []
-    mergedWords = "".join(self.words)
+    mergedWords = "".join(self.word)
     counts = collections.Counter(mergedWords)
-    for i, word in enumerate(self.words[:]):
+    for i, w in enumerate(self.word[:]):
         charValue = 0
-        for char in set(word):
+        for char in set(w):
             charValue += counts[char]
-        if charValue == len(word):
-            self.removedWords.append(word)
-            del self.words[i]
-            del self.weights[i]
-            del self.wLens[i]
+        if charValue == len(w):
+            self.removedWords.append(w)
+            del self.word[i]
+            del self.weight[i]
+            del self.wLen[i]
             self.size -= 1
             if msg:
-                print(f"'{word}' can not cross with any other words")
+                print(f"'{w}' can not cross with any other words")
 setattr(Dictionary, "deleteUnusableWords", deleteUnusableWords)
 
 sample_dic.deleteUnusableWords()
@@ -259,20 +257,20 @@ def calcWeight(self, msg=True):
     """
     Calculate word weights in the dictionary.
     """
-    mergedWords = "".join(self.words)
+    mergedWords = "".join(self.word)
     counts = collections.Counter(mergedWords)
 
-    for i, word in enumerate(self.words):
-        for char in word:
-            self.weights[i] += counts[char]
+    for i, w in enumerate(self.word):
+        for char in w:
+            self.weight[i] += counts[char]
             
     if msg:
         print("All weights are calculated.")
         print("TOP 5 characters:")
         print(counts.most_common()[:5])
-        idx = sorted(range(self.size), key=lambda k: self.weights[k], reverse=True)[:5]
+        idx = sorted(range(self.size), key=lambda k: self.weight[k], reverse=True)[:5]
         print("TOP 5 words:")
-        print(np.array(self.words)[idx])
+        print(np.array(self.word)[idx])
 setattr(Dictionary, "calcWeight", calcWeight)
 
 if not withWeight:
@@ -325,11 +323,11 @@ class Placeable():
         for div in range(2):
             for k in range(dic.size):
                 if div == 0:
-                    iMax = self.height - dic.wLens[k] + 1
+                    iMax = self.height - dic.wLen[k] + 1
                     jMax = self.width
                 elif div == 1:
                     iMax = self.height
-                    jMax = self.width - dic.wLens[k] + 1
+                    jMax = self.width - dic.wLen[k] + 1
                 for i in range(iMax):
                     for j in range(jMax):
                         self.div[self.size] = div
@@ -500,9 +498,9 @@ def add(self, div, i, j, k):
     """
     This method places a word at arbitrary positions. If it can not be arranged, nothing is done.
     """
-    word = self.dic.words[k]
-    weight = self.dic.weights[k]
-    wLen = self.dic.wLens[k]
+    word = self.dic.word[k]
+    weight = self.dic.weight[k]
+    wLen = self.dic.wLen[k]
 
     # Judge whether adding is enabled
     if self.isEnabledAdd(div, i, j, word, wLen) == False:
@@ -533,9 +531,9 @@ def add(self, div, i, j, k):
         self.cover[i, j:j+wLen] += 1
     
     # Update properties
-    wordIdx = self.dic.words.index(word)
+    wordIdx = self.dic.word.index(word)
     self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIdx]
-    self.usedWords[self.solSize] = k
+    self.usedWords[self.solSize] = self.dic.word[k]
     self.solSize += 1
     self.totalWeight += weight
     self.history.append((1, wordIdx, div, i, j))
@@ -832,8 +830,8 @@ def drop(self, div, i, j, k, isKick=False):
     p = self.plc.invP[div, i, j, k]
     pidx = np.where(self.usedPlcIdx == p)[0][0]
     
-    wLen = self.dic.wLens[k]
-    weight = self.dic.weights[k]
+    wLen = self.dic.wLen[k]
+    weight = self.dic.weight[k]
     # Pull out a word
     if div == 0:
         self.cover[i:i+wLen,j] -= 1
@@ -928,7 +926,7 @@ def collapse(self):
         i = self.plc.i[p]
         j = self.plc.j[p]
         k = self.plc.k[p]
-        wLen = self.dic.wLens[self.plc.k[p]]
+        wLen = self.dic.wLen[self.plc.k[p]]
         # If '2' is aligned in the cover array, the word can not be dropped
         if div == 0:
             if not np.any(np.diff(np.where(self.cover[i:i+wLen,j] == 2)[0]) == 1):
