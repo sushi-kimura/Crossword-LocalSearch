@@ -411,24 +411,31 @@ def isEnabledAdd(self, div, i, j, word, wLen):
     """
     This method determines if a word can be placed
     """
-    # If 0 words used, return True
-    if self.solSize == 0:
-        return True
-
-    # If the same word is in use, return False
-    if word in self.usedWords:
-        return False
-
-    # US/USA, DOMINICA/DOMINICAN probrem
     if div == 0:
         emptys = self.cell[i:i+wLen, j] == ""
-        if np.all(emptys == True) or np.any(self.enable[i:i+wLen, j] == False) or np.all(emptys == False):
-            return False
     if div == 1:
         emptys = self.cell[i, j:j+wLen] == ""
-        if np.all(emptys == True) or np.any(self.enable[i, j:j+wLen] == False) or np.all(emptys == False):
-            return False
+        
+    # If 0 words used, return True
+    if self.solSize is 0:
+        return True
 
+    # If the preceding and succeeding cells are already filled
+    if div == 0:
+        if i > 0 and self.cell[i-1, j] != "":
+            return False
+        if i+wLen < self.height and self.cell[i+wLen, j] != "":
+            return False
+    if div == 1:
+        if j > 0 and self.cell[i, j-1] != "":
+            return False
+        if j+wLen < self.width and self.cell[i, j+wLen] != "":
+            return False
+        
+    #At least one place must cross other words
+    if np.all(emptys == True):
+        return False
+        
     # Judge whether correct intersection
     where = np.where(emptys == False)[0]
     if div == 0:
@@ -439,6 +446,10 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         iall = np.full(where.size, i, dtype = "int64")
         if np.any(self.cell[iall, where+j] != np.array(list(word))[where]):
             return False
+        
+    # If the same word is in use, return False
+    if word in self.usedWords:
+        return False
 
     # If neighbor cells are filled except at the intersection, return False
     where = np.where(emptys == True)[0]
@@ -458,18 +469,15 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         # Lower
         if i < self.height-1 and np.any(self.cell[iall+1, where+j] != ""):
             return False
-
-    # If the preceding and succeeding cells are already filled
+    
+    # US/USA, DOMINICA/DOMINICAN probrem
     if div == 0:
-        if i > 0 and self.cell[i-1, j] != "":
-            return False
-        if i+wLen < self.height and self.cell[i+wLen, j] != "":
+        if np.any(self.enable[i:i+wLen, j] == False) or np.all(emptys == False):
             return False
     if div == 1:
-        if j > 0 and self.cell[i, j-1] != "":
+        if np.any(self.enable[i, j:j+wLen] == False) or np.all(emptys == False):
             return False
-        if j+wLen < self.width and self.cell[i, j+wLen] != "":
-            return False
+
 
     # If Break through the all barrier, return True
     return True
