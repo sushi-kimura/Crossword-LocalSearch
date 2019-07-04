@@ -193,14 +193,7 @@ class Dictionary():
             print(f" - top of dictionary : {self[0]}")
 
     def __getitem__(self, key):
-        if type(key) in (int, np.int64):
-            return {'word': self.words[key], 'weight': self.weights[key], 'len': self.wLens[key]}
-        if str == 'word':
-            return self.words
-        if str == 'weight':
-            return self.weights
-        if str == 'wLen':
-            return self.wLens
+        return {'word': self.words[key], 'weight': self.weights[key], 'len': self.wLens[key]}
     
     def __str__(self):
         return self.name
@@ -225,13 +218,15 @@ def deleteUnusableWords(self, msg=True):
     self.removedWords = []
     mergedWords = "".join(self.words)
     counts = collections.Counter(mergedWords)
-    for word in self.words[:]:
+    for i, word in enumerate(self.words[:]):
         charValue = 0
         for char in set(word):
             charValue += counts[char]
         if charValue == len(word):
             self.removedWords.append(word)
-            self.data.remove(word)
+            del self.words[i]
+            del self.weights[i]
+            del self.wLens[i]
             self.size -= 1
             if msg:
                 print(f"'{word}' can not cross with any other words")
