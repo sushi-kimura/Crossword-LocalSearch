@@ -1206,7 +1206,7 @@ sample_puzzle.isSimpleSol()
 # 最後に、生成されたパズルを画像として出力してみましょう。パズルを他人と共有する際に便利なツールです。
 
 # +
-def saveImage(self, data, fpath):
+def saveImage(self, data, fpath, dpi=100):
     """
     This method generates and returns a puzzle image with a word list
     """
@@ -1214,7 +1214,7 @@ def saveImage(self, data, fpath):
     collors = np.where(self.cover<1, "#000000", "#FFFFFF")
     df = pd.DataFrame(data)
 
-    fig=plt.figure(figsize=(16, 8), dpi=100)
+    fig=plt.figure(figsize=(16, 8), dpi=dpi)
     ax1=fig.add_subplot(121) # puzzle
     ax2=fig.add_subplot(122) # word list
     ax1.axis("off")
@@ -1243,24 +1243,24 @@ def saveImage(self, data, fpath):
     for _, cell in ax2_table.get_celld().items():
         cell.set_text_props(fontproperties=fp, size=18)
     plt.tight_layout()
-    plt.savefig(fpath)
+    plt.savefig(fpath, dpi=dpi)
     plt.close()
 setattr(Puzzle, "saveImage", saveImage)
 
-def saveProblemImage(self, fpath):
+def saveProblemImage(self, fpath, dpi=100):
     """
     This method generates and returns a puzzle problem with a word list
     """
     data = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height,self.width)
-    self.saveImage(data, fpath)
+    self.saveImage(data, fpath, dpi)
 setattr(Puzzle, "saveProblemImage", saveProblemImage)
     
-def saveAnswerImage(self, fpath):
+def saveAnswerImage(self, fpath, dpi=100):
     """
     This method generates and returns a puzzle answer with a word list.
     """
     data = self.cell
-    self.saveImage(data, fpath)
+    self.saveImage(data, fpath, dpi)
 setattr(Puzzle, "saveAnswerImage", saveAnswerImage)
 
 # -
@@ -1272,6 +1272,7 @@ sample_puzzle.saveProblemImage(f"fig/puzzle/{madeTime}_{str(sample_dic)}_{width}
 
 # ## 解答
 
+madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
 sample_puzzle.saveAnswerImage(f"fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_answer.png")
 
 # ---
