@@ -418,38 +418,38 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         
     # If 0 words used, return True
     if self.solSize is 0:
-        return True
+        return 0
 
     # If the preceding and succeeding cells are already filled
     if div == 0:
         if i > 0 and self.cell[i-1, j] != "":
-            return False
+            return 1
         if i+wLen < self.height and self.cell[i+wLen, j] != "":
-            return False
+            return 1
     if div == 1:
         if j > 0 and self.cell[i, j-1] != "":
-            return False
+            return 1
         if j+wLen < self.width and self.cell[i, j+wLen] != "":
-            return False
+            return 1
         
     #At least one place must cross other words
     if np.all(emptys == True):
-        return False
+        return 2
         
     # Judge whether correct intersection
     where = np.where(emptys == False)[0]
     if div == 0:
         jall = np.full(where.size, j, dtype = "int64")
         if np.any(self.cell[where+i, jall] != np.array(list(word))[where]):
-            return False
+            return 3
     if div == 1:
         iall = np.full(where.size, i, dtype = "int64")
         if np.any(self.cell[iall, where+j] != np.array(list(word))[where]):
-            return False
+            return 3
         
     # If the same word is in use, return False
     if word in self.usedWords:
-        return False
+        return 4
 
     # If neighbor cells are filled except at the intersection, return False
     where = np.where(emptys == True)[0]
@@ -457,30 +457,30 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         jall = np.full(where.size, j, dtype = "int64")
         # Left side
         if j > 0 and np.any(self.cell[where+i, jall-1] != ""):
-            return False
+            return 5
         # Right side
         if j < self.width-1 and np.any(self.cell[where+i, jall+1] != ""):
-            return False
+            return 5
     if div == 1:
         iall = np.full(where.size, i, dtype = "int64")
         # Upper
         if i > 0 and np.any(self.cell[iall-1, where+j] != ""):
-            return False
+            return 5
         # Lower
         if i < self.height-1 and np.any(self.cell[iall+1, where+j] != ""):
-            return False
+            return 5
     
     # US/USA, DOMINICA/DOMINICAN probrem
     if div == 0:
         if np.any(self.enable[i:i+wLen, j] == False) or np.all(emptys == False):
-            return False
+            return 6
     if div == 1:
         if np.any(self.enable[i, j:j+wLen] == False) or np.all(emptys == False):
-            return False
+            return 6
 
 
     # If Break through the all barrier, return True
-    return True
+    return 0
 
 # Set attribute to Puzzle class
 setattr(Puzzle, "isEnabledAdd", isEnabledAdd)
@@ -505,8 +505,9 @@ def add(self, div, i, j, k):
     wLen = self.dic.wLen[k]
 
     # Judge whether adding is enabled
-    if self.isEnabledAdd(div, i, j, word, wLen) == False:
-        return
+    code = self.isEnabledAdd(div, i, j, word, wLen)
+    if code is not 0:
+        return code
     
     # Put the word to puzzle
     if div == 0:
@@ -540,7 +541,7 @@ def add(self, div, i, j, k):
     self.totalWeight += weight
     self.history.append((1, wordIdx, div, i, j))
     self.historyIdx += 1
-    return
+    return 0
 # Set attribute to Puzzle class  
 setattr(Puzzle, "add", add)
 
@@ -559,12 +560,17 @@ def addToLimit(self):
     # Make a random index of plc
     randomIndex = np.arange(self.plc.size)
     np.random.shuffle(randomIndex)
+    
     # Add as much as possible
     solSizeTmp = None
     while self.solSize != solSizeTmp:
         solSizeTmp = self.solSize
-        for r in randomIndex:
-            self.add(self.plc.div[r], self.plc.i[r], self.plc.j[r], self.plc.k[r])
+        dropIdx = []
+        for i, r in enumerate(randomIndex):
+            code = self.add(self.plc.div[r], self.plc.i[r], self.plc.j[r], self.plc.k[r])
+            if code in (1,3,4,5,6):
+                dropIdx.append(i)
+        randomIndex = np.delete(randomIndex, dropIdx)
     return
 setattr(Puzzle, "addToLimit", addToLimit)
 
