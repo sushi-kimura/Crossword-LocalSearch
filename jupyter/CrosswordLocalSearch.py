@@ -416,13 +416,7 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         return True
 
     # If the same word is in use, return False
-    if np.any(self.usedWords == word):
-        return False
-
-    # If the word does not fit in the puzzle, return False
-    if div == 0 and i+wLen > self.height:
-        return False
-    if div == 1 and j+wLen > self.width:
+    if word in self.usedWords:
         return False
 
     # US/USA, DOMINICA/DOMINICAN probrem
@@ -1284,7 +1278,7 @@ def jump(self, idx):
         if code == 1:
             tmp_puzzle.add(div, i, j, k)
         else:
-            tmp_puzzle.drop(div, i, j, k, isKick=False)
+            tmp_puzzle.drop(div, i, j, k)
     tmp_puzzle.history = copy.deepcopy(self.history)
     return tmp_puzzle
 setattr(Puzzle, "jump", jump)
