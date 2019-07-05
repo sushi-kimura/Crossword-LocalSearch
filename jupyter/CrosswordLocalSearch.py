@@ -320,7 +320,7 @@ class Placeable():
         self.j = np.zeros(2*dic.size*self.width*self.height, dtype='int64')
         self.invP = np.zeros(2*dic.size*self.width*self.height, dtype='int64').reshape(2,self.height,self.width,dic.size)
 
-        for div in range(2):
+        for div in (0,1):
             for k in range(dic.size):
                 if div == 0:
                     iMax = self.height - dic.wLen[k] + 1
@@ -341,6 +341,11 @@ class Placeable():
             print(f" - placeable size : {self.size}/{self.div.size}(max shape)") 
     def __len__(self):
         return self.size
+    def __getitem__(self, key):
+        if type(key) in (int, np.int64):
+            return {"div":self.div[key], "i":self.i[key], "j":self.j[key], "k":self.k[key]}
+        if type(key) is str:
+            return eval(f"self.{key}")
 
 
 sample_plc = Placeable(sample_puzzle, sample_dic)
@@ -568,7 +573,7 @@ def addToLimit(self):
         dropIdx = []
         for i, r in enumerate(randomIndex):
             code = self.add(self.plc.div[r], self.plc.i[r], self.plc.j[r], self.plc.k[r])
-            if code in (1,3,4,5,6):
+            if code is not 2:
                 dropIdx.append(i)
         randomIndex = np.delete(randomIndex, dropIdx)
     return
