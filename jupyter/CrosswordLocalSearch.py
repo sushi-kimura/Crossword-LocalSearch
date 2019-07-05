@@ -300,7 +300,7 @@ if not withWeight:
 
 # ### Placeable クラス
 # 辞書内のすべての単語に対して、それぞれの単語が配置可能(placeable)な位置の一覧を作るクラス。  
-# これは`Puzzle`クラスと`Dictionary`クラスの両方の要素を用いて行われます。
+# これは`Puzzle`クラス内で内部的に`Dictionary`クラスとパズルの盤面情報を用いて行われます。
 #
 # 配置可能な位置は、単語の先頭文字の座標で指定します。  
 # ここでは、パズルの左上を(0,0)、右上を(n,0)、左下を(0,n)、右下を(n,n)とします。  
@@ -359,8 +359,8 @@ class Placeable():
                         self.invP[div,i,j,k] = self.size
                         self.size += 1
         if msg == True:
-            print("Placeable object has made.")
-            print(f" - placeable size : {self.size}/{self.div.size}(max shape)") 
+            print(f"Imported Dictionary name: `{dic.name}`, size: {dic.size}")
+            print(f"Placeable size : {self.size}/{self.div.size}(max shape)") 
     def __len__(self):
         return self.size
     def __getitem__(self, key):
@@ -370,7 +370,19 @@ class Placeable():
             return eval(f"self.{key}")
 
 
-sample_plc = Placeable(sample_puzzle, sample_dic)
+# このクラスインスタンスをユーザが陽に作成することはほぼないでしょう。  
+# ただし、内部では常に使われる重要なクラスです。  
+# 実際には、`Dictionary`オブジェクトを`Puzzle`にインポートする際に内部で計算が行われます。
+
+def importDict(self, dictionary):
+    self.dic = dictionary
+    self.plc = Placeable(self, self.dic)
+setattr(Puzzle, "importDict", importDict)
+
+# それでは`Puzzle`に`Dictionary`をインポートしましょう。  
+# このときに内部で`Placeable`の計算が行われます。
+
+sample_puzzle.importDict(sample_dic)
 
 
 # ### ObjectiveFunction クラス
@@ -600,12 +612,10 @@ def addToLimit(self):
     return
 setattr(Puzzle, "addToLimit", addToLimit)
 
-def firstSolve(self, dictionary, placeable):
+def firstSolve(self):
     """
     This method creates an initial solution
     """
-    self.dic = dictionary
-    self.plc = placeable
     # Check the initSol
     if self.initSol:
         raise RuntimeError("'firstSolve' method has already called")
@@ -618,7 +628,7 @@ def firstSolve(self, dictionary, placeable):
 setattr(Puzzle, "firstSolve", firstSolve)
 # -
 
-sample_puzzle.firstSolve(sample_dic, sample_plc)
+sample_puzzle.firstSolve()
 
 
 # どんなパズルができたのか、結果が気になりますよね。  
