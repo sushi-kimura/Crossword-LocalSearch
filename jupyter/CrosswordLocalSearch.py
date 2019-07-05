@@ -107,10 +107,10 @@ class Puzzle():
         self.height = height
         self.totalWeight = 0
         self.puzzleTitle = puzzleTitle
-        self.enable = np.ones(width*height, dtype = "bool").reshape(height,width)
         self.cell = np.full(width*height, "", dtype = "unicode").reshape(height,width)
         self.cover = np.zeros(width*height, dtype = "int64").reshape(height,width)
         self.coverDFS = np.zeros(width*height, dtype = "int64").reshape(height,width)
+        self.enable = np.ones(width*height, dtype = "bool").reshape(height,width)
         self.usedWords = np.full(width*height, "", dtype = "U%d" % max(width,height))
         self.usedPlcIdx = np.full(width*height, -1, dtype = "int64")
         self.solSize = 0
@@ -135,6 +135,28 @@ class Puzzle():
             
     def __str__(self):
         return self.puzzleTitle
+    
+    def reinit(self, all=False):
+        if all is True:
+            self.dic = None
+            self.plc = None
+            self.objFunc = None
+            self.optimizer = None
+        self.totalWeight = 0
+        self.enable = np.ones(width*height, dtype = "bool").reshape(height,width)
+        self.cell = np.full(width*height, "", dtype = "unicode").reshape(height,width)
+        self.cover = np.zeros(width*height, dtype = "int64").reshape(height,width)
+        self.coverDFS = np.zeros(width*height, dtype = "int64").reshape(height,width)
+        self.enable = np.ones(width*height, dtype = "bool").reshape(height,width)
+        self.usedWords = np.full(width*height, "", dtype = "U%d" % max(width,height))
+        self.usedPlcIdx = np.full(width*height, -1, dtype = "int64")
+        self.solSize = 0
+        self.history = []
+        self.historyIdx = 0
+        self.log = None
+        self.epoch = 0
+        self.initSol = False
+        self.initSeed = None
 
 
 sample_puzzle = Puzzle(width, height, puzzleTitle)
@@ -304,7 +326,7 @@ display(Image.open("fig/sample_placeable.png"))
 #   * width : 引数のパズルの横幅
 #   * height : 引数のパズルの縦幅
 #   * div : Placeable成分の文字列の方向
-#   * k : Placeable成分の文字の番号
+#   * k : Placeable成分の単語番号
 #   * i : Placeable成分のy方向の座標
 #   * j : Placeable成分のx方向の座標
 #   * invP : Placeableオブジェクトの逆写像
@@ -482,7 +504,6 @@ def isEnabledAdd(self, div, i, j, word, wLen):
     if div == 1:
         if np.any(self.enable[i, j:j+wLen] == False) or np.all(emptys == False):
             return 6
-
 
     # If Break through the all barrier, return True
     return 0
