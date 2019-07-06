@@ -12,8 +12,10 @@ import numpy as np
 #   * word : 単語配列
 #   * weight : 重み配列
 #   * wLen : 単語長配列
+#   * removedWords : 削除された単語配列
 
-class Dictionary():
+
+class Dictionary:
     def __init__(self, fpath, msg=True):
         self.fpath = fpath
         self.name = os.path.basename(fpath)[:-4]
@@ -26,6 +28,7 @@ class Dictionary():
         self.word = [d[0] for d in data]
         self.weight = [d[1] for d in data]
         self.wLen = [len(w) for w in self.word]
+        self.removedWords = []
         # Get a size of dictionary
         self.size = len(data)
         # Check dictionary type(English/Japanese/'Kanji')
@@ -50,7 +53,7 @@ class Dictionary():
         self.wLen = [len(w) for w in self.word]
 
         # Message
-        if msg == True:
+        if msg is True:
             print(f" - file path         : {self.fpath}")
             print(f" - dictionary size   : {self.size}")
             print(f" - dictionary type   : {self.dictType}")
@@ -75,7 +78,6 @@ class Dictionary():
         """
         This method checks words in the dictionary and erases words that can not cross any other words.
         """
-        self.removedWords = []
         mergedWords = "".join(self.word)
         counts = collections.Counter(mergedWords)
         for i, w in enumerate(self.word[:]):

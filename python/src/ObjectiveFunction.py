@@ -7,17 +7,18 @@ import numpy as np
 # 目的関数はパズルの初期解が得られてから、そのパズルを改善していくために使われます。
 # 目的関数には様々な指標が考えられるため、それらを管理する`ObjectiveFunction`クラスを定義します：
 
-class ObjectiveFunction():
+
+class ObjectiveFunction:
     def __init__(self, msg=True):
         self.flist = [
             "totalWeight",
             "solSize",
             "crossCount",
             "fillCount",
-            "maxConnectedEmptys"
+            "maxConnectedEmpties"
         ]
         self.registeredFuncs = []
-        if msg == True:
+        if msg is True:
             print("ObjectiveFunction object has made.")
 
     def __len__(self):
@@ -50,7 +51,7 @@ class ObjectiveFunction():
         """
         return puzzle.totalWeight
 
-    def maxConnectedEmptys(self, puzzle):
+    def maxConnectedEmpties(self, puzzle):
         """
         This method returns the maximum number of concatenations for unfilled squares
         """
@@ -69,8 +70,8 @@ class ObjectiveFunction():
         """
         for funcName in funcNames:
             if funcName not in self.flist:
-                raise RuntimeError(f"ObjectiveFunction class doesn't have '{funcName}' function")
-            if msg == True:
+                raise RuntimeError(f"ObjectiveFunction class does not have '{funcName}' function")
+            if msg is True:
                 print(" - '%s' function has registered." % funcName)
         self.registeredFuncs = funcNames
         return
@@ -79,10 +80,10 @@ class ObjectiveFunction():
         """
         This method returns any objective function value
         """
-        if all:
-            scores=np.zeros(len(self.registeredFuncs), dtype="int64")
+        if all is True:
+            scores = np.zeros(len(self.registeredFuncs), dtype="int64")
             for n in range(scores.size):
-                scores[n] = eval("self.%s(puzzle)" % self.registeredFuncs[n])
+                scores[n] = eval(f"self.{self.registeredFuncs[n]}(puzzle)")
             return scores
         if func is None:
             func = self.registeredFuncs[i]

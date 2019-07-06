@@ -93,6 +93,7 @@ start = time.time()
 #   * historyIdx : 現在参照している履歴番号
 #   * log：目的関数値の履歴
 #   * epoch : 初期解から局所探索した回数
+#   * ccl : 連結成分標識
 #   * initSol : 初期解が作られたかどうか(bool)
 #   * initSeed：初期解作成開始時点のseed値
 #   * dic：Dictionaryオブジェクト(後述)
@@ -100,7 +101,7 @@ start = time.time()
 #   * objFunc：ObjectiveFunctionオブジェクト(後述)
 #   * optimizer：Optimizerオブジェクト(後述)
 
-class Puzzle():
+class Puzzle:
     def __init__(self, width, height, puzzleTitle="スケルトンパズル", msg=True):
         self.width = width
         self.height = height
@@ -117,6 +118,7 @@ class Puzzle():
         self.historyIdx = 0
         self.log = None
         self.epoch = 0
+        self.ccl = None
         self.initSol = False
         self.initSeed = None
         self.dic = None
@@ -125,7 +127,7 @@ class Puzzle():
         self.optimizer = None
 
         ## Message
-        if msg == True:
+        if msg is True:
             print("Puzzle object has made.")
             print(f" - title       : {self.puzzleTitle}")
             print(f" - width       : {self.width}")
@@ -142,12 +144,12 @@ class Puzzle():
             self.objFunc = None
             self.optimizer = None
         self.totalWeight = 0
-        self.enable = np.ones(width*height, dtype="bool").reshape(height,width)
-        self.cell = np.full(width*height, "", dtype="unicode").reshape(height,width)
-        self.cover = np.zeros(width*height, dtype="int64").reshape(height,width)
-        self.coverDFS = np.zeros(width*height, dtype="int64").reshape(height,width)
-        self.enable = np.ones(width*height, dtype="bool").reshape(height,width)
-        self.usedWords = np.full(width*height, "", dtype="U%d" % max(width,height))
+        self.enable = np.ones(width*height, dtype="bool").reshape(height, width)
+        self.cell = np.full(width*height, "", dtype="unicode").reshape(height, width)
+        self.cover = np.zeros(width*height, dtype="int64").reshape(height, width)
+        self.coverDFS = np.zeros(width*height, dtype="int64").reshape(height, width)
+        self.enable = np.ones(width*height, dtype="bool").reshape(height, width)
+        self.usedWords = np.full(width*height, "", dtype="U%d" % max(width, height))
         self.usedPlcIdx = np.full(width*height, -1, dtype="int64")
         self.solSize = 0
         self.history = []
@@ -173,8 +175,9 @@ sample_puzzle = Puzzle(width, height, puzzleTitle)
 #   * word : 単語配列
 #   * weight : 重み配列
 #   * wLen : 単語長配列
+#   * removedWords : 削除された単語配列
 
-class Dictionary():
+class Dictionary:
     def __init__(self, fpath, msg=True):
         self.fpath = fpath
         self.name = os.path.basename(fpath)[:-4]
@@ -187,6 +190,7 @@ class Dictionary():
         self.word = [d[0] for d in data]
         self.weight = [d[1] for d in data]
         self.wLen = [len(w) for w in self.word]
+        self.removedWords = []
         # Get a size of dictionary
         self.size = len(data)
         # Check dictionary type(English/Japanese/'Kanji')
@@ -211,7 +215,7 @@ class Dictionary():
         self.wLen = [len(w) for w in self.word]
 
         # Message
-        if msg == True:
+        if msg is True:
             print(f" - file path         : {self.fpath}")
             print(f" - dictionary size   : {self.size}")
             print(f" - dictionary type   : {self.dictType}")
@@ -240,7 +244,6 @@ def deleteUnusableWords(self, msg=True):
     """
     This method checks words in the dictionary and erases words that can not cross any other words.
     """
-    self.removedWords = []
     mergedWords = "".join(self.word)
     counts = collections.Counter(mergedWords)
     for i, w in enumerate(self.word[:]):
@@ -253,7 +256,7 @@ def deleteUnusableWords(self, msg=True):
             del self.weight[i]
             del self.wLen[i]
             self.size -= 1
-            if msg:
+            if msg is True:
                 print(f"'{w}' can not cross with any other words")
 setattr(Dictionary, "deleteUnusableWords", deleteUnusableWords)
 
@@ -291,7 +294,7 @@ def calcWeight(self, msg=True):
         for char in w:
             self.weight[i] += counts[char]
             
-    if msg:
+    if msg is True:
         print("All weights are calculated.")
         print("TOP 5 characters:")
         print(counts.most_common()[:5])
@@ -336,7 +339,7 @@ display(Image.open("fig/sample_placeable.png"))
 #   * j : Placeable成分のx方向の座標
 #   * invP : Placeableオブジェクトの逆写像
 
-class Placeable():
+class Placeable:
     def __init__(self, puzzle, dic, msg=True):
         self.size = 0
         self.width = puzzle.width
@@ -363,14 +366,16 @@ class Placeable():
                         self.j[self.size] = j
                         self.invP[div,i,j,k] = self.size
                         self.size += 1
-        if msg == True:
+        if msg is True:
             print(f"Imported Dictionary name: `{dic.name}`, size: {dic.size}")
             print(f"Placeable size : {self.size}/{self.div.size}(max shape)") 
+            
     def __len__(self):
         return self.size
+
     def __getitem__(self, key):
         if type(key) in (int, np.int64):
-            return {"div":self.div[key], "i":self.i[key], "j":self.j[key], "k":self.k[key]}
+            return {"div": self.div[key], "i": self.i[key], "j": self.j[key], "k": self.k[key]}
         if type(key) is str:
             return eval(f"self.{key}")
 
@@ -396,17 +401,17 @@ sample_puzzle.importDict(sample_dic)
 # 目的関数はパズルの初期解が得られてから、そのパズルを改善していくために使われます。  
 # 目的関数には様々な指標が考えられるため、それらを管理する`ObjectiveFunction`クラスを定義します：
 
-class ObjectiveFunction():
+class ObjectiveFunction:
     def __init__(self, msg=True):
         self.flist = [
             "totalWeight",
             "solSize",
             "crossCount",
             "fillCount",
-            "maxConnectedEmptys"
+            "maxConnectedEmpties"
         ]
         self.registeredFuncs = []
-        if msg == True:
+        if msg is True:
             print("ObjectiveFunction object has made.")
     def __len__(self):
         return len(self.registeredFuncs)
@@ -424,12 +429,12 @@ objFunc = ObjectiveFunction()
 # この種の問題は「離散最適化問題(組み合わせ最適化)」と呼ばれ、巡回セールスマン問題などと近い分類に当たります。この手の問題で使われる最適化手法は「局所探索法」や「焼きなまし法」などが用いられます。  
 # 最適化手法はアイデア次第で様々なものが考えられるため、これら管理する`Optimizer`クラスを定義しておきましょう：
 
-class Optimizer():
+class Optimizer:
     def __init__(self, msg=True):
         self.methodList = ["localSearch", "iterativeLocalSearch"]
         self.method = ""
-        if msg == True:
-            print("Opimizer object has made.")
+        if msg is True:
+            print("Optimizer object has made.")
 
 
 optimizer = Optimizer()
@@ -456,9 +461,9 @@ def isEnabledAdd(self, div, i, j, word, wLen):
     This method determines if a word can be placed
     """
     if div == 0:
-        emptys = self.cell[i:i+wLen, j] == ""
+        empties = self.cell[i:i+wLen, j] == ""
     if div == 1:
-        emptys = self.cell[i, j:j+wLen] == ""
+        empties = self.cell[i, j:j+wLen] == ""
         
     # If 0 words used, return True
     if self.solSize is 0:
@@ -477,11 +482,11 @@ def isEnabledAdd(self, div, i, j, word, wLen):
             return 1
         
     # At least one place must cross other words
-    if np.all(emptys == True):
+    if np.all(empties == True):
         return 2
         
     # Judge whether correct intersection
-    where = np.where(emptys == False)[0]
+    where = np.where(empties == False)[0]
     if div == 0:
         jall = np.full(where.size, j, dtype="int64")
         if np.any(self.cell[where+i, jall] != np.array(list(word))[where]):
@@ -496,7 +501,7 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         return 4
 
     # If neighbor cells are filled except at the intersection, return False
-    where = np.where(emptys == True)[0]
+    where = np.where(empties == True)[0]
     if div == 0:
         jall = np.full(where.size, j, dtype="int64")
         # Left side
@@ -514,12 +519,12 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         if i < self.height-1 and np.any(self.cell[iall+1, where+j] != ""):
             return 5
     
-    # US/USA, DOMINICA/DOMINICAN probrem
+    # US/USA, DOMINICA/DOMINICAN problem
     if div == 0:
-        if np.any(self.enable[i:i+wLen, j] == False) or np.all(emptys == False):
+        if np.any(self.enable[i:i+wLen, j] == False) or np.all(empties == False):
             return 6
     if div == 1:
-        if np.any(self.enable[i, j:j+wLen] == False) or np.all(emptys == False):
+        if np.any(self.enable[i, j:j+wLen] == False) or np.all(empties == False):
             return 6
 
     # If Break through the all barrier, return True
@@ -766,9 +771,9 @@ setattr(Puzzle, "DFS", DFS)
 # `DFS`メソッドは引数で与えられたセルに連結した島しか判定しません。
 # 文字なしマスの最大連結数を見るためには、全ての島に対して`DFS`を使って番号を振る必要があります。
 #
-# さて、この`DFS`メソッドを使って文字なしマスの最大連結数を取り出す`maxConnectedEmptys`メソッドを実装しましょう(上でも述べたとおり、全マス数から最大連結数を引いたものをスコアとして返します)：
+# さて、この`DFS`メソッドを使って文字なしマスの最大連結数を取り出す`maxConnectedEmpties`メソッドを実装しましょう(上でも述べたとおり、全マス数から最大連結数を引いたものをスコアとして返します)：
 
-def maxConnectedEmptys(self, puzzle):
+def maxConnectedEmpties(self, puzzle):
     """
     This method returns the maximum number of concatenations for unfilled squares
     """
@@ -780,11 +785,11 @@ def maxConnectedEmptys(self, puzzle):
             ccl += 1
     score = puzzle.width*puzzle.height - np.max(np.bincount(puzzle.coverDFS.flatten())[1:])
     return score
-setattr(ObjectiveFunction, "maxConnectedEmptys", maxConnectedEmptys)
+setattr(ObjectiveFunction, "maxConnectedEmpties", maxConnectedEmpties)
 
 # 早速結果を見てみましょう：
 
-print("maxConnectedEmptys: %d" % objFunc.maxConnectedEmptys(sample_puzzle))
+print("maxConnectedEmpties: %d" % objFunc.maxConnectedEmpties(sample_puzzle))
 
 
 # 次に、これらの目的関数をどの順番で見ていくかの優先順位をつけて、`ObjectiveFunction`オブジェクトに登録します。  
@@ -796,27 +801,27 @@ def register(self, funcNames, msg=True):
     """
     for funcName in funcNames:
         if funcName not in self.flist:
-            raise RuntimeError(f"ObjectiveFunction class doesn't have '{funcName}' function")
-        if msg == True:
+            raise RuntimeError(f"ObjectiveFunction class does not have '{funcName}' function")
+        if msg is True:
             print(" - '%s' function has registered." % funcName)
     self.registeredFuncs = funcNames
     return
 setattr(ObjectiveFunction, "register", register)
 
-objFunc.register(["totalWeight","solSize", "crossCount", "fillCount", "maxConnectedEmptys"])
+objFunc.register(["totalWeight","solSize", "crossCount", "fillCount", "maxConnectedEmpties"])
 
 
-# この場合、"totalWeight"から評価が始まり、最後に”maxConnectedEmptys”が評価されます。  
+# この場合、"totalWeight"から評価が始まり、最後に”maxConnectedEmpties”が評価されます。  
 # 次に、こうして登録した目的関数値をスコアとして返す`getScore`メソッドを実装します：
 
 def getScore(self, puzzle, i=0, func=None, all=False):
     """
     This method returns any objective function value
     """
-    if all:
+    if all is True:
         scores=np.zeros(len(self.registeredFuncs), dtype="int64")
         for n in range(scores.size):
-            scores[n] = eval("self.%s(puzzle)" % self.registeredFuncs[n])
+            scores[n] = eval(f"self.{self.registeredFuncs[n]}(puzzle)")
         return scores
     if func is None:
         func = self.registeredFuncs[i]
@@ -893,10 +898,10 @@ def drop(self, div, i, j, k, isKick=False):
         iall = np.full(where.size, i, dtype="int64")
         self.cell[iall,j+where] = ""
     # Update usedWords, usedPlcIdx, solSize, totalWeight
-    self.usedWords = np.delete(self.usedWords, pidx)  #delete
+    self.usedWords = np.delete(self.usedWords, pidx)  # delete
     self.usedWords = np.append(self.usedWords, "")  # append
     self.usedPlcIdx = np.delete(self.usedPlcIdx, pidx)  # delete
-    self.usedPlcIdx = np.append(self.usedPlcIdx, -1)  #append
+    self.usedPlcIdx = np.append(self.usedPlcIdx, -1)  # append
     self.solSize -= 1
     self.totalWeight -= weight
     # Insert data to history
@@ -1110,7 +1115,7 @@ def setMethod(self, methodName, msg=True):
     """
     if methodName not in self.methodList:
         raise ValueError(f"Optimizer doesn't have '{methodName}' method")
-    if msg:
+    if msg is True:
         print(" - '%s' method has registered." % methodName)
     self.method = methodName
 setattr(Optimizer, "setMethod", setMethod)
@@ -1132,7 +1137,7 @@ def compile(self, objFunc, optimizer, msg=True):
     self.objFunc = objFunc
     self.optimizer = optimizer
     
-    if msg:
+    if msg is True:
         print("compile succeeded.")
         print(" --- objective functions:")
         for funcNum in range(len(objFunc)):
@@ -1350,13 +1355,13 @@ def jump(self, idx):
 setattr(Puzzle, "jump", jump)
 
 def getPrev(self, n=1):
-    if (self.historyIdx - n < 0):
+    if self.historyIdx-n < 0:
         return self.jump(0)
     return self.jump(self.historyIdx - n)
 setattr(Puzzle, "getPrev", getPrev)
 
 def getNext(self, n=1):
-    if (self.historyIdx + n > len(self.history)):
+    if self.historyIdx+n > len(self.history):
         return self.getLatest()
     return self.jump(self.historyIdx + n)
 setattr(Puzzle, "getNext", getNext)
@@ -1392,7 +1397,7 @@ def toPickle(self, fpath=None, msg=True):
     fpath = fpath or f"pickle/{now}_{self.dic.name}_{self.width}_{self.height}_{self.initSeed}_{self.epoch}.pickle"
     with open(fpath, mode="wb") as f:
         pickle.dump(self, f)
-    if msg:
+    if msg is True:
         print(f"Puzzle has pickled to the path '{fpath}'")
 setattr(Puzzle, "toPickle", toPickle)
 

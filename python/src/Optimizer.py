@@ -5,12 +5,13 @@ import copy
 # この種の問題は「離散最適化問題(組み合わせ最適化)」と呼ばれ、巡回セールスマン問題などと近い分類に当たります。この手の問題で使われる最適化手法は「局所探索法」や「焼きなまし法」などが用いられます。
 # 最適化手法はアイデア次第で様々なものが考えられるため、これら管理する`Optimizer`クラスを定義しておきましょう：
 
-class Optimizer():
+
+class Optimizer:
     def __init__(self, msg=True):
         self.methodList = ["localSearch", "iterativeLocalSearch"]
         self.method = ""
-        if msg == True:
-            print("Opimizer object has made.")
+        if msg is True:
+            print("Optimizer object has made.")
 
     def getNeighborSolution(self, puzzle):
         """
@@ -89,7 +90,7 @@ class Optimizer():
         This method sets the optimization method on the instance
         """
         if methodName not in self.methodList:
-            raise ValueError(f"Optimizer doesn't have '{methodName}' method")
+            raise ValueError(f"Optimizer does not have '{methodName}' method")
         if msg:
             print(" - '%s' method has registered." % methodName)
         self.method = methodName

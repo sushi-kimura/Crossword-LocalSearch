@@ -28,6 +28,7 @@ from src.Placeable import Placeable
 #   * historyIdx : 現在参照している履歴番号
 #   * log：目的関数値の履歴
 #   * epoch : 初期解から局所探索した回数
+#   * ccl : 連結成分標識
 #   * initSol : 初期解が作られたかどうか(bool)
 #   * initSeed：初期解作成開始時点のseed値
 #   * dic：Dictionaryオブジェクト(後述)
@@ -35,7 +36,8 @@ from src.Placeable import Placeable
 #   * objFunc：ObjectiveFunctionオブジェクト(後述)
 #   * optimizer：Optimizerオブジェクト(後述)
 
-class Puzzle():
+
+class Puzzle:
     def __init__(self, width, height, puzzleTitle="スケルトンパズル", msg=True):
         self.width = width
         self.height = height
@@ -52,6 +54,7 @@ class Puzzle():
         self.historyIdx = 0
         self.log = None
         self.epoch = 0
+        self.ccl = None
         self.initSol = False
         self.initSeed = None
         self.dic = None
@@ -60,7 +63,7 @@ class Puzzle():
         self.optimizer = None
 
         # Message
-        if msg == True:
+        if msg is True:
             print("Puzzle object has made.")
             print(f" - title       : {self.puzzleTitle}")
             print(f" - width       : {self.width}")
@@ -77,12 +80,12 @@ class Puzzle():
             self.objFunc = None
             self.optimizer = None
         self.totalWeight = 0
-        self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height,self.width)
-        self.cell = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height,self.width)
-        self.cover = np.zeros(self.width*self.height, dtype="int64").reshape(self.height,self.width)
-        self.coverDFS = np.zeros(self.width*self.height, dtype="int64").reshape(self.height,self.width)
-        self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height,self.width)
-        self.usedWords = np.full(self.width*self.height, "", dtype="U%d" % max(self.width,self.height))
+        self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
+        self.cell = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height, self.width)
+        self.cover = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
+        self.coverDFS = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
+        self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
+        self.usedWords = np.full(self.width*self.height, "", dtype="U%d" % max(self.width, self.height))
         self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int64")
         self.solSize = 0
         self.history = []
@@ -101,9 +104,9 @@ class Puzzle():
         This method determines if a word can be placed
         """
         if div == 0:
-            emptys = self.cell[i:i+wLen, j] == ""
+            empties = self.cell[i:i+wLen, j] == ""
         if div == 1:
-            emptys = self.cell[i, j:j+wLen] == ""
+            empties = self.cell[i, j:j+wLen] == ""
 
         # If 0 words used, return True
         if self.solSize is 0:
@@ -122,11 +125,11 @@ class Puzzle():
                 return 1
 
         # At least one place must cross other words
-        if np.all(emptys == True):
+        if np.all(empties == True):
             return 2
 
         # Judge whether correct intersection
-        where = np.where(emptys == False)[0]
+        where = np.where(empties is False)[0]
         if div == 0:
             jall = np.full(where.size, j, dtype="int64")
             if np.any(self.cell[where+i, jall] != np.array(list(word))[where]):
@@ -141,7 +144,7 @@ class Puzzle():
             return 4
 
         # If neighbor cells are filled except at the intersection, return False
-        where = np.where(emptys == True)[0]
+        where = np.where(empties is True)[0]
         if div == 0:
             jall = np.full(where.size, j, dtype="int64")
             # Left side
@@ -159,12 +162,12 @@ class Puzzle():
             if i < self.height-1 and np.any(self.cell[iall+1, where+j] != ""):
                 return 5
 
-        # US/USA, DOMINICA/DOMINICAN probrem
+        # US/USA, DOMINICA/DOMINICAN problem
         if div == 0:
-            if np.any(self.enable[i:i+wLen, j] == False) or np.all(emptys == False):
+            if np.any(self.enable[i:i+wLen, j] == False) or np.all(empties == False):
                 return 6
         if div == 1:
-            if np.any(self.enable[i, j:j+wLen] == False) or np.all(emptys == False):
+            if np.any(self.enable[i, j:j+wLen] == False) or np.all(empties == False):
                 return 6
 
         # If Break through the all barrier, return True
@@ -327,10 +330,10 @@ class Puzzle():
             iall = np.full(where.size, i, dtype="int64")
             self.cell[iall,j+where] = ""
         # Update usedWords, usedPlcIdx, solSize, totalWeight
-        self.usedWords = np.delete(self.usedWords, pidx) #delete
-        self.usedWords = np.append(self.usedWords, "") # append
-        self.usedPlcIdx = np.delete(self.usedPlcIdx, pidx) # delete
-        self.usedPlcIdx = np.append(self.usedPlcIdx, -1) #append
+        self.usedWords = np.delete(self.usedWords, pidx)  # delete
+        self.usedWords = np.append(self.usedWords, "")  # append
+        self.usedPlcIdx = np.delete(self.usedPlcIdx, pidx)  # delete
+        self.usedPlcIdx = np.append(self.usedPlcIdx, -1)  # append
         self.solSize -= 1
         self.totalWeight -= weight
         # Insert data to history
@@ -347,7 +350,7 @@ class Puzzle():
                     removeFlag = False
                 if j < self.width-2 and np.all(self.cell[[i-1,i-1],[j+1,j+2]] != ""):
                     removeFlag = False
-                if removeFlag == True:
+                if removeFlag is True:
                     self.enable[i-1,j] = True
             if i+wLen < self.height:
                 if i+wLen < self.height-2 and np.all(self.cell[[i+wLen+1,i+wLen+2],[j,j]] != ""):
@@ -356,7 +359,7 @@ class Puzzle():
                     removeFlag = False
                 if j < self.width-2 and np.all(self.cell[[i+wLen,i+wLen],[j+1,j+2]] != ""):
                       removeFlag = False
-                if removeFlag == True:
+                if removeFlag is True:
                     self.enable[i+wLen,j] = True
         if div == 1:
             if j > 0:
@@ -366,7 +369,7 @@ class Puzzle():
                     removeFlag = False
                 if i < self.height-2 and np.all(self.cell[[i+1,i+2],[j-1,j-1]] != ""):
                     removeFlag = False
-                if removeFlag == True:
+                if removeFlag is True:
                     self.enable[i,j-1] = True
             if j+wLen < self.width:
                 if j+wLen < self.width-2 and np.all(self.cell[[i,i],[j+wLen+1,j+wLen+2]] != ""):
@@ -375,7 +378,7 @@ class Puzzle():
                     removeFlag = False
                 if i < self.height-2 and np.all(self.cell[[i+1,i+2],[j+wLen,j+wLen]] != ""):
                     removeFlag = False
-                if removeFlag == True:
+                if removeFlag is True:
                     self.enable[i,j+wLen] = True
 
     def collapse(self):
@@ -445,7 +448,7 @@ class Puzzle():
         self.objFunc = objFunc
         self.optimizer = optimizer
 
-        if msg:
+        if msg is True:
             print("compile succeeded.")
             print(" --- objective functions:")
             for funcNum in range(len(objFunc)):
@@ -492,7 +495,7 @@ class Puzzle():
                 i = self.plc.i[q]
                 j = self.plc.j[q]
                 word2 = self.usedWords[s+t+1]
-                if len(word1) != len(word2): # If word1 and word2 have different lengths, they can not be replaced
+                if len(word1) != len(word2):  # If word1 and word2 have different lengths, they can not be replaced
                     continue
                 if self.plc.div[q] == 0:
                     crossIdx2 = np.where(self.cover[i:i+len(word2),j] == 2)[0]
@@ -521,23 +524,23 @@ class Puzzle():
         This method generates and returns a puzzle image with a word list
         """
         # Generate puzzle image
-        collors = np.where(self.cover<1, "#000000", "#FFFFFF")
+        colors = np.where(self.cover<1, "#000000", "#FFFFFF")
         df = pd.DataFrame(data)
 
-        fig=plt.figure(figsize=(16, 8), dpi=dpi)
-        ax1=fig.add_subplot(121) # puzzle
-        ax2=fig.add_subplot(122) # word list
+        fig = plt.figure(figsize=(16, 8), dpi=dpi)
+        ax1 = fig.add_subplot(121) # puzzle
+        ax2 = fig.add_subplot(122) # word list
         ax1.axis("off")
         ax2.axis("off")
         fig.set_facecolor('#EEEEEE')
         # Draw puzzle
-        ax1_table = ax1.table(cellText=df.values, cellColours=collors, cellLoc="center", bbox=[0, 0, 1, 1])
+        ax1_table = ax1.table(cellText=df.values, cellColours=colors, cellLoc="center", bbox=[0, 0, 1, 1])
         for _, cell in ax1_table.get_celld().items():
             cell.set_text_props(fontproperties=fp, size=20)
         ax1.set_title(label="*** "+self.puzzleTitle+" ***", fontproperties=fp, size=20)
         # Draw word list
         words = [word for word in self.usedWords if word != ""]
-        if words == []:
+        if words is []:
             words = [""]
         words.sort()
         words = sorted(words, key=len)
@@ -577,7 +580,7 @@ class Puzzle():
         tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
         tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
         for code, k, div, i, j in self.history[:idx]:
-            if code == 1:
+            if code is 1:
                 tmp_puzzle.add(div, i, j, k)
             else:
                 tmp_puzzle.drop(div, i, j, k)
@@ -586,12 +589,12 @@ class Puzzle():
         return tmp_puzzle
 
     def getPrev(self, n=1):
-        if (self.historyIdx - n < 0):
+        if self.historyIdx - n < 0:
             return self.jump(0)
         return self.jump(self.historyIdx - n)
 
     def getNext(self, n=1):
-        if (self.historyIdx + n > len(self.history)):
+        if self.historyIdx + n > len(self.history):
             return self.getLatest()
         return self.jump(self.historyIdx + n)
 
@@ -606,7 +609,7 @@ class Puzzle():
         fpath = fpath or f"pickle/{now}_{self.dic.name}_{self.width}_{self.height}_{self.initSeed}_{self.epoch}.pickle"
         with open(fpath, mode="wb") as f:
             pickle.dump(self, f)
-        if msg:
+        if msg is True:
             print(f"Puzzle has pickled to the path '{fpath}'")
 
     def resetHistory(self):

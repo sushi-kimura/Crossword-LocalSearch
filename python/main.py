@@ -3,7 +3,7 @@
 Crossword Local Search
 """
 # In[]
-import os
+# import os
 import numpy as np
 from matplotlib.font_manager import FontProperties
 
@@ -19,7 +19,7 @@ randomSeed = 1
 withweight = False
 
 fp = FontProperties(fname="../jupyter/fonts/SourceHanCodeJP.ttc", size=14)
-np.random.seed(seed = randomSeed)
+np.random.seed(seed=randomSeed)
 
 # In[]
 # Make instances
@@ -33,7 +33,7 @@ print("------------------------------------------------------------------")
 
 # In[]
 # Register and set method and compile
-objFunc.register(["totalWeight","solSize", "crossCount", "fillCount", "maxConnectedEmptys"])
+objFunc.register(["totalWeight","solSize", "crossCount", "fillCount", "maxConnectedEmpties"])
 optimizer.setMethod("localSearch")
 puzzle.compile(objFunc=objFunc, optimizer=optimizer)
 print("------------------------------------------------------------------")

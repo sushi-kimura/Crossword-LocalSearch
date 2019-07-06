@@ -33,7 +33,7 @@ import numpy as np
 #   * j : Placeable成分のx方向の座標
 #   * invP : Placeableオブジェクトの逆写像
 
-class Placeable():
+class Placeable:
     def __init__(self, puzzle, dic, msg=True):
         self.size = 0
         self.width = puzzle.width
@@ -42,7 +42,7 @@ class Placeable():
         self.k = np.zeros(2*dic.size*self.width*self.height, dtype='int64')
         self.i = np.zeros(2*dic.size*self.width*self.height, dtype='int64')
         self.j = np.zeros(2*dic.size*self.width*self.height, dtype='int64')
-        self.invP = np.zeros(2*dic.size*self.width*self.height, dtype='int64').reshape(2,self.height,self.width,dic.size)
+        self.invP = np.zeros(2*dic.size*self.width*self.height, dtype='int64').reshape(2, self.height, self.width, dic.size)
 
         for div in (0,1):
             for k in range(dic.size):
@@ -60,13 +60,15 @@ class Placeable():
                         self.j[self.size] = j
                         self.invP[div,i,j,k] = self.size
                         self.size += 1
-        if msg == True:
+        if msg is True:
             print(f"Imported Dictionary name: `{dic.name}`, size: {dic.size}")
             print(f"Placeable size : {self.size}/{self.div.size}(max shape)")
+
     def __len__(self):
         return self.size
+
     def __getitem__(self, key):
         if type(key) in (int, np.int64):
-            return {"div":self.div[key], "i":self.i[key], "j":self.j[key], "k":self.k[key]}
+            return {"div": self.div[key], "i": self.i[key], "j": self.j[key], "k": self.k[key]}
         if type(key) is str:
             return eval(f"self.{key}")
