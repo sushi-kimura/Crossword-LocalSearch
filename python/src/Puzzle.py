@@ -466,6 +466,7 @@ class Puzzle():
         """
         This method repeats the solution improvement by the specified number of epochs
         """
+        self.resetHistory()
         if self.initSol is False:
             raise RuntimeError("'firstSolve' method has not called")
         if epoch is 0:
@@ -583,11 +584,14 @@ class Puzzle():
         tmp_puzzle = Puzzle(self.width, self.height, self.puzzleTitle, msg=False)
         tmp_puzzle.dic = copy.deepcopy(self.dic)
         tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
+        tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
+        tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
         for code, k, div, i, j in self.history[:idx]:
             if code == 1:
                 tmp_puzzle.add(div, i, j, k)
             else:
                 tmp_puzzle.drop(div, i, j, k)
+        tmp_puzzle.initSol = True
         tmp_puzzle.history = copy.deepcopy(self.history)
         return tmp_puzzle
 
@@ -614,3 +618,6 @@ class Puzzle():
             pickle.dump(self, f)
         if msg:
             print(f"Puzzle has pickled to the path '{fpath}'")
+
+    def resetHistory(self):
+        self.history = self.history[:self.historyIdx]
