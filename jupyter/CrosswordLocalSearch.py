@@ -60,7 +60,6 @@ from PIL import Image
 from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
-# #%matplotlib inline
 
 fp = FontProperties(fname="fonts/SourceHanCodeJP.ttc", size=14)
 np.random.seed(seed = randomSeed)
@@ -182,6 +181,9 @@ class Dictionary():
         file = open(self.fpath, 'r', encoding='utf-8')
         data = file.readlines()
         file.close()
+        self.word = [d[0] for d in data]
+        self.weight = [d[1] for d in data]
+        self.wLen = [len(w) for w in self.word]
         # Get a size of dictionary
         self.size = len(data)
         # Check dictionary type(English/Japanese/'Kanji')
@@ -1161,7 +1163,7 @@ sample_puzzle.solve(epoch=10)
 # 以上が局所探索法です。引数の`move`をオプションとして`True`で指定すると、「反復局所探索法」(未実装)になります。
 #
 # ここで、解の改善過程における目的関数値の推移を可視化してみましょう。  
-# ただし、epoch=0は初期解の目的関数値を表します。
+# ただし、`epoch=0`は初期解の目的関数値を表します。
 
 sample_puzzle.log
 
@@ -1178,7 +1180,8 @@ setattr(Puzzle, "showLog", showLog)
 sample_puzzle.showLog(figsize=(7,6))
 
 
-# ---
+# ***
+#
 # ## 解の唯一性
 # せっかくのパズルも複数の解が存在すると正しく解くことが出来なくなってしまいます。  
 # 例えば、「アメリカ」という単語が「リ」のみでクロスしていて、別の場所に「ソマリア」という単語が同じく「リ」のみでクロスしている場合、これらの単語は入れ替え可能となり、解が唯一に定まりません。  
@@ -1236,9 +1239,9 @@ setattr(Puzzle, "isSimpleSol", isSimpleSol)
 sample_puzzle.isSimpleSol()
 
 
-# ---
+# ***
+#
 # ## パズルの画像化
-
 # 最後に、生成されたパズルを画像として出力してみましょう。パズルを他人と共有する際に便利なツールです。
 
 # +
@@ -1283,7 +1286,7 @@ def saveImage(self, data, fpath, dpi=100):
     plt.close()
 setattr(Puzzle, "saveImage", saveImage)
 
-def saveProblemImage(self, fpath, dpi=100):
+def saveProblemImage(self, fpath="problem.png", dpi=100):
     """
     This method generates and returns a puzzle problem with a word list
     """
@@ -1291,7 +1294,7 @@ def saveProblemImage(self, fpath, dpi=100):
     self.saveImage(data, fpath, dpi)
 setattr(Puzzle, "saveProblemImage", saveProblemImage)
     
-def saveAnswerImage(self, fpath, dpi=100):
+def saveAnswerImage(self, fpath="answer.png", dpi=100):
     """
     This method generates and returns a puzzle answer with a word list.
     """
@@ -1301,29 +1304,34 @@ setattr(Puzzle, "saveAnswerImage", saveAnswerImage)
 
 # -
 
-# ## 問題
+# ### 問題
 
 madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
 sample_puzzle.saveProblemImage(f"fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_problem.png")
 
-# ## 解答
+# ### 解答
 
 madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
 sample_puzzle.saveAnswerImage(f"fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_answer.png")
 
-# ---
+# ***
+#
 # ## パズルの巻き戻し・早送り
 # Puzzleオブジェクトにはパズルの単語増減の履歴が保持されています。まずは履歴を確認してみましょう。
 
 sample_puzzle.history
 
 
-# この履歴上の指定した位置に相当するPuzzleオブジェクトを返すメソッドを作成します。
+# この履歴上の指定した位置に相当する`Puzzle`オブジェクトを返すメソッドを作成します。各種メソッドの機能は以下の通りです：
+#  * jump：history番号を指定して、そこに解を移動させる
+#  * getPrev：一つ前の履歴番号に解を移動させる
+#  * getNext：一つ後の履歴番号に解を移動させる
+#  * getLatest：最新の履歴番号に解を移動させる
 
 # +
 def jump(self, idx):
     tmp_puzzle = Puzzle(self.width, self.height, self.puzzleTitle, msg=False)
-    tmp_puzzle.dic = copy.deepcopy(sample_puzzle.dic)
+    tmp_puzzle.dic = copy.deepcopy(self.dic)
     tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
     for code, k, div, i, j in self.history[:idx]:
         if code == 1:
@@ -1351,7 +1359,7 @@ def getLatest(self):
 setattr(Puzzle, "getLatest", getLatest)
 # -
 
-# これらのメソッドを利用することで、Puzzleの状態を自由に移動することができます。
+# これらを利用することで、`Puzzle`オブジェクトの状態を自由に移動させることができます。
 
 tmp_puzzle = sample_puzzle.jump(2)
 tmp_puzzle.show()
@@ -1363,9 +1371,11 @@ tmp_puzzle = tmp_puzzle.getLatest()
 tmp_puzzle.show()
 
 
-# ---
-# ## PuzzleオブジェクトのPickle化
-# 最後に、Puzzleオブジェクトをバイナリ形式で保存します。このファイルを読み込むことで、過去に生成したオブジェクトを再度読み込むことができます。
+# ***
+#
+# ## Puzzleオブジェクトの保存
+# 最後に、`Puzzle`オブジェクトを`Pickle`ライブラリを用いてバイナリ形式で保存します。  
+# このファイルを読み込むことで、過去に生成したオブジェクトを再度読み込むことができます。
 
 def toPickle(self, fpath=None, msg=True):
     """
@@ -1381,32 +1391,14 @@ setattr(Puzzle, "toPickle", toPickle)
 
 sample_puzzle.toPickle()
 
-# たとえば、`pickle/sample.pickle`というpickleファイルを読み込むには、以下のようなコードを実行します。
-
-with open("pickle/sample.pickle", "rb") as f:
-    pickled_puzzle = pickle.load(f)
-pickled_puzzle.show()
-
+# こうして保存したパズルデータは、`Pickle`ライブラリの仕様に従ってロードすることができます。  
+# 詳しくは拡張機能について詳しく解説した`CrosswordExtension.ipynb`をご覧ください。
+#
+# ***
+# ### 最後に
 # これで、クロスワード自動生成ツールの紹介は終わりになります。  
 # ここからは目的関数をさらに定義したり、最適化手法を追加したりして、自由に拡張してください。  
-# このノートの作者は辞書内の単語の重み付けや、単語の重要性評価による作業時間の短縮などの機能を追記する予定です。
+# また、ここで紹介したものの他にも、様々な拡張機能を用意しておりますので、その説明は`CrosswordExtension.ipynb`をご覧ください。
 
 e_time = time.time() - start
 print ("e_time:{0}" + format(e_time) + "[s]")
-
-# ---
-# ## （番外編）解の軌跡をアニメーション化
-# 解の軌跡をアニメーション化してみましょう。
-# パズルの巻き戻し・早送り機能を使って、作業履歴を最初から順番に画像化し、
-# 外部ファイルを用いてそれを動画化します。
-
-# +
-# tmpPuzzle = sample_puzzle.jump(0)
-# tmpPuzzle.saveAnswerImage(f"fig/animation/0000.png")
-# for histNum in range(len(sample_puzzle.history)):
-#     tmpPuzzle = tmpPuzzle.getNext()
-#     tmpPuzzle.saveAnswerImage(f"fig/animation/{str(histNum+1).zfill(4)}.png")
-
-# +
-# # !python ../python/script/movie_maker.py "fig/animation/" 10
-# # !mv out.mov fig/animation

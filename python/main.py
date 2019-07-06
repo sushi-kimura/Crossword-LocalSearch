@@ -1,44 +1,60 @@
-
 # coding: utf-8
 """
 Crossword Local Search
 """
-import numpy as np
-from numpy.random import *
-import pandas as pd
-import unicodedata
-import itertools
-import sys
+# In[]
+import os
 import copy
+import datetime
+import time
+import math
+import itertools
+import unicodedata
+import collections
+import pickle
 
-from common import *
+import numpy as np
+import pandas as pd
+from PIL import Image
+from IPython.display import display, HTML
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 
+os.chdir("/Users/taiga/Crossword-LocalSearch/Python")
+import src
+
+# In[]
 # Set variables
-fpath = "../dict/countries.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports
+fpath = "../dict/pokemon.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports
 width = 15
 height = 15
 randomSeed = 1
 withweight = False
 
-# Set a seed
-seed(seed = randomSeed)
+fp = FontProperties(fname="../jupyter/fonts/SourceHanCodeJP.ttc", size=14)
+np.random.seed(seed = randomSeed)
 
+# In[]
 # Make instances
-puzzle = Puzzle(width, height)
-dic = Dictionary(fpath)
-plc = Placeable(puzzle, dic)
-objFunc = ObjectiveFunction(puzzle)
-optimizer = Optimizer()
+puzzle = src.Puzzle(width, height)
+dic = src.Dictionary(fpath)
+puzzle.importDict(dic)
+
+objFunc = src.ObjectiveFunction()
+optimizer = src.Optimizer()
 print("------------------------------------------------------------------")
 
+# In[]
 # Register and set method and compile
-objFunc.register(["solSize", "crossCount", "fillCount", "maxConnectedEmptys"])
+objFunc.register(["totalWeight","solSize", "crossCount", "fillCount", "maxConnectedEmptys"])
 optimizer.setMethod("localSearch")
-puzzle.compile(dictionary=dic, placeable=plc, objFunc=objFunc, optimizer=optimizer)
+puzzle.compile(objFunc=objFunc, optimizer=optimizer)
 print("------------------------------------------------------------------")
 
+# In[]
 # Solve
-puzzle.firstSolve(dic, plc)
-puzzle.solve(epock=10)
-print("SimpleSolution: %s" % puzzle.isSimpleSol(plc))
+puzzle.firstSolve()
+puzzle.solve(epoch=10)
+print("SimpleSolution: %s" % puzzle.isSimpleSol())
+puzzle.saveAnswerImage("test.png", fp=fp)
 print("==================================================================")
