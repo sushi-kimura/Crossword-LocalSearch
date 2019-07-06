@@ -1,24 +1,5 @@
-import os
-import copy
-import datetime
-import time
-import math
 import itertools
-import unicodedata
-import collections
-import pickle
-
 import numpy as np
-import pandas as pd
-from PIL import Image
-from IPython.display import display, HTML
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
-
-import src.Puzzle
-import src.Dictionary
-import src.Placeable
-import src.Optimizer
 
 # ### ObjectiveFunction クラス
 # 生成したパズルは何らかの指標で定量的にその良し悪しを評価する必要があります。

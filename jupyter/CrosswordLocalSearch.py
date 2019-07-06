@@ -31,12 +31,12 @@
 #   * `withWeight` : 辞書に重みを付すかどうか(bool)
 #   * `puzzleTitle` : パズルのタイトル（デフォルトは「スケルトンパズル」）
 
-fpath = f"../dict/typhoon.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
+fpath = f"../dict/typhoon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
 width = 15
 height = 15
 randomSeed = 6
 withWeight = False
-puzzleTitle = "台風パズル" # default:スケルトンパズル
+puzzleTitle = "台風パズル"  # default:スケルトンパズル
 
 # ***
 #
@@ -106,12 +106,12 @@ class Puzzle():
         self.height = height
         self.totalWeight = 0
         self.puzzleTitle = puzzleTitle
-        self.cell = np.full(width*height, "", dtype = "unicode").reshape(height,width)
-        self.cover = np.zeros(width*height, dtype = "int64").reshape(height,width)
-        self.coverDFS = np.zeros(width*height, dtype = "int64").reshape(height,width)
-        self.enable = np.ones(width*height, dtype = "bool").reshape(height,width)
-        self.usedWords = np.full(width*height, "", dtype = "U%d" % max(width,height))
-        self.usedPlcIdx = np.full(width*height, -1, dtype = "int64")
+        self.cell = np.full(width*height, "", dtype="unicode").reshape(height,width)
+        self.cover = np.zeros(width*height, dtype="int64").reshape(height,width)
+        self.coverDFS = np.zeros(width*height, dtype="int64").reshape(height,width)
+        self.enable = np.ones(width*height, dtype="bool").reshape(height,width)
+        self.usedWords = np.full(width*height, "", dtype="U%d" % max(width,height))
+        self.usedPlcIdx = np.full(width*height, -1, dtype="int64")
         self.solSize = 0
         self.history = []
         self.historyIdx = 0
@@ -142,13 +142,13 @@ class Puzzle():
             self.objFunc = None
             self.optimizer = None
         self.totalWeight = 0
-        self.enable = np.ones(width*height, dtype = "bool").reshape(height,width)
-        self.cell = np.full(width*height, "", dtype = "unicode").reshape(height,width)
-        self.cover = np.zeros(width*height, dtype = "int64").reshape(height,width)
-        self.coverDFS = np.zeros(width*height, dtype = "int64").reshape(height,width)
-        self.enable = np.ones(width*height, dtype = "bool").reshape(height,width)
-        self.usedWords = np.full(width*height, "", dtype = "U%d" % max(width,height))
-        self.usedPlcIdx = np.full(width*height, -1, dtype = "int64")
+        self.enable = np.ones(width*height, dtype="bool").reshape(height,width)
+        self.cell = np.full(width*height, "", dtype="unicode").reshape(height,width)
+        self.cover = np.zeros(width*height, dtype="int64").reshape(height,width)
+        self.coverDFS = np.zeros(width*height, dtype="int64").reshape(height,width)
+        self.enable = np.ones(width*height, dtype="bool").reshape(height,width)
+        self.usedWords = np.full(width*height, "", dtype="U%d" % max(width,height))
+        self.usedPlcIdx = np.full(width*height, -1, dtype="int64")
         self.solSize = 0
         self.history = []
         self.historyIdx = 0
@@ -179,7 +179,7 @@ class Dictionary():
         self.fpath = fpath
         self.name = os.path.basename(fpath)[:-4]
         print("Dictionary object has made.")
-        ## Read
+        # Read
         print(" - READING DICTIONARY...")
         file = open(self.fpath, 'r', encoding='utf-8')
         data = file.readlines()
@@ -210,7 +210,7 @@ class Dictionary():
         self.weight = [d[1] for d in dic_list]
         self.wLen = [len(w) for w in self.word]
 
-        ## Message
+        # Message
         if msg == True:
             print(f" - file path         : {self.fpath}")
             print(f" - dictionary size   : {self.size}")
@@ -476,18 +476,18 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         if j+wLen < self.width and self.cell[i, j+wLen] != "":
             return 1
         
-    #At least one place must cross other words
+    # At least one place must cross other words
     if np.all(emptys == True):
         return 2
         
     # Judge whether correct intersection
     where = np.where(emptys == False)[0]
     if div == 0:
-        jall = np.full(where.size, j, dtype = "int64")
+        jall = np.full(where.size, j, dtype="int64")
         if np.any(self.cell[where+i, jall] != np.array(list(word))[where]):
             return 3
     if div == 1:
-        iall = np.full(where.size, i, dtype = "int64")
+        iall = np.full(where.size, i, dtype="int64")
         if np.any(self.cell[iall, where+j] != np.array(list(word))[where]):
             return 3
         
@@ -498,7 +498,7 @@ def isEnabledAdd(self, div, i, j, word, wLen):
     # If neighbor cells are filled except at the intersection, return False
     where = np.where(emptys == True)[0]
     if div == 0:
-        jall = np.full(where.size, j, dtype = "int64")
+        jall = np.full(where.size, j, dtype="int64")
         # Left side
         if j > 0 and np.any(self.cell[where+i, jall-1] != ""):
             return 5
@@ -506,7 +506,7 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         if j < self.width-1 and np.any(self.cell[where+i, jall+1] != ""):
             return 5
     if div == 1:
-        iall = np.full(where.size, i, dtype = "int64")
+        iall = np.full(where.size, i, dtype="int64")
         # Upper
         if i > 0 and np.any(self.cell[iall-1, where+j] != ""):
             return 5
@@ -893,10 +893,10 @@ def drop(self, div, i, j, k, isKick=False):
         iall = np.full(where.size, i, dtype="int64")
         self.cell[iall,j+where] = ""
     # Update usedWords, usedPlcIdx, solSize, totalWeight
-    self.usedWords = np.delete(self.usedWords, pidx) #delete
-    self.usedWords = np.append(self.usedWords, "") # append
-    self.usedPlcIdx = np.delete(self.usedPlcIdx, pidx) # delete
-    self.usedPlcIdx = np.append(self.usedPlcIdx, -1) #append
+    self.usedWords = np.delete(self.usedWords, pidx)  #delete
+    self.usedWords = np.append(self.usedWords, "")  # append
+    self.usedPlcIdx = np.delete(self.usedPlcIdx, pidx)  # delete
+    self.usedPlcIdx = np.append(self.usedPlcIdx, -1)  #append
     self.solSize -= 1
     self.totalWeight -= weight
     # Insert data to history

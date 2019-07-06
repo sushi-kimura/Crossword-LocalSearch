@@ -1,24 +1,4 @@
-import os
 import copy
-import datetime
-import time
-import math
-import itertools
-import unicodedata
-import collections
-import pickle
-
-import numpy as np
-import pandas as pd
-from PIL import Image
-from IPython.display import display, HTML
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
-
-import src.Puzzle
-import src.Dictionary
-import src.Placeable
-import src.ObjectiveFunction
 
 # ### Optimizer クラス
 # 目的関数を指標にパズルを改善していく際、どのような手法で最適化していくのかも重要なカギになります。

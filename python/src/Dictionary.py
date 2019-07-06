@@ -1,19 +1,7 @@
 import os
-import copy
-import datetime
-import time
-import math
-import itertools
 import unicodedata
 import collections
-import pickle
-
 import numpy as np
-import pandas as pd
-from PIL import Image
-from IPython.display import display, HTML
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
 
 # ### Dictionary クラス
 # 入力した単語リストを整理して保持するクラス。
@@ -30,7 +18,7 @@ class Dictionary():
         self.fpath = fpath
         self.name = os.path.basename(fpath)[:-4]
         print("Dictionary object has made.")
-        ## Read
+        # Read
         print(" - READING DICTIONARY...")
         file = open(self.fpath, 'r', encoding='utf-8')
         data = file.readlines()
@@ -61,7 +49,7 @@ class Dictionary():
         self.weight = [d[1] for d in dic_list]
         self.wLen = [len(w) for w in self.word]
 
-        ## Message
+        # Message
         if msg == True:
             print(f" - file path         : {self.fpath}")
             print(f" - dictionary size   : {self.size}")
@@ -79,7 +67,6 @@ class Dictionary():
 
     def getK(self, word):
         return np.where(self.word == word)[0][0]
-
 
     # 無駄な計算を減らすため、他のどの単語とも接続(クロス)できない単語は辞書からあらかじめ削除しておきます。
     # `Dictionary`クラスに`deleteUnusableWords`メソッドを実装します：

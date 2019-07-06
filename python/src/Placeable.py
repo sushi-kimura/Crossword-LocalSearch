@@ -1,24 +1,4 @@
-import os
-import copy
-import datetime
-import time
-import math
-import itertools
-import unicodedata
-import collections
-import pickle
-
 import numpy as np
-import pandas as pd
-from PIL import Image
-from IPython.display import display, HTML
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
-
-import src.Puzzle
-import src.Dictionary
-import src.ObjectiveFunction
-import src.Optimizer
 
 # ### Placeable クラス
 # 辞書内のすべての単語に対して、それぞれの単語が配置可能(placeable)な位置の一覧を作るクラス。

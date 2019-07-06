@@ -4,28 +4,15 @@ Crossword Local Search
 """
 # In[]
 import os
-import copy
-import datetime
-import time
-import math
-import itertools
-import unicodedata
-import collections
-import pickle
-
 import numpy as np
-import pandas as pd
-from PIL import Image
-from IPython.display import display, HTML
-import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
-os.chdir("/Users/taiga/Crossword-LocalSearch/Python")
+# os.chdir("/Users/taiga/Crossword-LocalSearch/Python")
 import src
 
 # In[]
 # Set variables
-fpath = "../dict/pokemon.txt" # countries hokkaido animals kotowaza birds dinosaurs fishes sports
+fpath = "../dict/pokemon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports
 width = 15
 height = 15
 randomSeed = 1
