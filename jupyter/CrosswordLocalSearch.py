@@ -156,6 +156,9 @@ class Puzzle():
         self.epoch = 0
         self.initSol = False
         self.initSeed = None
+    
+    def resetHistory(self):
+        self.history = self.history[:self.historyIdx]
 
 
 sample_puzzle = Puzzle(width, height, puzzleTitle)
@@ -1147,6 +1150,7 @@ def solve(self, epoch):
     """
     This method repeats the solution improvement by the specified number of epochs
     """
+    self.resetHistory()
     if self.initSol is False:
         raise RuntimeError("'firstSolve' method has not called")
     if epoch is 0:
@@ -1333,11 +1337,14 @@ def jump(self, idx):
     tmp_puzzle = Puzzle(self.width, self.height, self.puzzleTitle, msg=False)
     tmp_puzzle.dic = copy.deepcopy(self.dic)
     tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
+    tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
+    tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
     for code, k, div, i, j in self.history[:idx]:
         if code == 1:
             tmp_puzzle.add(div, i, j, k)
         else:
             tmp_puzzle.drop(div, i, j, k)
+    tmp_puzzle.initSol = True
     tmp_puzzle.history = copy.deepcopy(self.history)
     return tmp_puzzle
 setattr(Puzzle, "jump", jump)
@@ -1401,4 +1408,4 @@ sample_puzzle.toPickle()
 # また、ここで紹介したものの他にも、様々な拡張機能を用意しておりますので、その説明は`CrosswordExtension.ipynb`をご覧ください。
 
 e_time = time.time() - start
-print ("e_time:{0}" + format(e_time) + "[s]")
+print ("e_time:" + format(e_time) + "[s]")
