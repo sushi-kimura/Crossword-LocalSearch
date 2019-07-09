@@ -36,7 +36,7 @@ class Optimizer:
             puzzle.logging()
         # Copy
         _puzzle = copy.deepcopy(puzzle)
-        if show:
+        if show is True:
             print(">>> Interim solution")
             _puzzle.show(_puzzle.cell)
         goalEpoch = _puzzle.epoch + epoch
@@ -54,7 +54,7 @@ class Optimizer:
                     print(f"    - Improved: {_puzzle.objFunc.getScore(_puzzle, all=True)} --> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
                     _puzzle = copy.deepcopy(newPuzzle)
                     _puzzle.logging()
-                    if show:
+                    if show is True:
                         _puzzle.show(_puzzle.cell)
                     break
                 if newScore < prevScore:
@@ -65,7 +65,7 @@ class Optimizer:
                 _puzzle = copy.deepcopy(newPuzzle)
                 _puzzle.logging()
                 print(f"    - Replaced(same score): {_puzzle.objFunc.getScore(_puzzle, all=True)} -> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
-                if show:
+                if show is True:
                     _puzzle.show(_puzzle.cell)
         # Update previous puzzle
         puzzle.totalWeight = copy.deepcopy(_puzzle.totalWeight)

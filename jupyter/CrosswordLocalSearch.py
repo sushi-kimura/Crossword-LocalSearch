@@ -144,13 +144,13 @@ class Puzzle:
             self.objFunc = None
             self.optimizer = None
         self.totalWeight = 0
-        self.enable = np.ones(width*height, dtype="bool").reshape(height, width)
-        self.cell = np.full(width*height, "", dtype="unicode").reshape(height, width)
-        self.cover = np.zeros(width*height, dtype="int64").reshape(height, width)
-        self.coverDFS = np.zeros(width*height, dtype="int64").reshape(height, width)
-        self.enable = np.ones(width*height, dtype="bool").reshape(height, width)
-        self.usedWords = np.full(width*height, "", dtype="U%d" % max(width, height))
-        self.usedPlcIdx = np.full(width*height, -1, dtype="int64")
+        self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
+        self.cell = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height, self.width)
+        self.cover = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
+        self.coverDFS = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
+        self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
+        self.usedWords = np.full(self.width*self.height, "", dtype="U%d" % max(self.width, self.height))
+        self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int64")
         self.solSize = 0
         self.history = []
         self.historyIdx = 0
@@ -1056,7 +1056,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
         puzzle.logging()
     # Copy
     _puzzle = copy.deepcopy(puzzle)
-    if show:
+    if show is True:
         print(">>> Interim solution")
         _puzzle.show(_puzzle.cell)
     goalEpoch = _puzzle.epoch + epoch
@@ -1074,7 +1074,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
                 print(f"    - Improved: {_puzzle.objFunc.getScore(_puzzle, all=True)} --> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
                 _puzzle = copy.deepcopy(newPuzzle)
                 _puzzle.logging()
-                if show:
+                if show is True:
                     _puzzle.show(_puzzle.cell)
                 break
             if newScore < prevScore:
@@ -1085,7 +1085,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
             _puzzle = copy.deepcopy(newPuzzle)
             _puzzle.logging()
             print(f"    - Replaced(same score): {_puzzle.objFunc.getScore(_puzzle, all=True)} -> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
-            if show:
+            if show is True:
                 _puzzle.show(_puzzle.cell)
     # Update previous puzzle
     puzzle.totalWeight = copy.deepcopy(_puzzle.totalWeight)
