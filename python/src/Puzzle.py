@@ -540,7 +540,7 @@ class Puzzle:
         ax1.set_title(label="*** "+self.puzzleTitle+" ***", fontproperties=fp, size=20)
         # Draw word list
         words = [word for word in self.usedWords if word != ""]
-        if words is []:
+        if words == []:
             words = [""]
         words.sort()
         words = sorted(words, key=len)
