@@ -1,11 +1,27 @@
+"""
+ipynbファイルから変換したpyファイルを, 指定したパッケージ名のもと, クラス毎に分割する.
+コマンドライン引数は
+ 1. ipynbから得たpyファイル
+ 2. パッケージ名（-nオプションで指定. デフォルトは'src'）
+
+ 実行例：
+ python ipynbpy2py.py jupyter/CrosswordLocalSearch.py test_package
+"""
+
 import os
-import re
 import argparse
 
 # In[]
+parser = argparse.ArgumentParser(description="convert ipynb.py to .py with given package_name")
+parser.add_argument("ipynbpy", type=str,
+                    help="python file made by jupytext or ipynb")
+parser.add_argument("-n", "--name", type=str, default="src",
+                    help="name of package, default=src")
+args = parser.parse_args()
+
 # settings
-ipynbpy = "jupyter/CrosswordLocalSearch.py"
-package_name = "src"
+ipynbpy = args.ipynbpy
+package_name = args.name
 
 # open
 with open(ipynbpy, encoding='utf-8') as f:
@@ -42,7 +58,7 @@ for line in lines:
 def_flag = False
 def_end_flag = False
 for line in lines:
-    if line[:3] == "def":
+    if line[:4] == "def ":
         def_lines = []
         def_flag = True
     elif line[0] not in (" ", os.linesep, "setattr"):
@@ -99,10 +115,15 @@ for class_num in range(len(class_names)):
                 import_lines[class_num].append(import_line)
     import_lines[class_num].append(os.linesep)
 
-# output
-os.makedirs("class", exist_ok=True)
+## output
+os.makedirs(package_name, exist_ok=True)
+# __init__.py
+with open(f'{package_name}/__init__.py', 'w', encoding='utf-8') as of:
+    for class_name in class_names:
+        of.write(f"from {package_name}.{class_name} import {class_name}{os.linesep}")
+# class_name.py
 for class_num, class_name in enumerate(class_names):
-    with open(f'class/{class_name}.py', 'w', encoding='utf-8') as of:
+    with open(f'{package_name}/{class_name}.py', 'w', encoding='utf-8') as of:
         for import_line in import_lines[class_num]:
             of.write(import_line)
         for class_line in class_lines[class_num]:
