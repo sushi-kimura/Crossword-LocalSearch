@@ -431,7 +431,7 @@ objFunc = ObjectiveFunction()
 
 class Optimizer:
     def __init__(self, msg=True):
-        self.methodList = ["localSearch", "iterativeLocalSearch"]
+        self.methodList = ["localSearch", "iteratedLocalSearch"]
         self.method = ""
         if msg is True:
             print("Optimizer object has made.")

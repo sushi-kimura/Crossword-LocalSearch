@@ -129,7 +129,7 @@ class Puzzle:
             return 2
 
         # Judge whether correct intersection
-        where = np.where(empties is False)[0]
+        where = np.where(empties == False)[0]
         if div == 0:
             jall = np.full(where.size, j, dtype="int64")
             if np.any(self.cell[where+i, jall] != np.array(list(word))[where]):
@@ -144,7 +144,7 @@ class Puzzle:
             return 4
 
         # If neighbor cells are filled except at the intersection, return False
-        where = np.where(empties is True)[0]
+        where = np.where(empties == True)[0]
         if div == 0:
             jall = np.full(where.size, j, dtype="int64")
             # Left side
