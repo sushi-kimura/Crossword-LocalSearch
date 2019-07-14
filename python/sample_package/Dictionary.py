@@ -8,9 +8,7 @@ class Dictionary:
     def __init__(self, fpath, msg=True):
         self.fpath = fpath
         self.name = os.path.basename(fpath)[:-4]
-        print("Dictionary object has made.")
         # Read
-        print(" - READING DICTIONARY...")
         file = open(self.fpath, 'r', encoding='utf-8')
         data = file.readlines()
         file.close()
@@ -43,6 +41,7 @@ class Dictionary:
 
         # Message
         if msg is True:
+            print("Dictionary object has made.")
             print(f" - file path         : {self.fpath}")
             print(f" - dictionary size   : {self.size}")
             print(f" - dictionary type   : {self.dictType}")
@@ -50,13 +49,13 @@ class Dictionary:
 
     def __getitem__(self, key):
         return {'word': self.word[key], 'weight': self.weight[key], 'len': self.wLen[key]}
-    
+
     def __str__(self):
         return self.name
-    
+
     def __len__(self):
         return self.size
-    
+
     def getK(self, word):
         return np.where(self.word == word)[0][0]
 
@@ -89,7 +88,7 @@ class Dictionary:
         for i, w in enumerate(self.word):
             for char in w:
                 self.weight[i] += counts[char]
-                
+
         if msg is True:
             print("All weights are calculated.")
             print("TOP 5 characters:")

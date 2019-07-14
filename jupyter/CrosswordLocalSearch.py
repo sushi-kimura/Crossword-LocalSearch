@@ -181,9 +181,7 @@ class Dictionary:
     def __init__(self, fpath, msg=True):
         self.fpath = fpath
         self.name = os.path.basename(fpath)[:-4]
-        print("Dictionary object has made.")
         # Read
-        print(" - READING DICTIONARY...")
         file = open(self.fpath, 'r', encoding='utf-8')
         data = file.readlines()
         file.close()
@@ -216,6 +214,7 @@ class Dictionary:
 
         # Message
         if msg is True:
+            print("Dictionary object has made.")
             print(f" - file path         : {self.fpath}")
             print(f" - dictionary size   : {self.size}")
             print(f" - dictionary type   : {self.dictType}")
