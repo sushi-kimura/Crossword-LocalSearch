@@ -15,11 +15,11 @@ from src import Puzzle, Dictionary, ObjectiveFunction, Optimizer
 fpath = "../dict/pokemon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports
 width = 15
 height = 15
-randomSeed = 1
+seed = 1
 withweight = False
 
 fp = FontProperties(fname="../jupyter/fonts/SourceHanCodeJP.ttc", size=14)
-np.random.seed(seed=randomSeed)
+np.random.seed(seed=seed)
 
 # In[]
 # Make instances
@@ -42,4 +42,4 @@ puzzle.solve(epoch=5)
 print(f"SimpleSolution: {puzzle.isSimpleSol()}")
 print(puzzle.cell)
 print(f"単語リスト：{puzzle.usedWords[:puzzle.solSize]}")
-puzzle.saveAnswerImage("test.png", fp=fp)
+puzzle.saveAnswerImage(f"fig/{dic.name}_w{width}_h{height}_r{seed}.png", fp=fp)
