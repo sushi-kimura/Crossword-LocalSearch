@@ -25,7 +25,7 @@ from matplotlib.font_manager import FontProperties
 from src import Puzzle, Dictionary, ObjectiveFunction, Optimizer
 
 # In[]
-parser = argparse.ArgumentParser(description="convert ipynb.py to .py with given package_name")
+parser = argparse.ArgumentParser(description="make a puzzle with given parameters")
 parser.add_argument("fpath", type=str,
                     help="file path of a dictionary")
 parser.add_argument("width", type=int,
