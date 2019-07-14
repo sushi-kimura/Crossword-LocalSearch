@@ -1,11 +1,11 @@
+import math
+import itertools
+import pandas as pd
+import matplotlib.pyplot as plt
+import datetime
 import pickle
 import numpy as np
-import datetime
 import copy
-import itertools
-import matplotlib.pyplot as plt
-import math
-import pandas as pd
 from IPython.display import display, HTML
 
 from sample_package.Placeable import Placeable

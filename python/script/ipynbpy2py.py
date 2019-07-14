@@ -2,10 +2,14 @@
 ipynbファイルから変換したpyファイルを, 指定したパッケージ名のもと, クラス毎に分割する.
 コマンドライン引数は
  1. ipynbから得たpyファイル
- 2. パッケージ名（-nオプションで指定. デフォルトは'src'）
+ 2. パッケージ名（-nまたは--nameオプションで指定. デフォルトは'src'）
+ 3. 追加のipynbから得たpyファイル（-aまたは--addオプションで指定. 複数の場合は-aオプションを複数回つけて指定）
+ 4. __pycache__ディレクトリをgitignoreするかどうか（-niまたは--notignoreと書くとignoreをしない. デフォルトはignoreする.）
 
  実行例：
- python ipynbpy2py.py jupyter/CrosswordLocalSearch.py test_package
+ python ipynbpy2py.py jupyter/CrosswordLocalSearch.py -n sample_package
+ python ipynbpy2py.py jupyter/CrosswordLocalSearch.py -n sample_package -a jupyter/CrosswordExtension.py
+ python ipynbpy2py.py jupyter/CrosswordLocalSearch.py -n sample_package -a jupyter/CrosswordExtension.py -a jupyter/CrosswordExtension_2.py
 """
 
 import os
@@ -15,27 +19,45 @@ import argparse
 parser = argparse.ArgumentParser(description="convert ipynb.py to .py with given package_name")
 parser.add_argument("ipynbpy", type=str,
                     help="python file made by jupytext or ipynb")
+parser.add_argument("-a", "--add", type=str, action='append',
+                    help="additional python file made by jupytext or ipynb")
 parser.add_argument("-n", "--name", type=str, default="src",
                     help="name of package, default=src")
+parser.add_argument("-ni", "--notignore", action='store_true',
+                    help="do not make a .gitignore file for __pycache__, default=False")
 args = parser.parse_args()
 
 # settings
 ipynbpy = args.ipynbpy
 package_name = args.name
+additional_ipynbpy = args.add
+not_ignore = args.notignore
 
 # open
 with open(ipynbpy, encoding='utf-8') as f:
     lines = f.readlines()
+if additional_ipynbpy != None:
+    for add_f in additional_ipynbpy:
+        with open(add_f, encoding='utf-8') as f:
+            add_lines = f.readlines()
+        for add_line in add_lines:
+            lines.append(add_line)
 
 # read import and class
-imports, classes = [], []
+imports_all, imports, classes = [], [], []
 for i, line in enumerate(lines):
     if line[:7] == "import " or line[:5] == "from ":
-        imports.append(line)
+        imports_all.append(line)
     if line[:6] == "class ":
         classes.append(line)
-imports = list(set(imports))
+imports_all = list(set(imports_all))
 class_names = list(map(lambda c: c[6:-2], classes))
+
+# remove unused imports
+for import_line in imports_all:
+    for class_name in class_names:
+        if class_name not in import_line and import_line not in imports:
+            imports.append(import_line)
 
 # set class line box, if 5 class is loaded, class_lines = [[],[],[],[],[]]
 import_table, import_lines, class_lines = [], [], []
@@ -128,3 +150,7 @@ for class_num, class_name in enumerate(class_names):
             of.write(import_line)
         for class_line in class_lines[class_num]:
             of.write(class_line)
+# .gitignore
+if not_ignore is False:
+    with open(f'{package_name}/.gitignore', 'w', encoding='utf-8') as of:
+        of.write(f"__pycache__/{os.linesep}")

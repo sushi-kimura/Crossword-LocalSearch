@@ -3,12 +3,12 @@
 Crossword Local Search
 """
 # In[]
-# import os
+import os
 import numpy as np
 from matplotlib.font_manager import FontProperties
 
-# os.chdir("/Users/taiga/Crossword-LocalSearch/Python")
-import src
+#os.chdir("/Users/taiga/Crossword-LocalSearch/Python")
+from src import Puzzle, Dictionary, ObjectiveFunction, Optimizer
 
 # In[]
 # Set variables
@@ -23,25 +23,23 @@ np.random.seed(seed=randomSeed)
 
 # In[]
 # Make instances
-puzzle = src.Puzzle(width, height)
-dic = src.Dictionary(fpath)
-puzzle.importDict(dic)
-
-objFunc = src.ObjectiveFunction()
-optimizer = src.Optimizer()
-print("------------------------------------------------------------------")
+puzzle = Puzzle(width, height)
+dic = Dictionary(fpath)
+objFunc = ObjectiveFunction()
+optimizer = Optimizer()
 
 # In[]
+puzzle.importDict(dic)
 # Register and set method and compile
 objFunc.register(["totalWeight","solSize", "crossCount", "fillCount", "maxConnectedEmpties"])
 optimizer.setMethod("localSearch")
 puzzle.compile(objFunc=objFunc, optimizer=optimizer)
-print("------------------------------------------------------------------")
 
 # In[]
 # Solve
 puzzle.firstSolve()
-puzzle.solve(epoch=10)
-print("SimpleSolution: %s" % puzzle.isSimpleSol())
+puzzle.solve(epoch=5)
+print(f"SimpleSolution: {puzzle.isSimpleSol()}")
+print(puzzle.cell)
+print(f"単語リスト：{puzzle.usedWords}")
 puzzle.saveAnswerImage("test.png", fp=fp)
-print("==================================================================")
