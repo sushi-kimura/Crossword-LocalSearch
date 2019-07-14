@@ -42,10 +42,10 @@ class Puzzle:
             print(f" - width       : {self.width}")
             print(f" - height      : {self.height}")
             print(f" - cell' shape : (width, height) = ({self.cell.shape[0]},{self.cell.shape[1]})")
-            
+
     def __str__(self):
         return self.puzzleTitle
-    
+
     def reinit(self, all=False):
         if all is True:
             self.dic = None
@@ -67,14 +67,14 @@ class Puzzle:
         self.epoch = 0
         self.initSol = False
         self.initSeed = None
-    
+
     def resetHistory(self):
         self.history = self.history[:self.historyIdx]
 
 
-    def importDict(self, dictionary):
+    def importDict(self, dictionary, msg=True):
         self.dic = dictionary
-        self.plc = Placeable(self, self.dic)
+        self.plc = Placeable(self, self.dic, msg=msg)
     def isEnabledAdd(self, div, i, j, word, wLen):
         """
         This method determines if a word can be placed
@@ -83,7 +83,7 @@ class Puzzle:
             empties = self.cell[i:i+wLen, j] == ""
         if div == 1:
             empties = self.cell[i, j:j+wLen] == ""
-            
+
         # If 0 words used, return True
         if self.solSize is 0:
             return 0
@@ -99,11 +99,11 @@ class Puzzle:
                 return 1
             if j+wLen < self.width and self.cell[i, j+wLen] != "":
                 return 1
-            
+
         # At least one place must cross other words
         if np.all(empties == True):
             return 2
-            
+
         # Judge whether correct intersection
         where = np.where(empties == False)[0]
         if div == 0:
@@ -114,7 +114,7 @@ class Puzzle:
             iall = np.full(where.size, i, dtype="int64")
             if np.any(self.cell[iall, where+j] != np.array(list(word))[where]):
                 return 3
-            
+
         # If the same word is in use, return False
         if word in self.usedWords:
             return 4
@@ -137,7 +137,7 @@ class Puzzle:
             # Lower
             if i < self.height-1 and np.any(self.cell[iall+1, where+j] != ""):
                 return 5
-        
+
         # US/USA, DOMINICA/DOMINICAN problem
         if div == 0:
             if np.any(self.enable[i:i+wLen, j] == False) or np.all(empties == False):
@@ -161,7 +161,7 @@ class Puzzle:
         code = self.isEnabledAdd(div, i, j, word, wLen)
         if code is not 0:
             return code
-        
+
         # Put the word to puzzle
         if div == 0:
             self.cell[i:i+wLen, j] = list(word)[0:wLen]
@@ -179,13 +179,13 @@ class Puzzle:
                 self.enable[i, j-1] = False
             if j+wLen < self.width:
                 self.enable[i, j+wLen] = False
-        
+
         # Update cover array
         if div == 0:
             self.cover[i:i+wLen, j] += 1
         if div == 1:
             self.cover[i, j:j+wLen] += 1
-        
+
         # Update properties
         wordIdx = self.dic.word.index(word)
         self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIdx]
@@ -197,12 +197,12 @@ class Puzzle:
         return 0
     def addToLimit(self):
         """
-        This method adds the words as much as possible 
+        This method adds the words as much as possible
         """
         # Make a random index of plc
         randomIndex = np.arange(self.plc.size)
         np.random.shuffle(randomIndex)
-        
+
         # Add as much as possible
         solSizeTmp = None
         while self.solSize != solSizeTmp:
@@ -221,13 +221,13 @@ class Puzzle:
         # Check the initSol
         if self.initSol:
             raise RuntimeError("'firstSolve' method has already called")
-            
+
         # Save initial seed number
         self.initSeed = np.random.get_state()[1][0]
         # Add as much as possible
         self.addToLimit()
         self.initSol = True
-    def show(self, ndarray=None):
+    def show(self, ndarray=None, stdout=False):
         """
         This method displays a puzzle
         """
@@ -252,7 +252,10 @@ class Puzzle:
         ]
         df = pd.DataFrame(ndarray)
         df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
-        display(df)
+        if stdout is False:
+            display(df)
+        else:
+            print(ndarray)
     def DFS(self, i, j, ccl):
         """
         This method performs a Depth-First Search and labels each connected component
@@ -285,7 +288,7 @@ class Puzzle:
         # Get p, pidx
         p = self.plc.invP[div, i, j, k]
         pidx = np.where(self.usedPlcIdx == p)[0][0]
-        
+
         wLen = self.dic.wLen[k]
         weight = self.dic.weight[k]
         # Pull out a word
@@ -357,11 +360,11 @@ class Puzzle:
         # If solSize = 0, return
         if self.solSize == 0:
             return
-        
-        # Make a random index of solSize  
+
+        # Make a random index of solSize
         randomIndex = np.arange(self.solSize)
         np.random.shuffle(randomIndex)
-        
+
         # Drop words until connectivity collapses
         tmpUsedPlcIdx = copy.deepcopy(self.usedPlcIdx)
         for r, p in enumerate(tmpUsedPlcIdx[randomIndex]):
@@ -378,7 +381,7 @@ class Puzzle:
             if div == 1:
                 if not np.any(np.diff(np.where(self.cover[i,j:j+wLen] == 2)[0]) == 1):
                     self.drop(div, i, j, k)
-            
+
             # End with connectivity breakdown
             self.coverDFS = np.where(self.cover >= 1, 1, 0)
             self.ccl = 2
@@ -401,7 +404,7 @@ class Puzzle:
         for c in range(self.ccl-2):
             cclScores[c] = np.sum(np.where(self.coverDFS == c+2, self.cover, 0))
         largestCCL = np.argmax(cclScores) + 2
-        
+
         # Erase elements except CCL ('kick' in C-program)
         for idx, p in enumerate(self.usedPlcIdx[:self.solSize]):
             if p == -1:
@@ -414,14 +417,14 @@ class Puzzle:
         """
         self.objFunc = objFunc
         self.optimizer = optimizer
-        
+
         if msg is True:
             print("compile succeeded.")
             print(" --- objective functions:")
             for funcNum in range(len(objFunc)):
                 print("  |-> %d. %s" % (funcNum, objFunc.registeredFuncs[funcNum]))
             print(" --- optimizer: %s" % optimizer.method)
-    def solve(self, epoch):
+    def solve(self, epoch, stdout=False):
         """
         This method repeats the solution improvement by the specified number of epochs
         """
@@ -430,7 +433,7 @@ class Puzzle:
             raise RuntimeError("'firstSolve' method has not called")
         if epoch is 0:
             raise ValueError("'epoch' must be lather than 0")
-        exec(f"self.optimizer.{self.optimizer.method}(self, {epoch})")
+        exec(f"self.optimizer.{self.optimizer.method}(self, {epoch}, stdout=stdout)")
         print(" --- done")
     def showLog(self, title="Objective Function's time series", grid=True, figsize=None):
         """
@@ -507,13 +510,13 @@ class Puzzle:
             words = [""]
         words.sort()
         words = sorted(words, key=len)
-        
+
         rows = self.height
         cols = math.ceil(len(words)/rows)
         padnum = cols*rows - len(words)
         words += ['']*padnum
         words = np.array(words).reshape(cols, rows).T
-        
+
         ax2_table = ax2.table(cellText=words, cellColours=None, cellLoc="left", edges="open", bbox=[0, 0, 1, 1])
         ax2.set_title(label="【単語リスト】", fontproperties=fp, size=20)
         for _, cell in ax2_table.get_celld().items():

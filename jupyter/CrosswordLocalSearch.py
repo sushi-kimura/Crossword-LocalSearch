@@ -383,9 +383,9 @@ class Placeable:
 # ただし、内部では常に使われる重要なクラスです。  
 # 実際には、`Dictionary`オブジェクトを`Puzzle`にインポートする際に内部で計算が行われます。
 
-def importDict(self, dictionary):
+def importDict(self, dictionary, msg=True):
     self.dic = dictionary
-    self.plc = Placeable(self, self.dic)
+    self.plc = Placeable(self, self.dic, msg=msg)
 setattr(Puzzle, "importDict", importDict)
 
 # それでは`Puzzle`に`Dictionary`をインポートしましょう。  
@@ -643,7 +643,7 @@ sample_puzzle.firstSolve()
 # どんなパズルができたのか、結果が気になりますよね。  
 # 結果を確認するための`show`メソッドを定義します：
 
-def show(self, ndarray=None):
+def show(self, ndarray=None, stdout=False):
     """
     This method displays a puzzle
     """
@@ -668,7 +668,10 @@ def show(self, ndarray=None):
     ]
     df = pd.DataFrame(ndarray)
     df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
-    display(df)
+    if stdout is False:
+        display(df) 
+    else:
+        print(ndarray)
 setattr(Puzzle, "show", show)
 
 # `show`メソッドの引数として結果を与えることで、結果の確認ができます。  
@@ -1046,7 +1049,7 @@ setattr(Optimizer, "getNeighborSolution", getNeighborSolution)
 # 厳密にはそれが最適解かはわかりませんが、この解は近似的な最適解と言えるでしょう。  
 # それでは、局所探索法を行う`localSearch`メソッドを実装します：
 
-def localSearch(self, puzzle, epoch, show=True, move=False):
+def localSearch(self, puzzle, epoch, show=True, move=False, stdout=False):
     """
     This method performs a local search
     """
@@ -1057,7 +1060,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
     _puzzle = copy.deepcopy(puzzle)
     if show is True:
         print(">>> Interim solution")
-        _puzzle.show(_puzzle.cell)
+        _puzzle.show(_puzzle.cell, stdout=stdout)
     goalEpoch = _puzzle.epoch + epoch
     for ep in range(epoch):
         _puzzle.epoch += 1
@@ -1074,7 +1077,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
                 _puzzle = copy.deepcopy(newPuzzle)
                 _puzzle.logging()
                 if show is True:
-                    _puzzle.show(_puzzle.cell)
+                    _puzzle.show(_puzzle.cell, stdout=stdout)
                 break
             if newScore < prevScore:
                 _puzzle.logging()
@@ -1085,7 +1088,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
             _puzzle.logging()
             print(f"    - Replaced(same score): {_puzzle.objFunc.getScore(_puzzle, all=True)} -> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
             if show is True:
-                _puzzle.show(_puzzle.cell)
+                _puzzle.show(_puzzle.cell, stdout=stdout)
     # Update previous puzzle
     puzzle.totalWeight = copy.deepcopy(_puzzle.totalWeight)
     puzzle.enable = copy.deepcopy(_puzzle.enable)
@@ -1150,7 +1153,7 @@ sample_puzzle.compile(objFunc=objFunc, optimizer=optimizer)
 # 局所探索法による解の改善を実行する準備が完全に整いました。  
 # それでは、これを行う`solve`メソッドを実装し、エポック数を指定して解が改善されていく様子を見てみましょう！
 
-def solve(self, epoch):
+def solve(self, epoch, stdout=False):
     """
     This method repeats the solution improvement by the specified number of epochs
     """
@@ -1159,7 +1162,7 @@ def solve(self, epoch):
         raise RuntimeError("'firstSolve' method has not called")
     if epoch is 0:
         raise ValueError("'epoch' must be lather than 0")
-    exec(f"self.optimizer.{self.optimizer.method}(self, {epoch})")
+    exec(f"self.optimizer.{self.optimizer.method}(self, {epoch}, stdout=stdout)")
     print(" --- done")
 setattr(Puzzle, "solve", solve)
 

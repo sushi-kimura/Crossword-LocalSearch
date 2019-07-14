@@ -27,7 +27,7 @@ class Optimizer:
         _puzzle.addToLimit()
         return _puzzle
 
-    def localSearch(self, puzzle, epoch, show=True, move=False):
+    def localSearch(self, puzzle, epoch, show=True, move=False, stdout=False):
         """
         This method performs a local search
         """
@@ -38,7 +38,7 @@ class Optimizer:
         _puzzle = copy.deepcopy(puzzle)
         if show is True:
             print(">>> Interim solution")
-            _puzzle.show(_puzzle.cell)
+            _puzzle.show(_puzzle.cell, stdout=stdout)
         goalEpoch = _puzzle.epoch + epoch
         for ep in range(epoch):
             _puzzle.epoch += 1
@@ -55,7 +55,7 @@ class Optimizer:
                     _puzzle = copy.deepcopy(newPuzzle)
                     _puzzle.logging()
                     if show is True:
-                        _puzzle.show(_puzzle.cell)
+                        _puzzle.show(_puzzle.cell, stdout=stdout)
                     break
                 if newScore < prevScore:
                     _puzzle.logging()
@@ -66,7 +66,7 @@ class Optimizer:
                 _puzzle.logging()
                 print(f"    - Replaced(same score): {_puzzle.objFunc.getScore(_puzzle, all=True)} -> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
                 if show is True:
-                    _puzzle.show(_puzzle.cell)
+                    _puzzle.show(_puzzle.cell, stdout=stdout)
         # Update previous puzzle
         puzzle.totalWeight = copy.deepcopy(_puzzle.totalWeight)
         puzzle.enable = copy.deepcopy(_puzzle.enable)

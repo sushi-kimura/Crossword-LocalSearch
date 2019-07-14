@@ -95,9 +95,9 @@ class Puzzle:
         self.initSol = False
         self.initSeed = None
 
-    def importDict(self, dictionary):
+    def importDict(self, dictionary, msg=True):
         self.dic = dictionary
-        self.plc = Placeable(self, self.dic)
+        self.plc = Placeable(self, self.dic, msg=msg)
 
     def isEnabledAdd(self, div, i, j, word, wLen):
         """
@@ -254,7 +254,7 @@ class Puzzle:
         self.addToLimit()
         self.initSol = True
 
-    def show(self, ndarray=None):
+    def show(self, ndarray=None, stdout=False):
         """
         This method displays a puzzle
         """
@@ -279,7 +279,10 @@ class Puzzle:
         ]
         df = pd.DataFrame(ndarray)
         df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
-        display(df)
+        if stdout is False:
+            display(df)
+        else:
+            print(ndarray)
 
     def DFS(self, i, j, ccl):
         """
@@ -455,7 +458,7 @@ class Puzzle:
                 print("  |-> %d. %s" % (funcNum, objFunc.registeredFuncs[funcNum]))
             print(" --- optimizer: %s" % optimizer.method)
 
-    def solve(self, epoch):
+    def solve(self, epoch, stdout=False):
         """
         This method repeats the solution improvement by the specified number of epochs
         """
@@ -464,7 +467,7 @@ class Puzzle:
             raise RuntimeError("'firstSolve' method has not called")
         if epoch is 0:
             raise ValueError("'epoch' must be lather than 0")
-        exec(f"self.optimizer.{self.optimizer.method}(self, {epoch})")
+        exec(f"self.optimizer.{self.optimizer.method}(self, {epoch}, stdout=stdout)")
         print(" --- done")
 
     def showLog(self, title="Objective Function's time series", grid=True, figsize=None):
