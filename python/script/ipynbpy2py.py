@@ -72,7 +72,7 @@ for line in lines:
     if line[:6] == "class ":
         class_flag = True
         class_num += 1
-    elif line[0] not in (" ", os.linesep):
+    elif line[0] not in (" ", "\n"):
         class_flag = False
     if class_flag is True:
         class_lines[class_num].append(line)
@@ -83,7 +83,7 @@ for line in lines:
     if line[:4] == "def ":
         def_lines = []
         def_flag = True
-    elif line[0] not in (" ", os.linesep, "setattr"):
+    elif line[0] not in (" ", "\n", "setattr"):
         def_flag = False
     if def_flag is True:
         def_lines.append(line)
@@ -93,7 +93,7 @@ for line in lines:
     if def_end_flag is True:
         class_num = class_names.index(setattr_class)
         for def_line in def_lines:
-            if def_line[0] not in (os.linesep):
+            if def_line[0] not in ("\n"):
                 def_line = "    " + def_line
             class_lines[class_num].append(def_line)
         def_end_flag = False
@@ -128,21 +128,21 @@ for class_num in range(len(class_names)):
             if import_name in import_line:
                 import_lines[class_num].append(import_line)
     import_lines[class_num] = list(set(import_lines[class_num]))
-    import_lines[class_num].append(os.linesep)
+    import_lines[class_num].append("\n")
 for class_num in range(len(class_names)):
     for import_name in import_table[class_num]:
         for class_name in class_names:
             if import_name in class_name:
-                import_line = f"from {package_name}.{class_name} import {class_name}{os.linesep}"
+                import_line = f"from {package_name}.{class_name} import {class_name}\n"
                 import_lines[class_num].append(import_line)
-    import_lines[class_num].append(os.linesep)
+    import_lines[class_num].append("\n")
 
 ## output
 os.makedirs(package_name, exist_ok=True)
 # __init__.py
 with open(f'{package_name}/__init__.py', 'w', encoding='utf-8') as of:
     for class_name in class_names:
-        of.write(f"from {package_name}.{class_name} import {class_name}{os.linesep}")
+        of.write(f"from {package_name}.{class_name} import {class_name}\n")
 # class_name.py
 for class_num, class_name in enumerate(class_names):
     with open(f'{package_name}/{class_name}.py', 'w', encoding='utf-8') as of:
@@ -153,4 +153,4 @@ for class_num, class_name in enumerate(class_names):
 # .gitignore
 if not_ignore is False:
     with open(f'{package_name}/.gitignore', 'w', encoding='utf-8') as of:
-        of.write(f"__pycache__/{os.linesep}")
+        of.write(f"__pycache__/\n")
