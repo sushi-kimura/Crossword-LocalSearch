@@ -105,12 +105,12 @@ class Puzzle:
         self.height = height
         self.totalWeight = 0
         self.puzzleTitle = puzzleTitle
-        self.cell = np.full(width*height, "", dtype="unicode").reshape(height,width)
-        self.cover = np.zeros(width*height, dtype="int64").reshape(height,width)
-        self.coverDFS = np.zeros(width*height, dtype="int64").reshape(height,width)
-        self.enable = np.ones(width*height, dtype="bool").reshape(height,width)
-        self.usedWords = np.full(width*height, "", dtype="U%d" % max(width,height))
-        self.usedPlcIdx = np.full(width*height, -1, dtype="int64")
+        self.cell = np.full(width * height, "", dtype="unicode").reshape(height, width)
+        self.cover = np.zeros(width * height, dtype="int64").reshape(height, width)
+        self.coverDFS = np.zeros(width * height, dtype="int64").reshape(height, width)
+        self.enable = np.ones(width * height, dtype="bool").reshape(height, width)
+        self.usedWords = np.full(width * height, "", dtype="U%d" % max(width, height))
+        self.usedPlcIdx = np.full(width * height, -1, dtype="int64")
         self.solSize = 0
         self.history = []
         self.historyIdx = 0
@@ -123,7 +123,6 @@ class Puzzle:
         self.plc = None
         self.objFunc = None
         self.optimizer = None
-
         ## Message
         if msg is True:
             print("Puzzle object has made.")
@@ -131,10 +130,8 @@ class Puzzle:
             print(f" - width       : {self.width}")
             print(f" - height      : {self.height}")
             print(f" - cell' shape : (width, height) = ({self.cell.shape[0]},{self.cell.shape[1]})")
-            
     def __str__(self):
         return self.puzzleTitle
-    
     def reinit(self, all=False):
         if all is True:
             self.dic = None
@@ -156,7 +153,6 @@ class Puzzle:
         self.epoch = 0
         self.initSol = False
         self.initSeed = None
-    
     def resetHistory(self):
         self.history = self.history[:self.historyIdx]
 

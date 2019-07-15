@@ -1,9 +1,8 @@
-import collections
-import numpy as np
-import os
 import unicodedata
-
-
+import os
+import collections
+
+
 class Dictionary:
     def __init__(self, fpath, msg=True):
         self.fpath = fpath
@@ -26,40 +25,6 @@ class Dictionary:
             self.dictType = "English"
         elif "CJK" in uniName:
             self.dictType = "Kanji"
-
-        # Remove "\n"
-        def removeNewLineCode(word):
-            line = word.rstrip("\n").split(" ")
-            if len(line) == 1:
-                line.append(0)
-            line[1] = int(line[1])
-            return line
-        dic_list = list(map(removeNewLineCode, data))
-        self.word = [d[0] for d in dic_list]
-        self.weight = [d[1] for d in dic_list]
-        self.wLen = [len(w) for w in self.word]
-
-        # Message
-        if msg is True:
-            print("Dictionary object has made.")
-            print(f" - file path         : {self.fpath}")
-            print(f" - dictionary size   : {self.size}")
-            print(f" - dictionary type   : {self.dictType}")
-            print(f" - top of dictionary : {self[0]}")
-
-    def __getitem__(self, key):
-        return {'word': self.word[key], 'weight': self.weight[key], 'len': self.wLen[key]}
-
-    def __str__(self):
-        return self.name
-
-    def __len__(self):
-        return self.size
-
-    def getK(self, word):
-        return np.where(self.word == word)[0][0]
-
-
     def deleteUnusableWords(self, msg=True):
         """
         This method checks words in the dictionary and erases words that can not cross any other words.
@@ -84,15 +49,3 @@ class Dictionary:
         """
         mergedWords = "".join(self.word)
         counts = collections.Counter(mergedWords)
-
-        for i, w in enumerate(self.word):
-            for char in w:
-                self.weight[i] += counts[char]
-
-        if msg is True:
-            print("All weights are calculated.")
-            print("TOP 5 characters:")
-            print(counts.most_common()[:5])
-            idx = sorted(range(self.size), key=lambda k: self.weight[k], reverse=True)[:5]
-            print("TOP 5 words:")
-            print(np.array(self.word)[idx])

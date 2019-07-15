@@ -1,15 +1,13 @@
 import copy
-
-
+
+
 class Optimizer:
     def __init__(self, msg=True):
         self.methodList = ["localSearch", "iteratedLocalSearch"]
         self.method = ""
         if msg is True:
             print("Optimizer object has made.")
-
-
-    def getNeighborSolution(self, puzzle):
+    def getNeighborSolution(self, puzzle):   
         """
         This method gets the neighborhood solution
         """
@@ -19,7 +17,7 @@ class Optimizer:
         _puzzle.collapse()
         # Kick
         _puzzle.kick()
-        # Add as much as possible
+        # Add as much as possible 
         _puzzle.addToLimit()
         return _puzzle
     def localSearch(self, puzzle, epoch, show=True, move=False, stdout=False):
@@ -40,7 +38,7 @@ class Optimizer:
             print(">>> Epoch %d/%d" % (_puzzle.epoch, goalEpoch))
             # Get neighbor solution by drop->kick->add
             newPuzzle = self.getNeighborSolution(_puzzle)
-
+            
             # Repeat if the score is high
             for funcNum in range(len(_puzzle.objFunc)):
                 prevScore = _puzzle.objFunc.getScore(_puzzle, funcNum)

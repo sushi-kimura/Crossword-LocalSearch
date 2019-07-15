@@ -1,7 +1,7 @@
-import itertools
 import numpy as np
-
-
+import itertools
+
+
 class ObjectiveFunction:
     def __init__(self, msg=True):
         self.flist = [
@@ -18,8 +18,6 @@ class ObjectiveFunction:
         return len(self.registeredFuncs)
     def getFuncs(self):
         return self.registeredFuncs
-
-
     def solSize(self, puzzle):
         """
         This method returns the number of words used in the solution
