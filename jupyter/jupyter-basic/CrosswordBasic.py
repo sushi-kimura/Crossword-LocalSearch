@@ -14,8 +14,7 @@
 #     name: python3
 # ---
 
-# # Crossword Local Search
-#
+# # CrosswordBasic
 # ## 概要
 # このノートブックではクロスワード(スケルトンパズル)自動生成ツールおよびそれらの可視化について紹介します。
 
@@ -31,7 +30,7 @@
 #   * `withWeight` : 辞書に重みを付すかどうか(bool)
 #   * `puzzleTitle` : パズルのタイトル（デフォルトは「スケルトンパズル」）
 
-fpath = f"../dict/typhoon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
+fpath = f"../../dict/typhoon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
 width = 15
 height = 15
 randomSeed = 6
@@ -61,7 +60,6 @@ from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
-fp = FontProperties(fname="fonts/SourceHanCodeJP.ttc", size=14)
 np.random.seed(seed = randomSeed)
 start = time.time()
 
@@ -317,7 +315,7 @@ if not withWeight:
 # よって、配置する場合のパターンは全部で20通りになります。
 # 詳しくは次の図をご参照ください。青が単語配置可能な位置、赤が配置不可能な位置を示します。
 
-display(Image.open("fig/puzzles.png"))
+display(Image.open("../fig/puzzles.png"))
 
 # これらの情報は次のフォーマットで整理されます：
 #   * k : 単語番号(辞書内の何番目の単語か)
@@ -325,7 +323,7 @@ display(Image.open("fig/puzzles.png"))
 #   * j : 単語の先頭文字のx座標
 #   * i : 単語の先頭文字のy座標
 
-display(Image.open("fig/sample_placeable.png"))
+display(Image.open("../fig/sample_placeable.png"))
 
 
 # メンバ変数は以下の通り：
@@ -1263,6 +1261,7 @@ def saveImage(self, data, fpath, dpi=100):
     # Generate puzzle image
     collors = np.where(self.cover<1, "#000000", "#FFFFFF")
     df = pd.DataFrame(data)
+    fp = FontProperties(fname="../../fonts/SourceHanCodeJP.ttc", size=14)
 
     fig=plt.figure(figsize=(16, 8), dpi=dpi)
     ax1=fig.add_subplot(121) # puzzle
@@ -1293,6 +1292,7 @@ def saveImage(self, data, fpath, dpi=100):
     for _, cell in ax2_table.get_celld().items():
         cell.set_text_props(fontproperties=fp, size=18)
     plt.tight_layout()
+    plt.show()
     plt.savefig(fpath, dpi=dpi)
     plt.close()
 setattr(Puzzle, "saveImage", saveImage)
@@ -1318,12 +1318,12 @@ setattr(Puzzle, "saveAnswerImage", saveAnswerImage)
 # ### 問題
 
 madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
-sample_puzzle.saveProblemImage(f"fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_problem.png")
+sample_puzzle.saveProblemImage(f"../fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_problem.png")
 
 # ### 解答
 
 madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
-sample_puzzle.saveAnswerImage(f"fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_answer.png")
+sample_puzzle.saveAnswerImage(f"../fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_answer.png")
 
 # ***
 #
@@ -1396,7 +1396,7 @@ def toPickle(self, fpath=None, msg=True):
     This method saves Puzzle object as a binary file
     """
     now = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
-    fpath = fpath or f"pickle/{now}_{self.dic.name}_{self.width}_{self.height}_{self.initSeed}_{self.epoch}.pickle"
+    fpath = fpath or f"../pickle/{now}_{self.dic.name}_{self.width}_{self.height}_{self.initSeed}_{self.epoch}.pickle"
     with open(fpath, mode="wb") as f:
         pickle.dump(self, f)
     if msg is True:
