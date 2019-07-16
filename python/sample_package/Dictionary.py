@@ -1,6 +1,6 @@
 import os
-import collections
 import unicodedata
+import collections
 import numpy as np
 
 
@@ -9,9 +9,8 @@ class Dictionary:
         self.fpath = fpath
         self.name = os.path.basename(fpath)[:-4]
         # Read
-        file = open(self.fpath, 'r', encoding='utf-8')
-        data = file.readlines()
-        file.close()
+        with open(self.fpath, 'r', encoding='utf-8') as f:
+            data = f.readlines()
         self.word = [d[0] for d in data]
         self.weight = [d[1] for d in data]
         self.wLen = [len(w) for w in self.word]

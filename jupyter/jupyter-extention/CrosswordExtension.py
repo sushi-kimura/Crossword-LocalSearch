@@ -34,15 +34,17 @@ import itertools
 import unicodedata
 import collections
 import pickle
+import shutil
 
 import numpy as np
 import pandas as pd
 from PIL import Image
 from IPython.display import display, HTML
 import matplotlib.pyplot as plt
+import cv2
 
 sys.path.append('../../python')
-from src import Puzzle, Dictionary, Placeable, ObjectiveFunction, Optimizer
+from sample_package import Puzzle, Dictionary, Placeable, ObjectiveFunction, Optimizer
 
 start = time.time()
 # -
@@ -63,38 +65,37 @@ sample_puzzle.show()
 # ## （番外編）解の軌跡をアニメーション化
 # 解の軌跡をアニメーション化してみましょう。
 # パズルの巻き戻し・早送り機能を使って、作業履歴を最初から順番に画像化し、
-# 外部ファイルを用いてそれを動画化します。
+# 外部ファイルを用いてそれを動画化します（このセルの実行には数分かかる場合があります）。
 
-# !rm -rf fig/animation
-# !mkdir fig/animation
-tmpPuzzle = sample_puzzle.jump(0)
-tmpPuzzle.saveAnswerImage(f"../fig/animation/0000.png")
-for histNum in range(len(sample_puzzle.history)):
-    tmpPuzzle = tmpPuzzle.getNext()
-    tmpPuzzle.saveAnswerImage(f"../fig/animation/{str(histNum+1).zfill(4)}.png")
+# +
+shutil.rmtree('../fig/animation/')
+os.mkdir('../fig/animation/')
+
+# make .gitignore
+with open("../fig/animation/.gitignore", "w") as f:
+    f.write("*.png")
+# jump to top of the frame
+# tmpPuzzle = sample_puzzle.jump(0)
+# tmpPuzzle.saveAnswerImage(f"../fig/animation/0000.png")
+# # save all history as image file
+# for histNum in range(len(sample_puzzle.history)):
+#     tmpPuzzle = tmpPuzzle.getNext()
+#     tmpPuzzle.saveAnswerImage(f"../fig/animation/{str(histNum+1).zfill(4)}.png")
+# -
 
 # 動画化にはmovie_maker.pyを用います。コマンドライン引数で画像が入ったディレクトリとFPSを指定します。
 
-# !python ../python/script/movie_maker.py "../fig/animation/" -o "../fig/animation/out.mp4" -f 10 -c mp4v
+# !python ../../python/script/movie_maker.py "../fig/animation/" -o "../fig/animation/out.mp4" -f 10 -c mp4v
 
 # これで、fig/animation内にout.mp4という動画ファイルが作成されました。
 # 再生してみましょう。
 
-# +
 import io
 import base64
-
-video = io.open('../fig/animation/out.mov', 'r+b').read()
-encoded = base64.b64encode(video)
-HTML(data='''<video alt="out" controls>
-                <source src="data:fig/animation/out.mov;base64,{0}" type="video/mov" />
-             </video>'''.format(encoded.decode('utf-8')))
-
 video = io.open('../fig/animation/out.mp4', 'r+b').read()
 encoded = base64.b64encode(video)
 HTML(data='''<video alt="test" controls>
                 <source src="data:video/mp4;base64,{0}" type="video/mp4" />
              </video>'''.format(encoded.decode('ascii')))
-# -
 
 

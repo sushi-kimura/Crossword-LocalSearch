@@ -1,13 +1,13 @@
-import math
-from IPython.display import display, HTML
-import datetime
 from matplotlib.font_manager import FontProperties
-import copy
-import pickle
 import pandas as pd
-import itertools
+from IPython.display import display, HTML
+import pickle
+import math
+import copy
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
+import itertools
 
 from sample_package.Placeable import Placeable
 
@@ -521,7 +521,6 @@ class Puzzle:
         for _, cell in ax2_table.get_celld().items():
             cell.set_text_props(fontproperties=fp, size=18)
         plt.tight_layout()
-        plt.show()
         plt.savefig(fpath, dpi=dpi)
         plt.close()
     def saveProblemImage(self, fpath="problem.png", dpi=100):
@@ -560,13 +559,13 @@ class Puzzle:
         return self.jump(self.historyIdx + n)
     def getLatest(self):
         return self.jump(len(self.history))
-    def toPickle(self, fpath=None, msg=True):
+    def toPickle(self, name=None, msg=True):
         """
         This method saves Puzzle object as a binary file
         """
         now = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
-        fpath = fpath or f"../pickle/{now}_{self.dic.name}_{self.width}_{self.height}_{self.initSeed}_{self.epoch}.pickle"
-        with open(fpath, mode="wb") as f:
+        name = name or f"{now}_{self.dic.name}_{self.width}_{self.height}_{self.initSeed}_{self.epoch}.pickle"
+        with open(name, mode="wb") as f:
             pickle.dump(self, f)
         if msg is True:
-            print(f"Puzzle has pickled to the path '{fpath}'")
+            print(f"Puzzle has pickled to the path '{name}'")

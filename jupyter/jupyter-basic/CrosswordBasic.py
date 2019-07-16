@@ -52,6 +52,7 @@ import itertools
 import unicodedata
 import collections
 import pickle
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -176,9 +177,8 @@ class Dictionary:
         self.fpath = fpath
         self.name = os.path.basename(fpath)[:-4]
         # Read
-        file = open(self.fpath, 'r', encoding='utf-8')
-        data = file.readlines()
-        file.close()
+        with open(self.fpath, 'r', encoding='utf-8') as f:
+            data = f.readlines()
         self.word = [d[0] for d in data]
         self.weight = [d[1] for d in data]
         self.wLen = [len(w) for w in self.word]
@@ -1162,7 +1162,7 @@ def solve(self, epoch, stdout=False):
     print(" --- done")
 setattr(Puzzle, "solve", solve)
 
-sample_puzzle.solve(epoch=10)
+sample_puzzle.solve(epoch=5)
 
 # 最後に表示された解が局所最適解です。  
 # 初期解に比べ、解が目的関数に沿って改善されていれば成功です。  
@@ -1290,7 +1290,6 @@ def saveImage(self, data, fpath, dpi=100):
     for _, cell in ax2_table.get_celld().items():
         cell.set_text_props(fontproperties=fp, size=18)
     plt.tight_layout()
-    plt.show()
     plt.savefig(fpath, dpi=dpi)
     plt.close()
 setattr(Puzzle, "saveImage", saveImage)
@@ -1389,19 +1388,22 @@ tmp_puzzle.show()
 # 最後に、`Puzzle`オブジェクトを`Pickle`ライブラリを用いてバイナリ形式で保存します。  
 # このファイルを読み込むことで、過去に生成したオブジェクトを再度読み込むことができます。
 
-def toPickle(self, fpath=None, msg=True):
+def toPickle(self, name=None, msg=True):
     """
     This method saves Puzzle object as a binary file
     """
     now = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
-    fpath = fpath or f"../pickle/{now}_{self.dic.name}_{self.width}_{self.height}_{self.initSeed}_{self.epoch}.pickle"
-    with open(fpath, mode="wb") as f:
+    name = name or f"{now}_{self.dic.name}_{self.width}_{self.height}_{self.initSeed}_{self.epoch}.pickle"
+    with open(name, mode="wb") as f:
         pickle.dump(self, f)
     if msg is True:
-        print(f"Puzzle has pickled to the path '{fpath}'")
+        print(f"Puzzle has pickled to the path '{name}'")
 setattr(Puzzle, "toPickle", toPickle)
 
-sample_puzzle.toPickle()
+import glob
+sample_puzzle.toPickle() # sample.pickleを作る場合の引数：name="../pickle/sample.pickle"
+for pickle_file in glob.glob("*.pickle"):
+    shutil.move(pickle_file, "../pickle/")
 
 # こうして保存したパズルデータは、`Pickle`ライブラリの仕様に従ってロードすることができます。  
 # 詳しくは拡張機能について詳しく解説した`CrosswordExtension.ipynb`をご覧ください。
