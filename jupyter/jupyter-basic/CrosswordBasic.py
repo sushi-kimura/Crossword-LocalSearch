@@ -26,16 +26,16 @@
 #   * `fpath`      : 入力データ(単語リスト)のファイルパス
 #   * `width`          : 盤面の大きさ(横)
 #   * `height`          : 盤面の大きさ(縦)
-#   * `randomSeed`       : シード値
+#   * `seed`       : シード値
 #   * `withWeight` : 辞書に重みを付すかどうか(bool)
-#   * `puzzleTitle` : パズルのタイトル（デフォルトは「スケルトンパズル」）
+#   * `title` : パズルのタイトル（デフォルトは「スケルトンパズル」）
 
 fpath = f"../../dict/typhoon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
 width = 15
 height = 15
-randomSeed = 6
+seed = 6
 withWeight = False
-puzzleTitle = "台風パズル"  # default:スケルトンパズル
+title = "台風パズル"  # default:スケルトンパズル
 
 # ***
 #
@@ -60,7 +60,7 @@ from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
-np.random.seed(seed = randomSeed)
+np.random.seed(seed = seed)
 start = time.time()
 
 
@@ -79,7 +79,7 @@ start = time.time()
 #   * width : 盤面の大きさ(横)
 #   * height : 盤面の大きさ(縦)
 #   * totalWeight : 単語の重みの合計
-#   * puzzleTitle：パズルのタイトル(str)
+#   * title：パズルのタイトル(str)
 #   * enable : 配置禁止マスを保持した2次元(width*height)配列
 #   * cell : パズルの解を保存する2次元(width*height)配列
 #   * cover : セル上の文字数を保持する2次元(width*height)配列
@@ -100,11 +100,11 @@ start = time.time()
 #   * optimizer：Optimizerオブジェクト(後述)
 
 class Puzzle:
-    def __init__(self, width, height, puzzleTitle="スケルトンパズル", msg=True):
+    def __init__(self, width, height, title="スケルトンパズル", msg=True):
         self.width = width
         self.height = height
         self.totalWeight = 0
-        self.puzzleTitle = puzzleTitle
+        self.title = title
         self.cell = np.full(width * height, "", dtype="unicode").reshape(height, width)
         self.cover = np.zeros(width * height, dtype="int64").reshape(height, width)
         self.coverDFS = np.zeros(width * height, dtype="int64").reshape(height, width)
@@ -126,12 +126,12 @@ class Puzzle:
         ## Message
         if msg is True:
             print("Puzzle object has made.")
-            print(f" - title       : {self.puzzleTitle}")
+            print(f" - title       : {self.title}")
             print(f" - width       : {self.width}")
             print(f" - height      : {self.height}")
             print(f" - cell' shape : (width, height) = ({self.cell.shape[0]},{self.cell.shape[1]})")
     def __str__(self):
-        return self.puzzleTitle
+        return self.title
     def reinit(self, all=False):
         if all is True:
             self.dic = None
@@ -157,7 +157,7 @@ class Puzzle:
         self.history = self.history[:self.historyIdx]
 
 
-sample_puzzle = Puzzle(width, height, puzzleTitle)
+sample_puzzle = Puzzle(width, height, title)
 
 
 # ### Dictionary クラス
@@ -337,12 +337,9 @@ class Placeable:
         self.size = 0
         self.width = puzzle.width
         self.height = puzzle.height
-        self.div = np.zeros(2*dic.size*self.width*self.height, dtype='int64')
-        self.k = np.zeros(2*dic.size*self.width*self.height, dtype='int64')
-        self.i = np.zeros(2*dic.size*self.width*self.height, dtype='int64')
-        self.j = np.zeros(2*dic.size*self.width*self.height, dtype='int64')
-        self.invP = np.zeros(2*dic.size*self.width*self.height, dtype='int64').reshape(2,self.height,self.width,dic.size)
-
+        self.div, self.i, self.j, self.k = [], [], [], []
+        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype='uint16')
+        
         for div in (0,1):
             for k in range(dic.size):
                 if div == 0:
@@ -353,15 +350,19 @@ class Placeable:
                     jMax = self.width - dic.wLen[k] + 1
                 for i in range(iMax):
                     for j in range(jMax):
-                        self.div[self.size] = div
-                        self.k[self.size] = k
-                        self.i[self.size] = i
-                        self.j[self.size] = j
+                        self.div.append(div)
+                        self.i.append(i)
+                        self.j.append(j)
+                        self.k.append(k)
                         self.invP[div,i,j,k] = self.size
                         self.size += 1
+        self.div = np.array(self.div, dtype="uint8")
+        self.i = np.array(self.i, dtype="uint8")
+        self.j = np.array(self.j, dtype="uint8")
+        self.k = np.array(self.k, dtype="uint8")
         if msg is True:
             print(f"Imported Dictionary name: `{dic.name}`, size: {dic.size}")
-            print(f"Placeable size : {self.size}/{self.div.size}(max shape)") 
+            print(f"Placeable size : {self.size}")
             
     def __len__(self):
         return self.size
@@ -665,6 +666,7 @@ def show(self, ndarray=None, stdout=False):
     if stdout is False:
         display(df) 
     else:
+        ndarray = np.where(ndarray=="", "  ", ndarray)
         print(ndarray)
 setattr(Puzzle, "show", show)
 
@@ -1269,7 +1271,7 @@ def saveImage(self, data, fpath, dpi=100):
     ax1_table = ax1.table(cellText=df.values, cellColours=collors, cellLoc="center", bbox=[0, 0, 1, 1])
     for _, cell in ax1_table.get_celld().items():
         cell.set_text_props(fontproperties=fp, size=20)
-    ax1.set_title(label="*** "+self.puzzleTitle+" ***", fontproperties=fp, size=20)
+    ax1.set_title(label="*** "+self.title+" ***", fontproperties=fp, size=20)
     # Draw word list
     words = [word for word in self.usedWords if word != ""]
     if words == []:
@@ -1314,12 +1316,12 @@ setattr(Puzzle, "saveAnswerImage", saveAnswerImage)
 # ### 問題
 
 madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
-sample_puzzle.saveProblemImage(f"../fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_problem.png")
+sample_puzzle.saveProblemImage(f"../fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{seed}_{sample_puzzle.epoch}_problem.png")
 
 # ### 解答
 
 madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
-sample_puzzle.saveAnswerImage(f"../fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{randomSeed}_{sample_puzzle.epoch}_answer.png")
+sample_puzzle.saveAnswerImage(f"../fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{seed}_{sample_puzzle.epoch}_answer.png")
 
 # ***
 #
@@ -1337,7 +1339,7 @@ sample_puzzle.history
 
 # +
 def jump(self, idx):
-    tmp_puzzle = Puzzle(self.width, self.height, self.puzzleTitle, msg=False)
+    tmp_puzzle = Puzzle(self.width, self.height, self.title, msg=False)
     tmp_puzzle.dic = copy.deepcopy(self.dic)
     tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
     tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)

@@ -1,12 +1,14 @@
 import copy
-
-
+
+
 class Optimizer:
     def __init__(self, msg=True):
         self.methodList = ["localSearch", "iteratedLocalSearch"]
         self.method = ""
         if msg is True:
             print("Optimizer object has made.")
+
+
     def getNeighborSolution(self, puzzle):   
         """
         This method gets the neighborhood solution
