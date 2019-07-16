@@ -8,7 +8,7 @@ import numpy as np
 from matplotlib.font_manager import FontProperties
 
 #os.chdir("/Users/taiga/Crossword-LocalSearch/Python")
-from src import Puzzle, Dictionary, ObjectiveFunction, Optimizer
+from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
 
 # In[]
 # Set variables
