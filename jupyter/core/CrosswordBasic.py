@@ -1166,7 +1166,7 @@ def solve(self, epoch):
     print(" --- done")
 setattr(Puzzle, "solve", solve)
 
-sample_puzzle.solve(epoch=5)
+sample_puzzle.solve(epoch=10)
 
 # 最後に表示された解が局所最適解です。  
 # 初期解に比べ、解が目的関数に沿って改善されていれば成功です。  
