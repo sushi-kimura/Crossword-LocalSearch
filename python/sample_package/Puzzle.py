@@ -1,13 +1,14 @@
-from matplotlib.font_manager import FontProperties
-import pandas as pd
-from IPython.display import display, HTML
-import pickle
-import math
-import copy
-import matplotlib.pyplot as plt
 import numpy as np
+from src import utils
+import pandas as pd
+import pickle
+from IPython.display import display, HTML
 import datetime
 import itertools
+import math
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+import copy
 
 from sample_package.Placeable import Placeable
 
@@ -224,32 +225,32 @@ class Puzzle:
         # Add as much as possible
         self.addToLimit()
         self.initSol = True
-    def show(self, ndarray=None, stdout=False):
+    def show(self, ndarray=None):
         """
         This method displays a puzzle
         """
         if ndarray is None:
             ndarray = self.cell
-        styles = [
-            dict(selector="th", props=[("font-size", "90%"),
-                                       ("text-align", "center"),
-                                       ("color", "#ffffff"),
-                                       ("background", "#777777"),
-                                       ("border", "solid 1px white"),
-                                       ("width", "30px"),
-                                       ("height", "30px")]),
-            dict(selector="td", props=[("font-size", "105%"),
-                                       ("text-align", "center"),
-                                       ("color", "#161616"),
-                                       ("background", "#dddddd"),
-                                       ("border", "solid 1px white"),
-                                       ("width", "30px"),
-                                       ("height", "30px")]),
-            dict(selector="caption", props=[("caption-side", "bottom")])
-        ]
-        df = pd.DataFrame(ndarray)
-        df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
-        if stdout is False:
+        if utils.in_ipynb() is True:
+            styles = [
+                dict(selector="th", props=[("font-size", "90%"),
+                                           ("text-align", "center"),
+                                           ("color", "#ffffff"),
+                                           ("background", "#777777"),
+                                           ("border", "solid 1px white"),
+                                           ("width", "30px"),
+                                           ("height", "30px")]),
+                dict(selector="td", props=[("font-size", "105%"),
+                                           ("text-align", "center"),
+                                           ("color", "#161616"),
+                                           ("background", "#dddddd"),
+                                           ("border", "solid 1px white"),
+                                           ("width", "30px"),
+                                           ("height", "30px")]),
+                dict(selector="caption", props=[("caption-side", "bottom")])
+            ]
+            df = pd.DataFrame(ndarray)
+            df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
             display(df) 
         else:
             ndarray = np.where(ndarray=="", "  ", ndarray)
@@ -422,7 +423,7 @@ class Puzzle:
             for funcNum in range(len(objFunc)):
                 print("  |-> %d. %s" % (funcNum, objFunc.registeredFuncs[funcNum]))
             print(" --- optimizer: %s" % optimizer.method)
-    def solve(self, epoch, stdout=False):
+    def solve(self, epoch):
         """
         This method repeats the solution improvement by the specified number of epochs
         """
@@ -431,7 +432,7 @@ class Puzzle:
             raise RuntimeError("'firstSolve' method has not called")
         if epoch is 0:
             raise ValueError("'epoch' must be lather than 0")
-        exec(f"self.optimizer.{self.optimizer.method}(self, {epoch}, stdout=stdout)")
+        exec(f"self.optimizer.{self.optimizer.method}(self, {epoch})")
         print(" --- done")
     def showLog(self, title="Objective Function's time series", grid=True, figsize=None):
         """

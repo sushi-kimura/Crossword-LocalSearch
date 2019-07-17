@@ -44,6 +44,7 @@ title = "台風パズル"  # default:スケルトンパズル
 
 # +
 import os
+import sys
 import copy
 import datetime
 import time
@@ -60,6 +61,9 @@ from PIL import Image
 from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
+
+sys.path.append("../../python")
+from src import utils
 
 np.random.seed(seed = seed)
 start = time.time()
@@ -638,32 +642,32 @@ sample_puzzle.firstSolve()
 # どんなパズルができたのか、結果が気になりますよね。  
 # 結果を確認するための`show`メソッドを定義します：
 
-def show(self, ndarray=None, stdout=False):
+def show(self, ndarray=None):
     """
     This method displays a puzzle
     """
     if ndarray is None:
         ndarray = self.cell
-    styles = [
-        dict(selector="th", props=[("font-size", "90%"),
-                                   ("text-align", "center"),
-                                   ("color", "#ffffff"),
-                                   ("background", "#777777"),
-                                   ("border", "solid 1px white"),
-                                   ("width", "30px"),
-                                   ("height", "30px")]),
-        dict(selector="td", props=[("font-size", "105%"),
-                                   ("text-align", "center"),
-                                   ("color", "#161616"),
-                                   ("background", "#dddddd"),
-                                   ("border", "solid 1px white"),
-                                   ("width", "30px"),
-                                   ("height", "30px")]),
-        dict(selector="caption", props=[("caption-side", "bottom")])
-    ]
-    df = pd.DataFrame(ndarray)
-    df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
-    if stdout is False:
+    if utils.in_ipynb() is True:
+        styles = [
+            dict(selector="th", props=[("font-size", "90%"),
+                                       ("text-align", "center"),
+                                       ("color", "#ffffff"),
+                                       ("background", "#777777"),
+                                       ("border", "solid 1px white"),
+                                       ("width", "30px"),
+                                       ("height", "30px")]),
+            dict(selector="td", props=[("font-size", "105%"),
+                                       ("text-align", "center"),
+                                       ("color", "#161616"),
+                                       ("background", "#dddddd"),
+                                       ("border", "solid 1px white"),
+                                       ("width", "30px"),
+                                       ("height", "30px")]),
+            dict(selector="caption", props=[("caption-side", "bottom")])
+        ]
+        df = pd.DataFrame(ndarray)
+        df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
         display(df) 
     else:
         ndarray = np.where(ndarray=="", "  ", ndarray)
@@ -1045,7 +1049,7 @@ setattr(Optimizer, "getNeighborSolution", getNeighborSolution)
 # 厳密にはそれが最適解かはわかりませんが、この解は近似的な最適解と言えるでしょう。  
 # それでは、局所探索法を行う`localSearch`メソッドを実装します：
 
-def localSearch(self, puzzle, epoch, show=True, move=False, stdout=False):
+def localSearch(self, puzzle, epoch, show=True, move=False):
     """
     This method performs a local search
     """
@@ -1056,7 +1060,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False, stdout=False):
     _puzzle = copy.deepcopy(puzzle)
     if show is True:
         print(">>> Interim solution")
-        _puzzle.show(_puzzle.cell, stdout=stdout)
+        _puzzle.show(_puzzle.cell)
     goalEpoch = _puzzle.epoch + epoch
     for ep in range(epoch):
         _puzzle.epoch += 1
@@ -1073,7 +1077,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False, stdout=False):
                 _puzzle = copy.deepcopy(newPuzzle)
                 _puzzle.logging()
                 if show is True:
-                    _puzzle.show(_puzzle.cell, stdout=stdout)
+                    _puzzle.show(_puzzle.cell)
                 break
             if newScore < prevScore:
                 _puzzle.logging()
@@ -1084,7 +1088,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False, stdout=False):
             _puzzle.logging()
             print(f"    - Replaced(same score): {_puzzle.objFunc.getScore(_puzzle, all=True)} -> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
             if show is True:
-                _puzzle.show(_puzzle.cell, stdout=stdout)
+                _puzzle.show(_puzzle.cell)
     # Update previous puzzle
     puzzle.totalWeight = copy.deepcopy(_puzzle.totalWeight)
     puzzle.enable = copy.deepcopy(_puzzle.enable)
@@ -1149,7 +1153,7 @@ sample_puzzle.compile(objFunc=objFunc, optimizer=optimizer)
 # 局所探索法による解の改善を実行する準備が完全に整いました。  
 # それでは、これを行う`solve`メソッドを実装し、エポック数を指定して解が改善されていく様子を見てみましょう！
 
-def solve(self, epoch, stdout=False):
+def solve(self, epoch):
     """
     This method repeats the solution improvement by the specified number of epochs
     """
@@ -1158,7 +1162,7 @@ def solve(self, epoch, stdout=False):
         raise RuntimeError("'firstSolve' method has not called")
     if epoch is 0:
         raise ValueError("'epoch' must be lather than 0")
-    exec(f"self.optimizer.{self.optimizer.method}(self, {epoch}, stdout=stdout)")
+    exec(f"self.optimizer.{self.optimizer.method}(self, {epoch})")
     print(" --- done")
 setattr(Puzzle, "solve", solve)
 

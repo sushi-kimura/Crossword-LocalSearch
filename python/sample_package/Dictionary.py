@@ -1,7 +1,7 @@
 import os
+import numpy as np
 import unicodedata
 import collections
-import numpy as np
 
 
 class Dictionary:

@@ -63,7 +63,7 @@ def get(fpath, width, height, seed, epoch, title, withWeight, output):
     # In[]
     # Solve
     puzzle.firstSolve()
-    puzzle.solve(epoch=epoch, stdout=True)
+    puzzle.solve(epoch=epoch)
     is_simple = puzzle.isSimpleSol()
     pass_answer = f"fig/{output}_answer.png"
     pass_problem = f"fig/{output}_problem.png"

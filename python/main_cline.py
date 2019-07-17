@@ -83,7 +83,7 @@ puzzle.compile(objFunc=objFunc, optimizer=optimizer, msg=False)
 # In[]
 # Solve
 puzzle.firstSolve()
-puzzle.solve(epoch=epoch, stdout=True)
+puzzle.solve(epoch=epoch)
 print(f"SimpleSolution: {puzzle.isSimpleSol()}")
 print(puzzle.cell)
 print(f"単語リスト：{puzzle.usedWords[:puzzle.solSize]}")
