@@ -26,6 +26,7 @@
 # +
 import os
 import sys
+import glob
 import copy
 import datetime
 import time
@@ -67,21 +68,16 @@ sample_puzzle.show()
 # パズルの巻き戻し・早送り機能を使って、作業履歴を最初から順番に画像化し、
 # 外部ファイルを用いてそれを動画化します（このセルの実行には数分かかる場合があります）。
 
-# +
-shutil.rmtree('../fig/animation/')
-os.mkdir('../fig/animation/')
-
-# make .gitignore
-with open("../fig/animation/.gitignore", "w") as f:
-    f.write("*.png")
+for p in glob.glob("../fig/animation/*.png"):
+     if os.path.isfile(p):
+            os.remove(p)
 # jump to top of the frame
-# tmpPuzzle = sample_puzzle.jump(0)
-# tmpPuzzle.saveAnswerImage(f"../fig/animation/0000.png")
-# # save all history as image file
-# for histNum in range(len(sample_puzzle.history)):
-#     tmpPuzzle = tmpPuzzle.getNext()
-#     tmpPuzzle.saveAnswerImage(f"../fig/animation/{str(histNum+1).zfill(4)}.png")
-# -
+tmpPuzzle = sample_puzzle.jump(0)
+tmpPuzzle.saveAnswerImage(f"../fig/animation/0000.png")
+# save all history as image file
+for histNum in range(len(sample_puzzle.history)):
+    tmpPuzzle = tmpPuzzle.getNext()
+    tmpPuzzle.saveAnswerImage(f"../fig/animation/{str(histNum+1).zfill(4)}.png")
 
 # 動画化にはmovie_maker.pyを用います。コマンドライン引数で画像が入ったディレクトリとFPSを指定します。
 
