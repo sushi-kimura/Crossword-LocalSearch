@@ -114,7 +114,7 @@ class Puzzle:
         self.cover = np.zeros(width * height, dtype="int64").reshape(height, width)
         self.coverDFS = np.zeros(width * height, dtype="int64").reshape(height, width)
         self.enable = np.ones(width * height, dtype="bool").reshape(height, width)
-        self.usedWords = np.full(width * height, "", dtype="U%d" % max(width, height))
+        self.usedWords = np.full(width * height, "", dtype=f"U{max(width, height)}")
         self.usedPlcIdx = np.full(width * height, -1, dtype="int64")
         self.solSize = 0
         self.history = []
@@ -149,7 +149,7 @@ class Puzzle:
         self.cover = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
         self.coverDFS = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
         self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
-        self.usedWords = np.full(self.width*self.height, "", dtype="U%d" % max(self.width, self.height))
+        self.usedWords = np.full(self.width*self.height, "", dtype=f"U{max(self.width, self.height)}")
         self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int64")
         self.solSize = 0
         self.history = []
@@ -740,10 +740,10 @@ setattr(ObjectiveFunction, "totalWeight", totalWeight)
 
 # それでは、それぞれのスコアを見てみましょう：
 
-print("solSize: %d" % objFunc.solSize(sample_puzzle))
-print("crossCount: %d" % objFunc.crossCount(sample_puzzle))
-print("fillCount: %d" % objFunc.fillCount(sample_puzzle))
-print("totalWeight: %d" % objFunc.totalWeight(sample_puzzle))
+print(f"solSize: {objFunc.solSize(sample_puzzle)}")
+print(f"crossCount: {objFunc.crossCount(sample_puzzle)}")
+print(f"fillCount: {objFunc.fillCount(sample_puzzle)}")
+print(f"totalWeight: {objFunc.totalWeight(sample_puzzle)}")
 
 
 # 先ほどの初期解と見比べて目的関数の値が正しいかどうかを確認してください。
@@ -791,7 +791,7 @@ setattr(ObjectiveFunction, "maxConnectedEmpties", maxConnectedEmpties)
 
 # 早速結果を見てみましょう：
 
-print("maxConnectedEmpties: %d" % objFunc.maxConnectedEmpties(sample_puzzle))
+print(f"maxConnectedEmpties: {objFunc.maxConnectedEmpties(sample_puzzle)}")
 
 
 # 次に、これらの目的関数をどの順番で見ていくかの優先順位をつけて、`ObjectiveFunction`オブジェクトに登録します。  
@@ -805,7 +805,7 @@ def register(self, funcNames, msg=True):
         if funcName not in self.flist:
             raise RuntimeError(f"ObjectiveFunction class does not have '{funcName}' function")
         if msg is True:
-            print(" - '%s' function has registered." % funcName)
+            print(f" - '{funcName}' function has registered.")
     self.registeredFuncs = funcNames
     return
 setattr(ObjectiveFunction, "register", register)
@@ -833,8 +833,8 @@ setattr(ObjectiveFunction, "getScore", getScore)
 # このメソッドは引数`i`を指定すれば`i`番目のスコアが得られ、`all=True`を与えればスコアを一覧で返します。  
 # それでは、それぞれ試してみましょう：
 
-print("score[0]: %s" % objFunc.getScore(sample_puzzle, 0))
-print("scores: %s" % objFunc.getScore(sample_puzzle, all=True))
+print(f"score[0]: {objFunc.getScore(sample_puzzle, 0)}")
+print(f"scores: {objFunc.getScore(sample_puzzle, all=True)}")
 
 
 # ここで、解の改善過程を目的関数値の推移として記録するための`logging`メソッドを実装します。  
@@ -1064,7 +1064,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
     goalEpoch = _puzzle.epoch + epoch
     for ep in range(epoch):
         _puzzle.epoch += 1
-        print(">>> Epoch %d/%d" % (_puzzle.epoch, goalEpoch))
+        print(f">>> Epoch {_puzzle.epoch}/{goalEpoch}")
         # Get neighbor solution by drop->kick->add
         newPuzzle = self.getNeighborSolution(_puzzle)
         
@@ -1118,7 +1118,7 @@ def setMethod(self, methodName, msg=True):
     if methodName not in self.methodList:
         raise ValueError(f"Optimizer doesn't have '{methodName}' method")
     if msg is True:
-        print(" - '%s' method has registered." % methodName)
+        print(f" - '{methodName}' method has registered.")
     self.method = methodName
 setattr(Optimizer, "setMethod", setMethod)
 
@@ -1143,8 +1143,8 @@ def compile(self, objFunc, optimizer, msg=True):
         print("compile succeeded.")
         print(" --- objective functions:")
         for funcNum in range(len(objFunc)):
-            print("  |-> %d. %s" % (funcNum, objFunc.registeredFuncs[funcNum]))
-        print(" --- optimizer: %s" % optimizer.method)
+            print(f"  |-> {funcNum} {objFunc.registeredFuncs[funcNum]}")
+        print(f" --- optimizer: {optimizer.method}")
 setattr(Puzzle, "compile", compile)
 
 sample_puzzle.compile(objFunc=objFunc, optimizer=optimizer)
@@ -1316,12 +1316,12 @@ setattr(Puzzle, "saveAnswerImage", saveAnswerImage)
 
 # -
 
-# ### 問題
+# ### 問題として画像化
 
 madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
 sample_puzzle.saveProblemImage(f"../fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{seed}_{sample_puzzle.epoch}_problem.png")
 
-# ### 解答
+# ### 解答として画像化
 
 madeTime = datetime.datetime.today().strftime("%Y%m%d%H%M%S")
 sample_puzzle.saveAnswerImage(f"../fig/puzzle/{madeTime}_{str(sample_dic)}_{width}_{height}_{seed}_{sample_puzzle.epoch}_answer.png")
@@ -1376,11 +1376,7 @@ setattr(Puzzle, "getLatest", getLatest)
 
 # これらを利用することで、`Puzzle`オブジェクトの状態を自由に移動させることができます。
 
-tmp_puzzle = sample_puzzle.jump(2)
-tmp_puzzle.show()
-tmp_puzzle = tmp_puzzle.getPrev()
-tmp_puzzle.show()
-tmp_puzzle = tmp_puzzle.getNext(2)
+tmp_puzzle = sample_puzzle.jump(10)
 tmp_puzzle.show()
 tmp_puzzle = tmp_puzzle.getLatest()
 tmp_puzzle.show()
@@ -1419,4 +1415,4 @@ for pickle_file in glob.glob("*.pickle"):
 # また、ここで紹介したものの他にも、様々な拡張機能を用意しておりますので、その説明は`CrosswordExtension.ipynb`をご覧ください。
 
 e_time = time.time() - start
-print ("e_time:" + format(e_time) + "[s]")
+print (f"e_time: {format(e_time)} s")
