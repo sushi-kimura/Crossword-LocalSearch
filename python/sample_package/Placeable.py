@@ -7,7 +7,7 @@ class Placeable:
         self.width = puzzle.width
         self.height = puzzle.height
         self.div, self.i, self.j, self.k = [], [], [], []
-        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype='uint16')
+        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype="int")
         
         for div in (0,1):
             for k in range(dic.size):
@@ -25,10 +25,6 @@ class Placeable:
                         self.k.append(k)
                         self.invP[div,i,j,k] = self.size
                         self.size += 1
-        self.div = np.array(self.div, dtype="uint8")
-        self.i = np.array(self.i, dtype="uint8")
-        self.j = np.array(self.j, dtype="uint8")
-        self.k = np.array(self.k, dtype="uint8")
         if msg is True:
             print(f"Imported Dictionary name: `{dic.name}`, size: {dic.size}")
             print(f"Placeable size : {self.size}")
@@ -37,7 +33,7 @@ class Placeable:
         return self.size
 
     def __getitem__(self, key):
-        if type(key) in (int, np.int64):
+        if type(key) in (int, np.int):
             return {"div": self.div[key], "i": self.i[key], "j": self.j[key], "k": self.k[key]}
         if type(key) is str:
             return eval(f"self.{key}")

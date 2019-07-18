@@ -1,12 +1,12 @@
-import numpy as np
-from src import utils
-import pandas as pd
 import pickle
-from IPython.display import display, HTML
+import numpy as np
+import pandas as pd
 import datetime
 import itertools
-import math
 import matplotlib.pyplot as plt
+import math
+from IPython.display import display, HTML
+from src import utils
 from matplotlib.font_manager import FontProperties
 import copy
 
@@ -19,11 +19,11 @@ class Puzzle:
         self.totalWeight = 0
         self.title = title
         self.cell = np.full(width * height, "", dtype="unicode").reshape(height, width)
-        self.cover = np.zeros(width * height, dtype="int64").reshape(height, width)
-        self.coverDFS = np.zeros(width * height, dtype="int64").reshape(height, width)
+        self.cover = np.zeros(width * height, dtype="int").reshape(height, width)
+        self.coverDFS = np.zeros(width * height, dtype="int").reshape(height, width)
         self.enable = np.ones(width * height, dtype="bool").reshape(height, width)
-        self.usedWords = np.full(width * height, "", dtype="U%d" % max(width, height))
-        self.usedPlcIdx = np.full(width * height, -1, dtype="int64")
+        self.usedWords = np.full(width * height, "", dtype=f"U{max(width, height)}")
+        self.usedPlcIdx = np.full(width * height, -1, dtype="int")
         self.solSize = 0
         self.history = []
         self.historyIdx = 0
@@ -54,11 +54,11 @@ class Puzzle:
         self.totalWeight = 0
         self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
         self.cell = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height, self.width)
-        self.cover = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
-        self.coverDFS = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
+        self.cover = np.zeros(self.width*self.height, dtype="int").reshape(self.height, self.width)
+        self.coverDFS = np.zeros(self.width*self.height, dtype="int").reshape(self.height, self.width)
         self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
-        self.usedWords = np.full(self.width*self.height, "", dtype="U%d" % max(self.width, self.height))
-        self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int64")
+        self.usedWords = np.full(self.width*self.height, "", dtype=f"U{max(self.width, self.height)}")
+        self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int")
         self.solSize = 0
         self.history = []
         self.historyIdx = 0
@@ -105,11 +105,11 @@ class Puzzle:
         # Judge whether correct intersection
         where = np.where(empties == False)[0]
         if div == 0:
-            jall = np.full(where.size, j, dtype="int64")
+            jall = np.full(where.size, j, dtype="int")
             if np.any(self.cell[where+i, jall] != np.array(list(word))[where]):
                 return 3
         if div == 1:
-            iall = np.full(where.size, i, dtype="int64")
+            iall = np.full(where.size, i, dtype="int")
             if np.any(self.cell[iall, where+j] != np.array(list(word))[where]):
                 return 3
             
@@ -120,7 +120,7 @@ class Puzzle:
         # If neighbor cells are filled except at the intersection, return False
         where = np.where(empties == True)[0]
         if div == 0:
-            jall = np.full(where.size, j, dtype="int64")
+            jall = np.full(where.size, j, dtype="int")
             # Left side
             if j > 0 and np.any(self.cell[where+i, jall-1] != ""):
                 return 5
@@ -128,7 +128,7 @@ class Puzzle:
             if j < self.width-1 and np.any(self.cell[where+i, jall+1] != ""):
                 return 5
         if div == 1:
-            iall = np.full(where.size, i, dtype="int64")
+            iall = np.full(where.size, i, dtype="int")
             # Upper
             if i > 0 and np.any(self.cell[iall-1, where+j] != ""):
                 return 5
@@ -294,12 +294,12 @@ class Puzzle:
         if div == 0:
             self.cover[i:i+wLen,j] -= 1
             where = np.where(self.cover[i:i+wLen,j] == 0)[0]
-            jall = np.full(where.size, j, dtype="int64")
+            jall = np.full(where.size, j, dtype="int")
             self.cell[i+where,jall] = ""
         if div == 1:
             self.cover[i,j:j+wLen] -= 1
             where = np.where(self.cover[i,j:j+wLen] == 0)[0]
-            iall = np.full(where.size, i, dtype="int64")
+            iall = np.full(where.size, i, dtype="int")
             self.cell[iall,j+where] = ""
         # Update usedWords, usedPlcIdx, solSize, totalWeight
         self.usedWords = np.delete(self.usedWords, pidx)  # delete
@@ -399,7 +399,7 @@ class Puzzle:
             return
 
         # Define 'largestCCL' witch has the largest score(fillCount+crossCount)
-        cclScores = np.zeros(self.ccl-2, dtype="int64")
+        cclScores = np.zeros(self.ccl-2, dtype="int")
         for c in range(self.ccl-2):
             cclScores[c] = np.sum(np.where(self.coverDFS == c+2, self.cover, 0))
         largestCCL = np.argmax(cclScores) + 2
@@ -421,8 +421,8 @@ class Puzzle:
             print("compile succeeded.")
             print(" --- objective functions:")
             for funcNum in range(len(objFunc)):
-                print("  |-> %d. %s" % (funcNum, objFunc.registeredFuncs[funcNum]))
-            print(" --- optimizer: %s" % optimizer.method)
+                print(f"  |-> {funcNum} {objFunc.registeredFuncs[funcNum]}")
+            print(f" --- optimizer: {optimizer.method}")
     def solve(self, epoch):
         """
         This method repeats the solution improvement by the specified number of epochs

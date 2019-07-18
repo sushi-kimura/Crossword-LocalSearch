@@ -60,7 +60,7 @@ class ObjectiveFunction:
             if funcName not in self.flist:
                 raise RuntimeError(f"ObjectiveFunction class does not have '{funcName}' function")
             if msg is True:
-                print(" - '%s' function has registered." % funcName)
+                print(f" - '{funcName}' function has registered.")
         self.registeredFuncs = funcNames
         return
     def getScore(self, puzzle, i=0, func=None, all=False):
@@ -68,7 +68,7 @@ class ObjectiveFunction:
         This method returns any objective function value
         """
         if all is True:
-            scores=np.zeros(len(self.registeredFuncs), dtype="int64")
+            scores=np.zeros(len(self.registeredFuncs), dtype="int")
             for n in range(scores.size):
                 scores[n] = eval(f"self.{self.registeredFuncs[n]}(puzzle)")
             return scores

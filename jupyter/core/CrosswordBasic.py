@@ -111,11 +111,11 @@ class Puzzle:
         self.totalWeight = 0
         self.title = title
         self.cell = np.full(width * height, "", dtype="unicode").reshape(height, width)
-        self.cover = np.zeros(width * height, dtype="int64").reshape(height, width)
-        self.coverDFS = np.zeros(width * height, dtype="int64").reshape(height, width)
+        self.cover = np.zeros(width * height, dtype="int").reshape(height, width)
+        self.coverDFS = np.zeros(width * height, dtype="int").reshape(height, width)
         self.enable = np.ones(width * height, dtype="bool").reshape(height, width)
         self.usedWords = np.full(width * height, "", dtype=f"U{max(width, height)}")
-        self.usedPlcIdx = np.full(width * height, -1, dtype="int64")
+        self.usedPlcIdx = np.full(width * height, -1, dtype="int")
         self.solSize = 0
         self.history = []
         self.historyIdx = 0
@@ -146,11 +146,11 @@ class Puzzle:
         self.totalWeight = 0
         self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
         self.cell = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height, self.width)
-        self.cover = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
-        self.coverDFS = np.zeros(self.width*self.height, dtype="int64").reshape(self.height, self.width)
+        self.cover = np.zeros(self.width*self.height, dtype="int").reshape(self.height, self.width)
+        self.coverDFS = np.zeros(self.width*self.height, dtype="int").reshape(self.height, self.width)
         self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
         self.usedWords = np.full(self.width*self.height, "", dtype=f"U{max(self.width, self.height)}")
-        self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int64")
+        self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int")
         self.solSize = 0
         self.history = []
         self.historyIdx = 0
@@ -342,7 +342,7 @@ class Placeable:
         self.width = puzzle.width
         self.height = puzzle.height
         self.div, self.i, self.j, self.k = [], [], [], []
-        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype='uint16')
+        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype="int")
         
         for div in (0,1):
             for k in range(dic.size):
@@ -360,10 +360,6 @@ class Placeable:
                         self.k.append(k)
                         self.invP[div,i,j,k] = self.size
                         self.size += 1
-        self.div = np.array(self.div, dtype="uint8")
-        self.i = np.array(self.i, dtype="uint8")
-        self.j = np.array(self.j, dtype="uint8")
-        self.k = np.array(self.k, dtype="uint8")
         if msg is True:
             print(f"Imported Dictionary name: `{dic.name}`, size: {dic.size}")
             print(f"Placeable size : {self.size}")
@@ -372,7 +368,7 @@ class Placeable:
         return self.size
 
     def __getitem__(self, key):
-        if type(key) in (int, np.int64):
+        if type(key) in (int, np.int):
             return {"div": self.div[key], "i": self.i[key], "j": self.j[key], "k": self.k[key]}
         if type(key) is str:
             return eval(f"self.{key}")
@@ -486,11 +482,11 @@ def isEnabledAdd(self, div, i, j, word, wLen):
     # Judge whether correct intersection
     where = np.where(empties == False)[0]
     if div == 0:
-        jall = np.full(where.size, j, dtype="int64")
+        jall = np.full(where.size, j, dtype="int")
         if np.any(self.cell[where+i, jall] != np.array(list(word))[where]):
             return 3
     if div == 1:
-        iall = np.full(where.size, i, dtype="int64")
+        iall = np.full(where.size, i, dtype="int")
         if np.any(self.cell[iall, where+j] != np.array(list(word))[where]):
             return 3
         
@@ -501,7 +497,7 @@ def isEnabledAdd(self, div, i, j, word, wLen):
     # If neighbor cells are filled except at the intersection, return False
     where = np.where(empties == True)[0]
     if div == 0:
-        jall = np.full(where.size, j, dtype="int64")
+        jall = np.full(where.size, j, dtype="int")
         # Left side
         if j > 0 and np.any(self.cell[where+i, jall-1] != ""):
             return 5
@@ -509,7 +505,7 @@ def isEnabledAdd(self, div, i, j, word, wLen):
         if j < self.width-1 and np.any(self.cell[where+i, jall+1] != ""):
             return 5
     if div == 1:
-        iall = np.full(where.size, i, dtype="int64")
+        iall = np.full(where.size, i, dtype="int")
         # Upper
         if i > 0 and np.any(self.cell[iall-1, where+j] != ""):
             return 5
@@ -821,7 +817,7 @@ def getScore(self, puzzle, i=0, func=None, all=False):
     This method returns any objective function value
     """
     if all is True:
-        scores=np.zeros(len(self.registeredFuncs), dtype="int64")
+        scores=np.zeros(len(self.registeredFuncs), dtype="int")
         for n in range(scores.size):
             scores[n] = eval(f"self.{self.registeredFuncs[n]}(puzzle)")
         return scores
@@ -892,12 +888,12 @@ def drop(self, div, i, j, k, isKick=False):
     if div == 0:
         self.cover[i:i+wLen,j] -= 1
         where = np.where(self.cover[i:i+wLen,j] == 0)[0]
-        jall = np.full(where.size, j, dtype="int64")
+        jall = np.full(where.size, j, dtype="int")
         self.cell[i+where,jall] = ""
     if div == 1:
         self.cover[i,j:j+wLen] -= 1
         where = np.where(self.cover[i,j:j+wLen] == 0)[0]
-        iall = np.full(where.size, i, dtype="int64")
+        iall = np.full(where.size, i, dtype="int")
         self.cell[iall,j+where] = ""
     # Update usedWords, usedPlcIdx, solSize, totalWeight
     self.usedWords = np.delete(self.usedWords, pidx)  # delete
@@ -1011,7 +1007,7 @@ def kick(self):
         return
 
     # Define 'largestCCL' witch has the largest score(fillCount+crossCount)
-    cclScores = np.zeros(self.ccl-2, dtype="int64")
+    cclScores = np.zeros(self.ccl-2, dtype="int")
     for c in range(self.ccl-2):
         cclScores[c] = np.sum(np.where(self.coverDFS == c+2, self.cover, 0))
     largestCCL = np.argmax(cclScores) + 2
@@ -1416,3 +1412,5 @@ for pickle_file in glob.glob("*.pickle"):
 
 e_time = time.time() - start
 print (f"e_time: {format(e_time)} s")
+
+

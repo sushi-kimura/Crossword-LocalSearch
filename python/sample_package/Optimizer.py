@@ -37,7 +37,7 @@ class Optimizer:
         goalEpoch = _puzzle.epoch + epoch
         for ep in range(epoch):
             _puzzle.epoch += 1
-            print(">>> Epoch %d/%d" % (_puzzle.epoch, goalEpoch))
+            print(f">>> Epoch {_puzzle.epoch}/{goalEpoch}")
             # Get neighbor solution by drop->kick->add
             newPuzzle = self.getNeighborSolution(_puzzle)
             
@@ -86,5 +86,5 @@ class Optimizer:
         if methodName not in self.methodList:
             raise ValueError(f"Optimizer doesn't have '{methodName}' method")
         if msg is True:
-            print(" - '%s' method has registered." % methodName)
+            print(f" - '{methodName}' method has registered.")
         self.method = methodName
