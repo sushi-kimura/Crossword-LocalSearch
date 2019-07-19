@@ -31,7 +31,7 @@ optimizer = Optimizer()
 # In[]
 puzzle.importDict(dic)
 # Register and set method and compile
-objFunc.register(["totalWeight","solSize", "crossCount", "fillCount", "maxConnectedEmpties"])
+objFunc.register(["totalWeight", "solSize", "crossCount", "fillCount", "maxConnectedEmpties"])
 optimizer.setMethod("localSearch")
 puzzle.compile(objFunc=objFunc, optimizer=optimizer)
 

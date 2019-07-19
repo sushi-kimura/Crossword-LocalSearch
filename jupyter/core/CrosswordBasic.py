@@ -536,8 +536,8 @@ setattr(Puzzle, "isEnabledAdd", isEnabledAdd)
 #
 # 実際に、`add`メソッドを定義しましょう：
 
-### add
-def add(self, div, i, j, k):
+### _add
+def _add(self, div, i, j, k):
     """
     This method places a word at arbitrary positions. If it can not be arranged, nothing is done.
     """
@@ -583,7 +583,7 @@ def add(self, div, i, j, k):
     self.history.append((1, wordIdx, div, i, j))
     return 0
 # Set attribute to Puzzle class  
-setattr(Puzzle, "add", add)
+setattr(Puzzle, "_add", _add)
 
 
 # さあ、`add`メソッドが定義できました。  
@@ -607,7 +607,7 @@ def addToLimit(self):
         solSizeTmp = self.solSize
         dropIdx = []
         for i, r in enumerate(randomIndex):
-            code = self.add(self.plc.div[r], self.plc.i[r], self.plc.j[r], self.plc.k[r])
+            code = self._add(self.plc.div[r], self.plc.i[r], self.plc.j[r], self.plc.k[r])
             if code is not 2:
                 dropIdx.append(i)
         randomIndex = np.delete(randomIndex, dropIdx)
@@ -871,7 +871,7 @@ setattr(Puzzle, "logging", logging)
 #
 # ここで一旦、盤面に置かれた単語を抜く処理を`drop`メソッドとして実装します：
 
-def drop(self, div, i, j, k, isKick=False):
+def _drop(self, div, i, j, k, isKick=False):
     """
     This method removes the specified word from the puzzle.
     Note: This method pulls out the specified word without taking it into consideration, which may break the connectivity of the puzzle or cause LAOS / US / USA problems.
@@ -943,7 +943,7 @@ def drop(self, div, i, j, k, isKick=False):
                 removeFlag = False
             if removeFlag == True:
                 self.enable[i,j+wLen] = True
-setattr(Puzzle, "drop", drop)
+setattr(Puzzle, "_drop", _drop)
 
 
 # これを用いて単語を抜いた後、残った島の中で一番面積(+クロス数)の大きい島以外を全て消します(この判定にもDFSが使われています)。  
@@ -979,10 +979,10 @@ def collapse(self):
         # If '2' is aligned in the cover array, the word can not be dropped
         if div == 0:
             if not np.any(np.diff(np.where(self.cover[i:i+wLen,j] == 2)[0]) == 1):
-                self.drop(div, i, j, k)
+                self._drop(div, i, j, k)
         if div == 1:
             if not np.any(np.diff(np.where(self.cover[i,j:j+wLen] == 2)[0]) == 1):
-                self.drop(div, i, j, k)
+                self._drop(div, i, j, k)
         
         # End with connectivity breakdown
         self.coverDFS = np.where(self.cover >= 1, 1, 0)
@@ -1014,7 +1014,7 @@ def kick(self):
         if p == -1:
             continue
         if self.coverDFS[self.plc.i[p], self.plc.j[p]] != largestCCL:
-            self.drop(self.plc.div[p], self.plc.i[p], self.plc.j[p], self.plc.k[p], isKick=True)
+            self._drop(self.plc.div[p], self.plc.i[p], self.plc.j[p], self.plc.k[p], isKick=True)
 setattr(Puzzle, "kick", kick)
 
 
@@ -1349,9 +1349,9 @@ def jump(self, idx):
 
     for code, k, div, i, j in tmp_puzzle.baseHistory[:idx]:
         if code == 1:
-            tmp_puzzle.add(div, i, j, k)
+            tmp_puzzle._add(div, i, j, k)
         elif code in (2,3):
-            tmp_puzzle.drop(div, i, j, k)
+            tmp_puzzle._drop(div, i, j, k)
     tmp_puzzle.initSol = True
     return tmp_puzzle
 setattr(Puzzle, "jump", jump)

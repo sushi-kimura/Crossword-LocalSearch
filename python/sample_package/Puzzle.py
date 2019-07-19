@@ -1,14 +1,14 @@
+import itertools
 from src import utils
+from IPython.display import display, HTML
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+import numpy as np
 import copy
 import datetime
-import matplotlib.pyplot as plt
-import numpy as np
-from IPython.display import display, HTML
-import pickle
-from matplotlib.font_manager import FontProperties
 import pandas as pd
-import itertools
 import math
+import pickle
 
 from sample_package.Placeable import Placeable
 
@@ -79,7 +79,7 @@ class Puzzle:
             empties = self.cell[i:i+wLen, j] == ""
         if div == 1:
             empties = self.cell[i, j:j+wLen] == ""
-
+            
         # If 0 words used, return True
         if self.solSize is 0:
             return 0
@@ -95,11 +95,11 @@ class Puzzle:
                 return 1
             if j+wLen < self.width and self.cell[i, j+wLen] != "":
                 return 1
-
+            
         # At least one place must cross other words
         if np.all(empties == True):
             return 2
-
+            
         # Judge whether correct intersection
         where = np.where(empties == False)[0]
         if div == 0:
@@ -110,7 +110,7 @@ class Puzzle:
             iall = np.full(where.size, i, dtype="int")
             if np.any(self.cell[iall, where+j] != np.array(list(word))[where]):
                 return 3
-
+            
         # If the same word is in use, return False
         if word in self.usedWords:
             return 4
@@ -133,7 +133,7 @@ class Puzzle:
             # Lower
             if i < self.height-1 and np.any(self.cell[iall+1, where+j] != ""):
                 return 5
-
+        
         # US/USA, DOMINICA/DOMINICAN problem
         if div == 0:
             if np.any(self.enable[i:i+wLen, j] == False) or np.all(empties == False):
@@ -145,7 +145,7 @@ class Puzzle:
         # If Break through the all barrier, return True
         return 0
 
-    def add(self, div, i, j, k):
+    def _add(self, div, i, j, k):
         """
         This method places a word at arbitrary positions. If it can not be arranged, nothing is done.
         """
@@ -157,7 +157,7 @@ class Puzzle:
         code = self.isEnabledAdd(div, i, j, word, wLen)
         if code is not 0:
             return code
-
+        
         # Put the word to puzzle
         if div == 0:
             self.cell[i:i+wLen, j] = list(word)[0:wLen]
@@ -175,13 +175,13 @@ class Puzzle:
                 self.enable[i, j-1] = False
             if j+wLen < self.width:
                 self.enable[i, j+wLen] = False
-
+        
         # Update cover array
         if div == 0:
             self.cover[i:i+wLen, j] += 1
         if div == 1:
             self.cover[i, j:j+wLen] += 1
-
+        
         # Update properties
         wordIdx = self.dic.word.index(word)
         self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIdx]
@@ -192,19 +192,19 @@ class Puzzle:
         return 0
     def addToLimit(self):
         """
-        This method adds the words as much as possible
+        This method adds the words as much as possible 
         """
         # Make a random index of plc
         randomIndex = np.arange(self.plc.size)
         np.random.shuffle(randomIndex)
-
+        
         # Add as much as possible
         solSizeTmp = None
         while self.solSize != solSizeTmp:
             solSizeTmp = self.solSize
             dropIdx = []
             for i, r in enumerate(randomIndex):
-                code = self.add(self.plc.div[r], self.plc.i[r], self.plc.j[r], self.plc.k[r])
+                code = self._add(self.plc.div[r], self.plc.i[r], self.plc.j[r], self.plc.k[r])
                 if code is not 2:
                     dropIdx.append(i)
             randomIndex = np.delete(randomIndex, dropIdx)
@@ -216,7 +216,7 @@ class Puzzle:
         # Check the initSol
         if self.initSol:
             raise RuntimeError("'firstSolve' method has already called")
-
+            
         # Save initial seed number
         self.initSeed = np.random.get_state()[1][0]
         # Add as much as possible
@@ -248,7 +248,7 @@ class Puzzle:
             ]
             df = pd.DataFrame(ndarray)
             df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
-            display(df)
+            display(df) 
         else:
             ndarray = np.where(ndarray=="", "  ", ndarray)
             print(ndarray)
@@ -276,7 +276,7 @@ class Puzzle:
             self.log.index.name = "epoch"
         tmpSe = pd.Series(self.objFunc.getScore(self, all=True), index=self.objFunc.getFuncs())
         self.log = self.log.append(tmpSe, ignore_index=True)
-    def drop(self, div, i, j, k, isKick=False):
+    def _drop(self, div, i, j, k, isKick=False):
         """
         This method removes the specified word from the puzzle.
         Note: This method pulls out the specified word without taking it into consideration, which may break the connectivity of the puzzle or cause LAOS / US / USA problems.
@@ -284,7 +284,7 @@ class Puzzle:
         # Get p, pidx
         p = self.plc.invP[div, i, j, k]
         pidx = np.where(self.usedPlcIdx == p)[0][0]
-
+        
         wLen = self.dic.wLen[k]
         weight = self.dic.weight[k]
         # Pull out a word
@@ -355,11 +355,11 @@ class Puzzle:
         # If solSize = 0, return
         if self.solSize == 0:
             return
-
-        # Make a random index of solSize
+        
+        # Make a random index of solSize  
         randomIndex = np.arange(self.solSize)
         np.random.shuffle(randomIndex)
-
+        
         # Drop words until connectivity collapses
         tmpUsedPlcIdx = copy.deepcopy(self.usedPlcIdx)
         for r, p in enumerate(tmpUsedPlcIdx[randomIndex]):
@@ -372,11 +372,11 @@ class Puzzle:
             # If '2' is aligned in the cover array, the word can not be dropped
             if div == 0:
                 if not np.any(np.diff(np.where(self.cover[i:i+wLen,j] == 2)[0]) == 1):
-                    self.drop(div, i, j, k)
+                    self._drop(div, i, j, k)
             if div == 1:
                 if not np.any(np.diff(np.where(self.cover[i,j:j+wLen] == 2)[0]) == 1):
-                    self.drop(div, i, j, k)
-
+                    self._drop(div, i, j, k)
+            
             # End with connectivity breakdown
             self.coverDFS = np.where(self.cover >= 1, 1, 0)
             self.ccl = 2
@@ -399,20 +399,20 @@ class Puzzle:
         for c in range(self.ccl-2):
             cclScores[c] = np.sum(np.where(self.coverDFS == c+2, self.cover, 0))
         largestCCL = np.argmax(cclScores) + 2
-
+        
         # Erase elements except CCL ('kick' in C-program)
         for idx, p in enumerate(self.usedPlcIdx[:self.solSize]):
             if p == -1:
                 continue
             if self.coverDFS[self.plc.i[p], self.plc.j[p]] != largestCCL:
-                self.drop(self.plc.div[p], self.plc.i[p], self.plc.j[p], self.plc.k[p], isKick=True)
+                self._drop(self.plc.div[p], self.plc.i[p], self.plc.j[p], self.plc.k[p], isKick=True)
     def compile(self, objFunc, optimizer, msg=True):
         """
         This method compiles the objective function and optimization method into the Puzzle instance
         """
         self.objFunc = objFunc
         self.optimizer = optimizer
-
+        
         if msg is True:
             print("compile succeeded.")
             print(" --- objective functions:")
@@ -505,13 +505,13 @@ class Puzzle:
             words = [""]
         words.sort()
         words = sorted(words, key=len)
-
+        
         rows = self.height
         cols = math.ceil(len(words)/rows)
         padnum = cols*rows - len(words)
         words += ['']*padnum
         words = np.array(words).reshape(cols, rows).T
-
+        
         ax2_table = ax2.table(cellText=words, cellColours=None, cellLoc="left", edges="open", bbox=[0, 0, 1, 1])
         ax2.set_title(label="【単語リスト】", fontproperties=fp, size=20)
         for _, cell in ax2_table.get_celld().items():
@@ -538,7 +538,7 @@ class Puzzle:
         tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
         tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
         tmp_puzzle.baseHistory = copy.deepcopy(self.baseHistory)
-
+        
         if set(self.history).issubset(self.baseHistory) is False:
             if idx <= len(self.history):
                 tmp_puzzle.baseHistory = copy.deepcopy(self.history)
@@ -547,9 +547,9 @@ class Puzzle:
 
         for code, k, div, i, j in tmp_puzzle.baseHistory[:idx]:
             if code == 1:
-                tmp_puzzle.add(div, i, j, k)
+                tmp_puzzle._add(div, i, j, k)
             elif code in (2,3):
-                tmp_puzzle.drop(div, i, j, k)
+                tmp_puzzle._drop(div, i, j, k)
         tmp_puzzle.initSol = True
         return tmp_puzzle
     def getPrev(self, n=1):
