@@ -93,6 +93,7 @@ start = time.time()
 #   * usedPlcIdx : 解として使われた(後に定義する)Placeable配列上の添え字一覧
 #   * solSize : パズルに配置されている単語の数
 #   * history : 単語増減の履歴
+#   * baseHistory : 後に説明するjumpメソッドにより解を移動した際に保持されるhistory
 #   * historyIdx : 現在参照している履歴番号
 #   * log：目的関数値の履歴
 #   * epoch : 初期解から局所探索した回数
@@ -118,7 +119,7 @@ class Puzzle:
         self.usedPlcIdx = np.full(width * height, -1, dtype="int")
         self.solSize = 0
         self.history = []
-        self.historyIdx = 0
+        self.baseHistory = []
         self.log = None
         self.epoch = 0
         self.ccl = None
@@ -152,14 +153,12 @@ class Puzzle:
         self.usedWords = np.full(self.width*self.height, "", dtype=f"U{max(self.width, self.height)}")
         self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int")
         self.solSize = 0
+        self.baseHistory = []
         self.history = []
-        self.historyIdx = 0
         self.log = None
         self.epoch = 0
         self.initSol = False
         self.initSeed = None
-    def resetHistory(self):
-        self.history = self.history[:self.historyIdx]
 
 
 sample_puzzle = Puzzle(width, height, title)
@@ -582,7 +581,6 @@ def add(self, div, i, j, k):
     self.solSize += 1
     self.totalWeight += weight
     self.history.append((1, wordIdx, div, i, j))
-    self.historyIdx += 1
     return 0
 # Set attribute to Puzzle class  
 setattr(Puzzle, "add", add)
@@ -905,7 +903,6 @@ def drop(self, div, i, j, k, isKick=False):
     # Insert data to history
     code = 3 if isKick else 2
     self.history.append((code, k, div, i, j))
-    self.historyIdx += 1
     # Release prohibited cells
     removeFlag = True
     if div == 0:
@@ -1095,7 +1092,7 @@ def localSearch(self, puzzle, epoch, show=True, move=False):
     puzzle.usedPlcIdx = copy.deepcopy(_puzzle.usedPlcIdx)
     puzzle.solSize = copy.deepcopy(_puzzle.solSize)
     puzzle.history = copy.deepcopy(_puzzle.history)
-    puzzle.historyIdx = copy.deepcopy(_puzzle.historyIdx)
+    puzzle.baseHistory = copy.deepcopy(_puzzle.baseHistory)
     puzzle.log = copy.deepcopy(_puzzle.log)
     puzzle.epoch = copy.deepcopy(_puzzle.epoch)
     puzzle.initSol = copy.deepcopy(_puzzle.initSol)
@@ -1153,7 +1150,6 @@ def solve(self, epoch):
     """
     This method repeats the solution improvement by the specified number of epochs
     """
-    self.resetHistory()
     if self.initSol is False:
         raise RuntimeError("'firstSolve' method has not called")
     if epoch is 0:
@@ -1343,30 +1339,37 @@ def jump(self, idx):
     tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
     tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
     tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
-    for code, k, div, i, j in self.history[:idx]:
+    tmp_puzzle.baseHistory = copy.deepcopy(self.baseHistory)
+    
+    if set(self.history).issubset(self.baseHistory) is False:
+        if idx <= len(self.history):
+            tmp_puzzle.baseHistory = copy.deepcopy(self.history)
+        else:
+            raise RuntimeError('This puzzle is up to date')
+
+    for code, k, div, i, j in tmp_puzzle.baseHistory[:idx]:
         if code == 1:
             tmp_puzzle.add(div, i, j, k)
-        else:
+        elif code in (2,3):
             tmp_puzzle.drop(div, i, j, k)
     tmp_puzzle.initSol = True
-    tmp_puzzle.history = copy.deepcopy(self.history)
     return tmp_puzzle
 setattr(Puzzle, "jump", jump)
 
 def getPrev(self, n=1):
-    if self.historyIdx-n < 0:
+    if len(self.history) - n < 0:
         return self.jump(0)
-    return self.jump(self.historyIdx - n)
+    return self.jump(len(self.history) - n)
 setattr(Puzzle, "getPrev", getPrev)
 
 def getNext(self, n=1):
-    if self.historyIdx+n > len(self.history):
+    if len(self.history) + n > len(self.baseHistory):
         return self.getLatest()
-    return self.jump(self.historyIdx + n)
+    return self.jump(len(self.history) + n)
 setattr(Puzzle, "getNext", getNext)
 
 def getLatest(self):
-    return self.jump(len(self.history))
+    return self.jump(len(self.baseHistory))
 setattr(Puzzle, "getLatest", getLatest)
 # -
 
