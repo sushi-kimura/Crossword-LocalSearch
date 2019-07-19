@@ -18,7 +18,7 @@ height = 15
 seed = 1
 withweight = False
 
-fp = FontProperties(fname="../jupyter/fonts/SourceHanCodeJP.ttc", size=14)
+fp = FontProperties(fname="../fonts/SourceHanCodeJP.ttc", size=14)
 np.random.seed(seed=seed)
 
 # In[]
