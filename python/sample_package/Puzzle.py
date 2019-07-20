@@ -1,14 +1,14 @@
-import itertools
+import pickle
+import pandas as pd
+import matplotlib.pyplot as plt
 from src import utils
 from IPython.display import display, HTML
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
-import numpy as np
-import copy
-import datetime
-import pandas as pd
 import math
-import pickle
+import copy
+from matplotlib.font_manager import FontProperties
+import itertools
+import numpy as np
+import datetime
 
 from sample_package.Placeable import Placeable
 

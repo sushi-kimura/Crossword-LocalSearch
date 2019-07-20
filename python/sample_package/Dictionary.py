@@ -1,6 +1,6 @@
-import unicodedata
-import collections
 import numpy as np
+import collections
+import unicodedata
 import os
 
 
@@ -45,6 +45,17 @@ class Dictionary:
             print(f" - dictionary size   : {self.size}")
             print(f" - dictionary type   : {self.dictType}")
             print(f" - top of dictionary : {self[0]}")
+    
+    def include(self, word):
+        return word in self.word
+
+    def add(self, word, weight=0):
+        if self.include(word):
+            raise ValueError(f"The word '{word}' already exists")
+        self.word.append(word)
+        self.weight.append(weight)
+        self.wLen.append(len(word))
+        self.size += 1
 
     def __getitem__(self, key):
         return {'word': self.word[key], 'weight': self.weight[key], 'len': self.wLen[key]}

@@ -9,26 +9,33 @@ class Placeable:
         self.div, self.i, self.j, self.k = [], [], [], []
         self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype="int")
         
-        for div in (0,1):
-            for k in range(dic.size):
-                if div == 0:
-                    iMax = self.height - dic.wLen[k] + 1
-                    jMax = self.width
-                elif div == 1:
-                    iMax = self.height
-                    jMax = self.width - dic.wLen[k] + 1
-                for i in range(iMax):
-                    for j in range(jMax):
-                        self.div.append(div)
-                        self.i.append(i)
-                        self.j.append(j)
-                        self.k.append(k)
-                        self.invP[div,i,j,k] = self.size
-                        self.size += 1
+        self._compute(dic.word)
+
         if msg is True:
             print(f"Imported Dictionary name: `{dic.name}`, size: {dic.size}")
             print(f"Placeable size : {self.size}")
-            
+
+    def _compute(self, word, baseK=0):
+        if baseK is not 0:
+            ap = np.full((2, self.height, self.width, 1), np.nan, dtype="int")
+            self.invP = np.append(self.invP, ap, axis=3)
+        for div in (0,1):
+            for k,w in enumerate(word):
+                if div == 0:
+                    iMax = self.height - len(w) + 1
+                    jMax = self.width
+                elif div == 1:
+                    iMax = self.height
+                    jMax = self.width - len(w) + 1
+                for i in range(iMax):
+                    for j in range(jMax):
+                        self.invP[div,i,j,baseK+k] = len(self.div)
+                        self.div.append(div)
+                        self.i.append(i)
+                        self.j.append(j)
+                        self.k.append(baseK+k)
+        self.size = len(self.k)
+
     def __len__(self):
         return self.size
 
