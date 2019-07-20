@@ -1,14 +1,14 @@
-import pickle
-import pandas as pd
-import matplotlib.pyplot as plt
-from src import utils
-from IPython.display import display, HTML
-import math
-import copy
 from matplotlib.font_manager import FontProperties
+import pandas as pd
+from src import utils
 import itertools
+import copy
+from IPython.display import display, HTML
+import pickle
+import math
 import numpy as np
 import datetime
+import matplotlib.pyplot as plt
 
 from sample_package.Placeable import Placeable
 
@@ -484,9 +484,9 @@ class Puzzle:
         This method generates and returns a puzzle image with a word list
         """
         # Generate puzzle image
-        collors = np.where(self.cover<1, "#000000", "#FFFFFF")
+        colors = np.where(self.cover<1, "#000000", "#FFFFFF")
         df = pd.DataFrame(data)
-        fp = FontProperties(fname="../fonts/SourceHanCodeJP.ttc", size=14)
+        fp = FontProperties(fname="../../fonts/SourceHanCodeJP.ttc", size=14)
 
         fig=plt.figure(figsize=(16, 8), dpi=dpi)
         ax1=fig.add_subplot(121) # puzzle
@@ -495,7 +495,7 @@ class Puzzle:
         ax2.axis("off")
         fig.set_facecolor('#EEEEEE')
         # Draw puzzle
-        ax1_table = ax1.table(cellText=df.values, cellColours=collors, cellLoc="center", bbox=[0, 0, 1, 1])
+        ax1_table = ax1.table(cellText=df.values, cellColours=colors, cellLoc="center", bbox=[0, 0, 1, 1])
         for _, cell in ax1_table.get_celld().items():
             cell.set_text_props(fontproperties=fp, size=20)
         ax1.set_title(label="*** "+self.title+" ***", fontproperties=fp, size=20)
