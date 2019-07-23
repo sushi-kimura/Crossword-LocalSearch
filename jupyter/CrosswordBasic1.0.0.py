@@ -1369,8 +1369,10 @@ def jump(self, idx):
     for code, k, div, i, j in tmp_puzzle.baseHistory[:idx]:
         if code == 1:
             tmp_puzzle._add(div, i, j, k)
-        elif code in (2,3):
-            tmp_puzzle._drop(div, i, j, k)
+        elif code == 2:
+            tmp_puzzle._drop(div, i, j, k, isKick=False)
+        elif code == 3:
+            tmp_puzzle._drop(div, i, j, k, isKick=True)
     tmp_puzzle.initSol = True
     return tmp_puzzle
 setattr(Puzzle, "jump", jump)
