@@ -1,17 +1,56 @@
-import numpy as np
-import pickle
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     formats: ipynb,py
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.4'
+#       jupytext_version: 1.1.7
+#   kernelspec:
+#     display_name: Python 3
+#     language: python
+#     name: python3
+# ---
+
+# # 開発者向けJupyter Notebook
+# ## 概要
+# このノートブックは開発者が新規機能の実装や機能修正をする際に変更を共有するために使用します。
+
+# +
+import os
+import sys
 import copy
-import itertools
 import datetime
-from src import utils
+import time
+import math
+import itertools
+import unicodedata
+import collections
+import pickle
+import shutil
+
+import numpy as np
+import pandas as pd
+from PIL import Image
+from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
-from IPython.display import display, HTML
-import pandas as pd
-import math
 
-from sample_package.Dictionary import Dictionary
-from sample_package.Placeable import Placeable
+
+sys.path.append("../python")
+from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
+from src import utils
+
+
+# -
+
+# ## Puzzle
+
+# +
+# os.getcwd()a.split('crossword-localsearch')
+# -
 
 class Puzzle:
     def __init__(self, width, height, title="スケルトンパズル", msg=True):
@@ -37,6 +76,7 @@ class Puzzle:
         self.plc = Placeable(self.width, self.height, self.dic, msg=False)
         self.objFunc = None
         self.optimizer = None
+        #self.fp = os.path.get_path()
         ## Message
         if msg is True:
             print("Puzzle object has made.")
@@ -44,8 +84,10 @@ class Puzzle:
             print(f" - width       : {self.width}")
             print(f" - height      : {self.height}")
             print(f" - cell' shape : (width, height) = ({self.cell.shape[0]},{self.cell.shape[1]})")
+
     def __str__(self):
         return self.title
+
     def reinit(self, all=False):
         if all is True:
             self.dic = None
@@ -68,10 +110,10 @@ class Puzzle:
         self.initSol = False
         self.initSeed = None
 
-
     def importDict(self, dictionary, msg=True):
         self.dic = dictionary
         self.plc = Placeable(self.width, self.height, self.dic, msg=msg)
+
     def isEnabledAdd(self, div, i, j, word, wLen):
         """
         This method determines if a word can be placed
@@ -191,6 +233,7 @@ class Puzzle:
         self.totalWeight += weight
         self.history.append((1, wordIdx, div, i, j))
         return 0
+
     def addToLimit(self):
         """
         This method adds the words as much as possible 
@@ -210,6 +253,7 @@ class Puzzle:
                     dropIdx.append(i)
             randomIndex = np.delete(randomIndex, dropIdx)
         return
+
     def firstSolve(self):
         """
         This method creates an initial solution
@@ -223,6 +267,7 @@ class Puzzle:
         # Add as much as possible
         self.addToLimit()
         self.initSol = True
+
     def show(self, ndarray=None):
         """
         This method displays a puzzle
@@ -253,6 +298,7 @@ class Puzzle:
         else:
             ndarray = np.where(ndarray=="", "  ", ndarray)
             print(ndarray)
+
     def DFS(self, i, j, ccl):
         """
         This method performs a Depth-First Search and labels each connected component
@@ -266,6 +312,7 @@ class Puzzle:
             self.DFS(i, j-1, ccl)
         if j<self.width-1 and self.coverDFS[i, j+1] == 1:
             self.DFS(i, j+1, ccl)
+
     def logging(self):
         """
         This method logs the current objective function values
@@ -277,6 +324,7 @@ class Puzzle:
             self.log.index.name = "epoch"
         tmpSe = pd.Series(self.objFunc.getScore(self, all=True), index=self.objFunc.getFuncs())
         self.log = self.log.append(tmpSe, ignore_index=True)
+
     def _drop(self, div, i, j, k, isKick=False):
         """
         This method removes the specified word from the puzzle.
@@ -349,6 +397,7 @@ class Puzzle:
                     removeFlag = False
                 if removeFlag == True:
                     self.enable[i,j+wLen] = True
+
     def collapse(self):
         """
         This method collapses connectivity of the puzzle
@@ -387,6 +436,7 @@ class Puzzle:
                     self.ccl += 1
             if self.ccl-2 >= 2:
                 break
+
     def kick(self):
         """
         This method kicks elements except largest CCL
@@ -407,6 +457,7 @@ class Puzzle:
                 continue
             if self.coverDFS[self.plc.i[p], self.plc.j[p]] != largestCCL:
                 self._drop(self.plc.div[p], self.plc.i[p], self.plc.j[p], self.plc.k[p], isKick=True)
+
     def compile(self, objFunc, optimizer, msg=True):
         """
         This method compiles the objective function and optimization method into the Puzzle instance
@@ -420,6 +471,7 @@ class Puzzle:
             for funcNum in range(len(objFunc)):
                 print(f"  |-> {funcNum} {objFunc.registeredFuncs[funcNum]}")
             print(f" --- optimizer: {optimizer.method}")
+
     def solve(self, epoch):
         """
         This method repeats the solution improvement by the specified number of epochs
@@ -430,6 +482,7 @@ class Puzzle:
             raise ValueError("'epoch' must be lather than 0")
         exec(f"self.optimizer.{self.optimizer.method}(self, {epoch})")
         print(" --- done")
+
     def showLog(self, title="Objective Function's time series", grid=True, figsize=None):
         """
         This method shows log of objective functions
@@ -437,6 +490,7 @@ class Puzzle:
         if self.log is None:
             raise RuntimeError("Puzzle has no log")
         return self.log.plot(subplots=True, title=title, grid=grid, figsize=figsize)
+
     def isSimpleSol(self):
         """
         This method determines whether it is the simple solution
@@ -480,6 +534,7 @@ class Puzzle:
                     print(f" - words '{word1}' and '{word2}' are replaceable")
                     rtnBool = False
         return rtnBool
+
     def saveImage(self, data, fpath, dpi=100):
         """
         This method generates and returns a puzzle image with a word list
@@ -520,22 +575,25 @@ class Puzzle:
         plt.tight_layout()
         plt.savefig(fpath, dpi=dpi)
         plt.close()
+
     def saveProblemImage(self, fpath="problem.png", dpi=100):
         """
         This method generates and returns a puzzle problem with a word list
         """
         data = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height,self.width)
         self.saveImage(data, fpath, dpi)
+
     def saveAnswerImage(self, fpath="answer.png", dpi=100):
         """
         This method generates and returns a puzzle answer with a word list.
         """
         data = self.cell
         self.saveImage(data, fpath, dpi)
+
     def jump(self, idx):
         tmp_puzzle = Puzzle(self.width, self.height, self.title, msg=False)
         tmp_puzzle.dic = copy.deepcopy(self.dic)
-        tmp_puzzle.plc = Placeable(tmp_puzzle.width, tmp_puzzle.height, tmp_puzzle.dic, msg=False)
+        tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
         tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
         tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
         tmp_puzzle.baseHistory = copy.deepcopy(self.baseHistory)
@@ -549,22 +607,24 @@ class Puzzle:
         for code, k, div, i, j in tmp_puzzle.baseHistory[:idx]:
             if code == 1:
                 tmp_puzzle._add(div, i, j, k)
-            elif code == 2:
-                tmp_puzzle._drop(div, i, j, k, isKick=False)
-            elif code == 3:
-                tmp_puzzle._drop(div, i, j, k, isKick=True)
+            elif code in (2,3):
+                tmp_puzzle._drop(div, i, j, k)
         tmp_puzzle.initSol = True
         return tmp_puzzle
+
     def getPrev(self, n=1):
         if len(self.history) - n < 0:
             return self.jump(0)
         return self.jump(len(self.history) - n)
+
     def getNext(self, n=1):
         if len(self.history) + n > len(self.baseHistory):
             return self.getLatest()
         return self.jump(len(self.history) + n)
+
     def getLatest(self):
         return self.jump(len(self.baseHistory))
+
     def toPickle(self, name=None, msg=True):
         """
         This method saves Puzzle object as a binary file
@@ -575,3 +635,369 @@ class Puzzle:
             pickle.dump(self, f)
         if msg is True:
             print(f"Puzzle has pickled to the path '{name}'")
+
+
+# ## Dictionary
+
+class Dictionary:
+    def __init__(self, fpath=None, msg=True):
+        self.fpath = fpath
+        self.size = 0
+        self.name = ''
+        self.word = []
+        self.weight = []
+        self.wLen = []
+        self.removedWords = []
+        if fpath is not None:
+            self.name = os.path.basename(fpath)[:-4]
+            self.read(fpath)
+
+        # Message
+        if msg is True:
+            print("Dictionary object has made.")
+            print(f" - file path         : {self.fpath}")
+            print(f" - dictionary size   : {self.size}")
+            if self.size > 0:
+                print(f" - top of dictionary : {self[0]}")
+
+    def __getitem__(self, key):
+        return {'word': self.word[key], 'weight': self.weight[key], 'len': self.wLen[key]}
+    
+    def __str__(self):
+        return self.name
+    
+    def __len__(self):
+        return self.size
+
+    def getK(self, word):
+        return np.where(self.word == word)[0][0]
+    
+    def include(self, word):
+        return word in self.word
+
+    def add(self, word, weight=0):
+        if type(word) is str:
+                word = [word]
+        if type(weight) is int:
+            weight = [weight]
+        if len(word) != len(weight):
+            raise ValueError(f"word and weight must be same size")
+        for wo, we in zip(word, weight):
+            if self.include(wo):
+                print(f"The word '{wo}' already exists")
+            self.word.append(wo)
+            self.weight.append(we)
+            self.wLen.append(len(wo))
+            self.size += 1
+
+    def read(self, fpath):
+        with open(fpath, 'r', encoding='utf-8') as f:
+            data = f.readlines()
+
+        # Remove "\n"
+        def removeNewLineCode(word):
+            line = word.rstrip("\n").split(" ")
+            if len(line) == 1:
+                line.append(0)
+            line[1] = int(line[1])
+            return line
+
+        dic_list = list(map(removeNewLineCode, data))
+        word = [d[0] for d in dic_list]
+        weight = [d[1] for d in dic_list]
+        self.add(word, weight)
+
+    def deleteUnusableWords(self, msg=True):
+        """
+        This method checks words in the dictionary and erases words that can not cross any other words.
+        """
+        mergedWords = "".join(self.word)
+        counts = collections.Counter(mergedWords)
+        for i, w in enumerate(self.word[:]):
+            charValue = 0
+            for char in set(w):
+                charValue += counts[char]
+            if charValue == len(w):
+                self.removedWords.append(w)
+                del self.word[i]
+                del self.weight[i]
+                del self.wLen[i]
+                self.size -= 1
+                if msg is True:
+                    print(f"'{w}' can not cross with any other words")
+
+    def calcWeight(self, msg=True):
+        """
+        Calculate word weights in the dictionary.
+        """
+        mergedWords = "".join(self.word)
+        counts = collections.Counter(mergedWords)
+
+        for i, w in enumerate(self.word):
+            for char in w:
+                self.weight[i] += counts[char]
+
+        if msg is True:
+            print("All weights are calculated.")
+            print("TOP 5 characters:")
+            print(counts.most_common()[:5])
+            idx = sorted(range(self.size), key=lambda k: self.weight[k], reverse=True)[:5]
+            print("TOP 5 words:")
+            print(np.array(self.word)[idx])
+
+
+# ## Placeable
+
+class Placeable:
+    def __init__(self, width, height, dic, msg=True):
+        self.size = 0
+        self.width = width
+        self.height = height
+        self.div, self.i, self.j, self.k = [], [], [], []
+        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype="int")
+        
+        self._compute(dic.word)
+
+        if msg is True:
+            print(f"Imported Dictionary name: `{dic.name}`, size: {dic.size}")
+            print(f"Placeable size : {self.size}")
+
+    def _compute(self, word, baseK=0):
+        if baseK is not 0:
+            ap = np.full((2, self.height, self.width, 1), np.nan, dtype="int")
+            self.invP = np.append(self.invP, ap, axis=3)
+        for div in (0,1):
+            for k,w in enumerate(word):
+                if div == 0:
+                    iMax = self.height - len(w) + 1
+                    jMax = self.width
+                elif div == 1:
+                    iMax = self.height
+                    jMax = self.width - len(w) + 1
+                for i in range(iMax):
+                    for j in range(jMax):
+                        self.invP[div,i,j,baseK+k] = len(self.div)
+                        self.div.append(div)
+                        self.i.append(i)
+                        self.j.append(j)
+                        self.k.append(baseK+k)
+        self.size = len(self.k)
+
+    def __len__(self):
+        return self.size
+
+    def __getitem__(self, key):
+        if type(key) in (int, np.int):
+            return {"div": self.div[key], "i": self.i[key], "j": self.j[key], "k": self.k[key]}
+        if type(key) is str:
+            return eval(f"self.{key}")
+
+
+# ## ObjectFunction
+
+class ObjectiveFunction:
+    def __init__(self, msg=True):
+        self.flist = [
+            "totalWeight",
+            "solSize",
+            "crossCount",
+            "fillCount",
+            "maxConnectedEmpties"
+        ]
+        self.registeredFuncs = []
+        if msg is True:
+            print("ObjectiveFunction object has made.")
+
+    def __len__(self):
+        return len(self.registeredFuncs)
+
+    def getFuncs(self):
+        return self.registeredFuncs
+
+    def solSize(self, puzzle):
+        """
+        This method returns the number of words used in the solution
+        """
+        return puzzle.solSize
+
+    def crossCount(self, puzzle):
+        """
+        This method returns the number of crosses of a word
+        """
+        return np.sum(puzzle.cover == 2)
+
+    def fillCount(self, puzzle):
+        """
+        This method returns the number of character cells in the puzzle
+        """
+        return np.sum(puzzle.cover >= 1)
+
+    def totalWeight(self, puzzle):
+        """
+        This method returns the sum of the word weights used for the solution
+        """
+        return puzzle.totalWeight
+
+    def maxConnectedEmpties(self, puzzle):
+        """
+        This method returns the maximum number of concatenations for unfilled squares
+        """
+        ccl = 2
+        puzzle.coverDFS = np.where(puzzle.cover == 0, 1, 0)
+        for i, j in itertools.product(range(puzzle.height), range(puzzle.width)):
+            if puzzle.coverDFS[i, j] == 1:
+                puzzle.DFS(i, j, ccl)
+                ccl += 1
+        score = puzzle.width*puzzle.height - np.max(np.bincount(puzzle.coverDFS.flatten())[1:])
+        return score
+
+    def register(self, funcNames, msg=True):
+        """
+        This method registers an objective function in an instance
+        """
+        for funcName in funcNames:
+            if funcName not in self.flist:
+                raise RuntimeError(f"ObjectiveFunction class does not have '{funcName}' function")
+            if msg is True:
+                print(f" - '{funcName}' function has registered.")
+        self.registeredFuncs = funcNames
+        return
+
+    def getScore(self, puzzle, i=0, func=None, all=False):
+        """
+        This method returns any objective function value
+        """
+        if all is True:
+            scores=np.zeros(len(self.registeredFuncs), dtype="int")
+            for n in range(scores.size):
+                scores[n] = eval(f"self.{self.registeredFuncs[n]}(puzzle)")
+            return scores
+        if func is None:
+            func = self.registeredFuncs[i]
+        return eval(f"self.{func}(puzzle)")
+
+
+# ## Optimizer
+
+class Optimizer:
+    def __init__(self, msg=True):
+        self.methodList = ["localSearch", "iteratedLocalSearch"]
+        self.method = ""
+        if msg is True:
+            print("Optimizer object has made.")
+
+    def getNeighborSolution(self, puzzle):   
+        """
+        This method gets the neighborhood solution
+        """
+        # Copy the puzzle
+        _puzzle = copy.deepcopy(puzzle)
+        # Drop words until connectivity collapse
+        _puzzle.collapse()
+        # Kick
+        _puzzle.kick()
+        # Add as much as possible 
+        _puzzle.addToLimit()
+        return _puzzle
+
+    def localSearch(self, puzzle, epoch, show=True, move=False):
+        """
+        This method performs a local search
+        """
+        # Logging
+        if puzzle.epoch is 0:
+            puzzle.logging()
+        # Copy
+        _puzzle = copy.deepcopy(puzzle)
+        if show is True:
+            print(">>> Interim solution")
+            _puzzle.show(_puzzle.cell)
+        goalEpoch = _puzzle.epoch + epoch
+        for ep in range(epoch):
+            _puzzle.epoch += 1
+            print(f">>> Epoch {_puzzle.epoch}/{goalEpoch}")
+            # Get neighbor solution by drop->kick->add
+            newPuzzle = self.getNeighborSolution(_puzzle)
+            
+            # Repeat if the score is high
+            for funcNum in range(len(_puzzle.objFunc)):
+                prevScore = _puzzle.objFunc.getScore(_puzzle, funcNum)
+                newScore = newPuzzle.objFunc.getScore(newPuzzle, funcNum)
+                if newScore > prevScore:
+                    print(f"    - Improved: {_puzzle.objFunc.getScore(_puzzle, all=True)} --> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
+                    _puzzle = copy.deepcopy(newPuzzle)
+                    _puzzle.logging()
+                    if show is True:
+                        _puzzle.show(_puzzle.cell)
+                    break
+                if newScore < prevScore:
+                    _puzzle.logging()
+                    print(f"    - Stayed: {_puzzle.objFunc.getScore(_puzzle, all=True)}")
+                    break
+            else:
+                _puzzle = copy.deepcopy(newPuzzle)
+                _puzzle.logging()
+                print(f"    - Replaced(same score): {_puzzle.objFunc.getScore(_puzzle, all=True)} -> {newPuzzle.objFunc.getScore(newPuzzle, all=True)}")
+                if show is True:
+                    _puzzle.show(_puzzle.cell)
+        # Update previous puzzle
+        puzzle.totalWeight = copy.deepcopy(_puzzle.totalWeight)
+        puzzle.enable = copy.deepcopy(_puzzle.enable)
+        puzzle.cell = copy.deepcopy(_puzzle.cell)
+        puzzle.cover = copy.deepcopy(_puzzle.cover)
+        puzzle.coverDFS = copy.deepcopy(_puzzle.coverDFS)
+        puzzle.usedWords = copy.deepcopy(_puzzle.usedWords)
+        puzzle.usedPlcIdx = copy.deepcopy(_puzzle.usedPlcIdx)
+        puzzle.solSize = copy.deepcopy(_puzzle.solSize)
+        puzzle.history = copy.deepcopy(_puzzle.history)
+        puzzle.baseHistory = copy.deepcopy(_puzzle.baseHistory)
+        puzzle.log = copy.deepcopy(_puzzle.log)
+        puzzle.epoch = copy.deepcopy(_puzzle.epoch)
+        puzzle.initSol = copy.deepcopy(_puzzle.initSol)
+        puzzle.initSeed = copy.deepcopy(_puzzle.initSeed)
+        puzzle.dic = copy.deepcopy(_puzzle.dic)
+        puzzle.plc = copy.deepcopy(_puzzle.plc)
+
+    def setMethod(self, methodName, msg=True):
+        """
+        This method sets the optimization method on the instance
+        """
+        if methodName not in self.methodList:
+            raise ValueError(f"Optimizer doesn't have '{methodName}' method")
+        if msg is True:
+            print(f" - '{methodName}' method has registered.")
+        self.method = methodName
+
+
+# ## 実行
+
+# +
+fpath = "../dict/pokemon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports
+width = 15
+height = 15
+seed = 1
+withweight = False
+
+fp = FontProperties(fname="../fonts/SourceHanCodeJP.ttc", size=14)
+np.random.seed(seed=seed)
+
+# +
+# Make instances
+puzzle = Puzzle(width, height)
+dic = Dictionary(fpath)
+objFunc = ObjectiveFunction()
+optimizer = Optimizer()
+
+puzzle.importDict(dic)
+# -
+
+# Register and set method and compile
+objFunc.register(["totalWeight", "solSize", "crossCount", "fillCount", "maxConnectedEmpties"])
+optimizer.setMethod("localSearch")
+puzzle.compile(objFunc=objFunc, optimizer=optimizer)
+
+# Solve
+puzzle.firstSolve()
+puzzle.solve(epoch=5)
+print(f"SimpleSolution: {puzzle.isSimpleSol()}")
+puzzle.saveAnswerImage(f"fig/{dic.name}_w{width}_h{height}_r{seed}.png")
