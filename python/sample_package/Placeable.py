@@ -2,10 +2,10 @@ import numpy as np
 
 
 class Placeable:
-    def __init__(self, puzzle, dic, msg=True):
+    def __init__(self, width, height, dic, msg=True):
         self.size = 0
-        self.width = puzzle.width
-        self.height = puzzle.height
+        self.width = width
+        self.height = height
         self.div, self.i, self.j, self.k = [], [], [], []
         self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype="int")
         

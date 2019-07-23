@@ -1,15 +1,16 @@
-from matplotlib.font_manager import FontProperties
-import pandas as pd
-from src import utils
-import itertools
-import copy
-from IPython.display import display, HTML
-import pickle
-import math
 import numpy as np
+import pickle
+import copy
+import itertools
 import datetime
+from src import utils
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+from IPython.display import display, HTML
+import pandas as pd
+import math
 
+from sample_package.Dictionary import Dictionary
 from sample_package.Placeable import Placeable
 
 class Puzzle:
@@ -32,8 +33,8 @@ class Puzzle:
         self.ccl = None
         self.initSol = False
         self.initSeed = None
-        self.dic = None
-        self.plc = None
+        self.dic = Dictionary(msg=False)
+        self.plc = Placeable(self.width, self.height, self.dic, msg=False)
         self.objFunc = None
         self.optimizer = None
         ## Message
@@ -70,7 +71,7 @@ class Puzzle:
 
     def importDict(self, dictionary, msg=True):
         self.dic = dictionary
-        self.plc = Placeable(self, self.dic, msg=msg)
+        self.plc = Placeable(self.width, self.height, self.dic, msg=msg)
     def isEnabledAdd(self, div, i, j, word, wLen):
         """
         This method determines if a word can be placed
@@ -486,7 +487,7 @@ class Puzzle:
         # Generate puzzle image
         colors = np.where(self.cover<1, "#000000", "#FFFFFF")
         df = pd.DataFrame(data)
-        fp = FontProperties(fname="../../fonts/SourceHanCodeJP.ttc", size=14)
+        fp = FontProperties(fname="../fonts/SourceHanCodeJP.ttc", size=14)
 
         fig=plt.figure(figsize=(16, 8), dpi=dpi)
         ax1=fig.add_subplot(121) # puzzle
