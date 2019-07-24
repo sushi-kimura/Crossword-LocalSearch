@@ -90,19 +90,19 @@ puzzle.show()
 # [CrosswordBasic](CrosswordBasic.ipynb)では`局所探索法`を実装しました。局所探索法により局所最適解に到達した解に対して、`摂動`と呼ばれる操作を行うことで解を変更し、再び局所探索を行うという操作を繰り返す最適化手法を`反復局所探索法`と呼びます。以下ではこの手法を実装するための準備を行います。
 #
 # ## 摂動：パズルの平行移動
-# 摂動として盤面のパズルを平行移動するという操作を実装します。まずは盤面からパズルの矩形を取り出す`getRec`メソッドを定義します。続いて、パズルを平行移動する`move`メソッドを実装します。
+# 摂動として盤面のパズルを平行移動するという操作を実装します。まずは盤面からパズルの矩形を取り出す`getRect`メソッドを定義します。続いて、パズルを平行移動する`move`メソッドを実装します。
 
 # +
-def getRec(self):
+def getRect(self):
     rows = np.any(self.cover, axis=1)
     cols = np.any(self.cover, axis=0)
     rmin, rmax = np.where(rows)[0][[0, -1]]
     cmin, cmax = np.where(cols)[0][[0, -1]]
     return rmin, rmax, cmin, cmax
-setattr(Puzzle, "getRec", getRec)
+setattr(Puzzle, "getRect", getRect)
 
 def move(self, direction, n=0, limit=False):
-    rmin, rmax, cmin, cmax = self.getRec()
+    rmin, rmax, cmin, cmax = self.getRect()
     str2int= {'U':1, 'D':2, 'R':3, 'L':4}
     if direction in ('U','D','R','L','u','d','r','l'):
         direction=str2int[direction.upper()]

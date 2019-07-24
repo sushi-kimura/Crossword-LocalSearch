@@ -48,10 +48,6 @@ from src import utils
 
 # ## Puzzle
 
-# +
-# os.getcwd()a.split('crossword-localsearch')
-# -
-
 class Puzzle:
     def __init__(self, width, height, title="スケルトンパズル", msg=True):
         self.width = width
@@ -233,6 +229,17 @@ class Puzzle:
         self.totalWeight += weight
         self.history.append((1, wordIdx, div, i, j))
         return 0
+    
+    def add(self, div, i, j, word, weight=0):
+        if type(word) is int:
+            k = word
+        elif type(word) is str:
+            self.dic.add(word, weight)
+            self.plc._compute([word], self.dic.size-1)
+            k = self.dic.word.index(word)
+        else:
+            raise TypeError()
+        self._add(div, i, j, k)
 
     def addToLimit(self):
         """
@@ -635,6 +642,67 @@ class Puzzle:
             pickle.dump(self, f)
         if msg is True:
             print(f"Puzzle has pickled to the path '{name}'")
+    
+    def getRect(self):
+        rows = np.any(self.cover, axis=1)
+        cols = np.any(self.cover, axis=0)
+        rmin, rmax = np.where(rows)[0][[0, -1]]
+        cmin, cmax = np.where(cols)[0][[0, -1]]
+        return rmin, rmax, cmin, cmax
+
+    def move(self, direction, n=0, limit=False):
+        rmin, rmax, cmin, cmax = self.getRect()
+        str2int= {'U':1, 'D':2, 'R':3, 'L':4}
+        if direction in ('U','D','R','L','u','d','r','l'):
+            direction=str2int[direction.upper()]
+        if direction not in (1,2,3,4):
+            raise ValueError()
+        if n < 0:
+            reverse = {'1':2, '2':1, '3':4, '4':3}
+            direction = reverse[str(direction)]
+            n = -n
+        if limit is True:
+            n2limit = {1:rmin, 2:self.height-(rmax+1), 3:self.width-(cmax+1), 4:cmin}
+            n = n2limit[direction] 
+
+        if direction is 1:
+            if rmin < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, -n, axis=0)
+            self.cover = np.roll(self.cover, -n, axis=0)
+            self.coverDFS = np.roll(self.coverDFS, -n, axis=0)
+            self.enable = np.roll(self.enable, -n, axis=0)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p]-n, self.plc.j[p], self.plc.k[p]]
+        if direction is 2:
+            if self.height-(rmax+1) < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, n, axis=0)
+            self.cover = np.roll(self.cover, n, axis=0)
+            self.coverDFS = np.roll(self.coverDFS, n, axis=0)
+            self.enable = np.roll(self.enable, n, axis=0)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p]+n, self.plc.j[p], self.plc.k[p]]
+        if direction is 3:
+            if self.width-(cmax+1) < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, n, axis=1)
+            self.cover = np.roll(self.cover, n, axis=1)
+            self.coverDFS = np.roll(self.coverDFS, n, axis=1)
+            self.enable = np.roll(self.enable, n, axis=1)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]+n, self.plc.k[p]]
+        if direction is 4:
+            if cmin < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, -n, axis=1)
+            self.cover = np.roll(self.cover, -n, axis=1)
+            self.coverDFS = np.roll(self.coverDFS, -n, axis=1)
+            self.enable = np.roll(self.enable, -n, axis=1)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]-n, self.plc.k[p]]
+
+        self.history.append((4, direction, n))
 
 
 # ## Dictionary
@@ -972,7 +1040,7 @@ class Optimizer:
 # ## 実行
 
 # +
-fpath = "../dict/pokemon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports
+fpath = "../dict/typhoon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports pokemon typhoon
 width = 15
 height = 15
 seed = 1
@@ -980,6 +1048,7 @@ withweight = False
 
 fp = FontProperties(fname="../fonts/SourceHanCodeJP.ttc", size=14)
 np.random.seed(seed=seed)
+start = time.time()
 
 # +
 # Make instances
@@ -998,6 +1067,11 @@ puzzle.compile(objFunc=objFunc, optimizer=optimizer)
 
 # Solve
 puzzle.firstSolve()
-puzzle.solve(epoch=5)
+puzzle.solve(epoch=10)
 print(f"SimpleSolution: {puzzle.isSimpleSol()}")
 puzzle.saveAnswerImage(f"fig/{dic.name}_w{width}_h{height}_r{seed}.png")
+
+e_time = time.time() - start
+print (f"e_time: {format(e_time)} s")
+
+
