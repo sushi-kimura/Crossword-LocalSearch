@@ -36,8 +36,6 @@ import pandas as pd
 from PIL import Image
 from IPython.display import display, HTML
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
-
 
 sys.path.append("../python")
 from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
@@ -542,14 +540,13 @@ class Puzzle:
                     rtnBool = False
         return rtnBool
 
-    def saveImage(self, data, fpath, dpi=100):
+    def saveImage(self, data, fpath, list_label="[Word List]", dpi=100):
         """
         This method generates and returns a puzzle image with a word list
         """
         # Generate puzzle image
         colors = np.where(self.cover<1, "#000000", "#FFFFFF")
         df = pd.DataFrame(data)
-        fp = FontProperties(fname="../fonts/SourceHanCodeJP.ttc", size=14)
 
         fig=plt.figure(figsize=(16, 8), dpi=dpi)
         ax1=fig.add_subplot(121) # puzzle
@@ -560,43 +557,44 @@ class Puzzle:
         # Draw puzzle
         ax1_table = ax1.table(cellText=df.values, cellColours=colors, cellLoc="center", bbox=[0, 0, 1, 1])
         for _, cell in ax1_table.get_celld().items():
-            cell.set_text_props(fontproperties=fp, size=20)
-        ax1.set_title(label="*** "+self.title+" ***", fontproperties=fp, size=20)
+            cell.set_text_props(size=20)
+        ax1.set_title(label="*** "+self.title+" ***", size=20)
+
         # Draw word list
         words = [word for word in self.usedWords if word != ""]
         if words == []:
             words = [""]
         words.sort()
         words = sorted(words, key=len)
-        
+
         rows = self.height
         cols = math.ceil(len(words)/rows)
         padnum = cols*rows - len(words)
         words += ['']*padnum
         words = np.array(words).reshape(cols, rows).T
-        
+
         ax2_table = ax2.table(cellText=words, cellColours=None, cellLoc="left", edges="open", bbox=[0, 0, 1, 1])
-        ax2.set_title(label="【単語リスト】", fontproperties=fp, size=20)
+        ax2.set_title(label=list_label, size=20)
         for _, cell in ax2_table.get_celld().items():
-            cell.set_text_props(fontproperties=fp, size=18)
+            cell.set_text_props(size=18)
         plt.tight_layout()
         plt.savefig(fpath, dpi=dpi)
         plt.close()
 
-    def saveProblemImage(self, fpath="problem.png", dpi=100):
+    def saveProblemImage(self, fpath="problem.png", list_label="[Word List]", dpi=100):
         """
         This method generates and returns a puzzle problem with a word list
         """
         data = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height,self.width)
-        self.saveImage(data, fpath, dpi)
+        self.saveImage(data, fpath, list_label, dpi)
 
-    def saveAnswerImage(self, fpath="answer.png", dpi=100):
+    def saveAnswerImage(self, fpath="answer.png", list_label="[Word List]", dpi=100):
         """
         This method generates and returns a puzzle answer with a word list.
         """
         data = self.cell
-        self.saveImage(data, fpath, dpi)
-
+        self.saveImage(data, fpath, list_label, dpi)
+    
     def jump(self, idx):
         tmp_puzzle = Puzzle(self.width, self.height, self.title, msg=False)
         tmp_puzzle.dic = copy.deepcopy(self.dic)
@@ -1037,6 +1035,14 @@ class Optimizer:
         self.method = methodName
 
 
+# ### フォント設定
+# 本ライブラリにおける画像化には`matplotlib`が用いられますが、`matplotlib`はデフォルトで日本語に対応したフォントを使わないので、`rcParams`を用いてデフォルトのフォント設定を変更します。
+
+# font setting
+from matplotlib import rcParams
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'Noto Sans CJK JP']
+
 # ## 実行
 
 # +
@@ -1046,7 +1052,6 @@ height = 15
 seed = 1
 withweight = False
 
-fp = FontProperties(fname="../fonts/SourceHanCodeJP.ttc", size=14)
 np.random.seed(seed=seed)
 start = time.time()
 
