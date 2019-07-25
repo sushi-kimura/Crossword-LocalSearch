@@ -54,13 +54,14 @@ start = time.time()
 
 # ## ユーザ用add
 # [CrosswordBasic](CrosswordBasic.ipynb)で作成した`_add`メソッドを拡張し、ユーザにとって扱いやすい`add`メソッドを定義します。  
-# `_add`メソッドと同じように辞書番号を指定することもできますが、追加する単語が指定されることを想定しています。辞書に存在しない単語が指定された場合は、辞書に単語を追加しPlaceableも再計算されます。
+# `_add`メソッドと同じように辞書番号を指定することもできますが、追加する単語が文字列として指定されることを想定しています。辞書に存在しない単語が指定された場合は、辞書に単語を追加しPlaceableも再計算されます。
 
 def add(self, div, i, j, word, weight=0):
     if type(word) is int:
         k = word
     elif type(word) is str:
-        self.dic.add(word, weight)
+        if self.dic.include(word) is False:
+            self.dic.add(word, weight)
         self.plc._compute([word], self.dic.size-1)
         k = self.dic.word.index(word)
     else:
@@ -77,13 +78,57 @@ seed = 1
 puzzle = Puzzle(width, height, msg=False)
 dic = Dictionary(fpath, msg=False)
 puzzle.importDict(dic, msg=False)
-puzzle.add(1, 6, 3, 'カラス')
-puzzle.add(0, 4, 3, 'アシカ')
+puzzle.add(0, 2, 2, 'ラッコ')
 puzzle.add(1, 4, 2, 'コアラ')
+puzzle.add(0, 4, 3, 'アシカ')
+puzzle.add(1, 6, 3, 'カラス')
 puzzle.show()
-
-
 # -
+
+div, i, j = 0, 2, 2
+for p in puzzle.usedPlcIdx:
+    _div = puzzle.plc.div[p]
+    _i = puzzle.plc.i[p]
+    _j = puzzle.plc.j[p]
+    if _div == div and _i == i and _j == j:
+        k = puzzle.plc.k[p]
+print(k)
+
+
+# ## ユーザ用drop
+# [CrosswordBasic](CrosswordBasic.ipynb)で作成した`_drop`メソッドを拡張し、ユーザにとって扱いやすい`drop`メソッドを定義します。  
+# div, i, jの組み合わせや、削除する単語の番号または文字列を指定されることを想定しています。
+
+def drop(self, word=None, divij=None):
+    if word is None and divij is None:
+        raise ValueError()
+    if word is not None: 
+        if type(word) is int:
+            k = word
+        elif type(word) is str:
+            k = self.dic.word.index(word)
+        else:
+            raise TypeError()
+    else:
+        if type(divij) not in(list, tuple):
+            raise TypeError()
+        if len(divij) is not 3:
+            raise TypeError()
+        for p in self.usedPlcIdx:
+            _div = self.plc.div[p]
+            _i = self.plc.i[p]
+            _j = self.plc.j[p]
+            if _div == divij[0] and _i == divij[1] and _j == divij[2]:
+                k = puzzle.plc.k[p]
+                break
+    self._drop(div, i, j, k)
+setattr(Puzzle, 'drop', drop)
+
+puzzle.show()
+puzzle.drop(word='ラッコ')
+puzzle.show()
+puzzle.add(0, 2, 2, 'ラッコ')
+
 
 # ---
 # ## 反復局所探索法
