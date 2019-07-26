@@ -226,13 +226,31 @@ class Dictionary:
     def include(self, word):
         return word in self.word
 
-    def add(self, word, weight=0):
-        if self.include(word):
-            raise ValueError(f"The word '{word}' already exists")
-        self.word.append(word)
-        self.weight.append(weight)
-        self.wLen.append(len(word))
-        self.size += 1
+    def add(self, word=None, weight=None, fpath=None, msg=True):
+        if (word,fpath) == (None,None):
+            raise ValueError("'word' or 'fpath' must be specified")
+        if word is not None and fpath is not None:
+            raise ValueError("'word' or 'fpath' must be specified")
+        if fpath is not None:
+            self.read(fpath)
+        if word is not None:
+            if type(word) is str:
+                    word = [word]
+            if weight is None:
+                weight = [0]*len(word)
+            else:
+                if type(weight) is int:
+                    weight = [weight]
+                if len(word) != len(weight):
+                    raise ValueError(f"'word' and 'weight' must be same size")
+
+            for wo, we in zip(word, weight):
+                if self.include(wo) and msg is True:
+                    print(f"The word '{wo}' already exists")
+                self.word.append(wo)
+                self.weight.append(we)
+                self.wLen.append(len(wo))
+                self.size += 1
 
     def __getitem__(self, key):
         return {'word': self.word[key], 'weight': self.weight[key], 'len': self.wLen[key]}
@@ -1425,7 +1443,7 @@ def toPickle(self, name=None, msg=True):
 setattr(Puzzle, "toPickle", toPickle)
 
 import glob
-sample_puzzle.toPickle(name="pickle/sample.pickle") # sample.pickleを作る場合の引数：name="pickle/sample.pickle"
+sample_puzzle.toPickle(name=None) # sample.pickleを作る場合の引数：name="pickle/sample.pickle"
 for pickle_file in glob.glob("*.pickle"):
     shutil.move(pickle_file, "pickle/")
 

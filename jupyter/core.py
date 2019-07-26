@@ -772,20 +772,31 @@ class Dictionary:
     def include(self, word):
         return word in self.word
 
-    def add(self, word, weight=0):
-        if type(word) is str:
-                word = [word]
-        if type(weight) is int:
-            weight = [weight]
-        if len(word) != len(weight):
-            raise ValueError(f"word and weight must be same size")
-        for wo, we in zip(word, weight):
-            if self.include(wo):
-                print(f"The word '{wo}' already exists")
-            self.word.append(wo)
-            self.weight.append(we)
-            self.wLen.append(len(wo))
-            self.size += 1
+    def add(self, word=None, weight=None, fpath=None, msg=True):
+        if (word,fpath) == (None,None):
+            raise ValueError("'word' or 'fpath' must be specified")
+        if word is not None and fpath is not None:
+            raise ValueError("'word' or 'fpath' must be specified")
+        if fpath is not None:
+            self.read(fpath)
+        if word is not None:
+            if type(word) is str:
+                    word = [word]
+            if weight is None:
+                weight = [0]*len(word)
+            else:
+                if type(weight) is int:
+                    weight = [weight]
+                if len(word) != len(weight):
+                    raise ValueError(f"'word' and 'weight' must be same size")
+
+            for wo, we in zip(word, weight):
+                if self.include(wo) and msg is True:
+                    print(f"The word '{wo}' already exists")
+                self.word.append(wo)
+                self.weight.append(we)
+                self.wLen.append(len(wo))
+                self.size += 1
 
     def read(self, fpath):
         with open(fpath, 'r', encoding='utf-8') as f:
