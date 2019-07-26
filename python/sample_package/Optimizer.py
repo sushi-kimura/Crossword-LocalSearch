@@ -8,7 +8,6 @@ class Optimizer:
         if msg is True:
             print("Optimizer object has made.")
 
-
     def getNeighborSolution(self, puzzle):   
         """
         This method gets the neighborhood solution
@@ -22,6 +21,7 @@ class Optimizer:
         # Add as much as possible 
         _puzzle.addToLimit()
         return _puzzle
+
     def localSearch(self, puzzle, epoch, show=True, move=False):
         """
         This method performs a local search
@@ -79,6 +79,7 @@ class Optimizer:
         puzzle.initSeed = copy.deepcopy(_puzzle.initSeed)
         puzzle.dic = copy.deepcopy(_puzzle.dic)
         puzzle.plc = copy.deepcopy(_puzzle.plc)
+
     def setMethod(self, methodName, msg=True):
         """
         This method sets the optimization method on the instance
@@ -88,3 +89,5 @@ class Optimizer:
         if msg is True:
             print(f" - '{methodName}' method has registered.")
         self.method = methodName
+
+

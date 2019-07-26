@@ -1,14 +1,17 @@
-import itertools
-import copy
-import numpy as np
-from src import utils
-import matplotlib.pyplot as plt
-from IPython.display import display, HTML
+import os
 import pickle
+import datetime
+from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
+import numpy as np
 import pandas as pd
 import math
-import datetime
+import itertools
+from IPython.display import display, HTML
+import matplotlib.pyplot as plt
+from src import utils
+import copy
 
+from sample_package.Dictionary import Dictionary
 from sample_package.Placeable import Placeable
 
 class Puzzle:
@@ -31,10 +34,11 @@ class Puzzle:
         self.ccl = None
         self.initSol = False
         self.initSeed = None
-        self.dic = None
-        self.plc = None
+        self.dic = Dictionary(msg=False)
+        self.plc = Placeable(self.width, self.height, self.dic, msg=False)
         self.objFunc = None
         self.optimizer = None
+        #self.fp = os.path.get_path()
         ## Message
         if msg is True:
             print("Puzzle object has made.")
@@ -42,8 +46,10 @@ class Puzzle:
             print(f" - width       : {self.width}")
             print(f" - height      : {self.height}")
             print(f" - cell' shape : (width, height) = ({self.cell.shape[0]},{self.cell.shape[1]})")
+
     def __str__(self):
         return self.title
+
     def reinit(self, all=False):
         if all is True:
             self.dic = None
@@ -66,10 +72,10 @@ class Puzzle:
         self.initSol = False
         self.initSeed = None
 
-
     def importDict(self, dictionary, msg=True):
         self.dic = dictionary
         self.plc = Placeable(self.width, self.height, self.dic, msg=msg)
+
     def isEnabledAdd(self, div, i, j, word, wLen):
         """
         This method determines if a word can be placed
@@ -189,6 +195,18 @@ class Puzzle:
         self.totalWeight += weight
         self.history.append((1, wordIdx, div, i, j))
         return 0
+    
+    def add(self, div, i, j, word, weight=0):
+        if type(word) is int:
+            k = word
+        elif type(word) is str:
+            self.dic.add(word, weight)
+            self.plc._compute([word], self.dic.size-1)
+            k = self.dic.word.index(word)
+        else:
+            raise TypeError()
+        self._add(div, i, j, k)
+
     def addToLimit(self):
         """
         This method adds the words as much as possible 
@@ -208,6 +226,7 @@ class Puzzle:
                     dropIdx.append(i)
             randomIndex = np.delete(randomIndex, dropIdx)
         return
+
     def firstSolve(self):
         """
         This method creates an initial solution
@@ -221,6 +240,7 @@ class Puzzle:
         # Add as much as possible
         self.addToLimit()
         self.initSol = True
+
     def show(self, ndarray=None):
         """
         This method displays a puzzle
@@ -251,6 +271,7 @@ class Puzzle:
         else:
             ndarray = np.where(ndarray=="", "  ", ndarray)
             print(ndarray)
+
     def DFS(self, i, j, ccl):
         """
         This method performs a Depth-First Search and labels each connected component
@@ -264,6 +285,7 @@ class Puzzle:
             self.DFS(i, j-1, ccl)
         if j<self.width-1 and self.coverDFS[i, j+1] == 1:
             self.DFS(i, j+1, ccl)
+
     def logging(self):
         """
         This method logs the current objective function values
@@ -275,6 +297,7 @@ class Puzzle:
             self.log.index.name = "epoch"
         tmpSe = pd.Series(self.objFunc.getScore(self, all=True), index=self.objFunc.getFuncs())
         self.log = self.log.append(tmpSe, ignore_index=True)
+
     def _drop(self, div, i, j, k, isKick=False):
         """
         This method removes the specified word from the puzzle.
@@ -347,6 +370,38 @@ class Puzzle:
                     removeFlag = False
                 if removeFlag == True:
                     self.enable[i,j+wLen] = True
+    def drop(self, word=None, divij=None):
+        if word is None and divij is None:
+            raise ValueError()
+        if word is not None: 
+            if type(word) is int:
+                k = word
+            elif type(word) is str:
+                k = self.dic.word.index(word)
+            else:
+                raise TypeError()
+            for p in self.usedPlcIdx:
+                if self.plc.k[p] == k:
+                    div = self.plc.div[p]
+                    i = self.plc.i[p]
+                    j = self.plc.j[p]
+                    break
+        else:
+            if type(divij) not in(list, tuple):
+                raise TypeError()
+            if len(divij) is not 3:
+                raise TypeError()
+            div,i,j = divij
+            print(div, i, j)
+            for p in self.usedPlcIdx:
+                _div = self.plc.div[p]
+                _i = self.plc.i[p]
+                _j = self.plc.j[p]
+                if _div == divij[0] and _i == divij[1] and _j == divij[2]:
+                    k = puzzle.plc.k[p]
+                    break
+        self._drop(div, i, j, k)
+
     def collapse(self):
         """
         This method collapses connectivity of the puzzle
@@ -385,6 +440,7 @@ class Puzzle:
                     self.ccl += 1
             if self.ccl-2 >= 2:
                 break
+
     def kick(self):
         """
         This method kicks elements except largest CCL
@@ -405,6 +461,7 @@ class Puzzle:
                 continue
             if self.coverDFS[self.plc.i[p], self.plc.j[p]] != largestCCL:
                 self._drop(self.plc.div[p], self.plc.i[p], self.plc.j[p], self.plc.k[p], isKick=True)
+
     def compile(self, objFunc, optimizer, msg=True):
         """
         This method compiles the objective function and optimization method into the Puzzle instance
@@ -418,6 +475,7 @@ class Puzzle:
             for funcNum in range(len(objFunc)):
                 print(f"  |-> {funcNum} {objFunc.registeredFuncs[funcNum]}")
             print(f" --- optimizer: {optimizer.method}")
+
     def solve(self, epoch):
         """
         This method repeats the solution improvement by the specified number of epochs
@@ -428,6 +486,7 @@ class Puzzle:
             raise ValueError("'epoch' must be lather than 0")
         exec(f"self.optimizer.{self.optimizer.method}(self, {epoch})")
         print(" --- done")
+
     def showLog(self, title="Objective Function's time series", grid=True, figsize=None):
         """
         This method shows log of objective functions
@@ -435,6 +494,7 @@ class Puzzle:
         if self.log is None:
             raise RuntimeError("Puzzle has no log")
         return self.log.plot(subplots=True, title=title, grid=grid, figsize=figsize)
+
     def isSimpleSol(self):
         """
         This method determines whether it is the simple solution
@@ -478,6 +538,7 @@ class Puzzle:
                     print(f" - words '{word1}' and '{word2}' are replaceable")
                     rtnBool = False
         return rtnBool
+
     def saveImage(self, data, fpath, list_label="[Word List]", dpi=100):
         """
         This method generates and returns a puzzle image with a word list
@@ -504,13 +565,13 @@ class Puzzle:
             words = [""]
         words.sort()
         words = sorted(words, key=len)
-        
+
         rows = self.height
         cols = math.ceil(len(words)/rows)
         padnum = cols*rows - len(words)
         words += ['']*padnum
         words = np.array(words).reshape(cols, rows).T
-        
+
         ax2_table = ax2.table(cellText=words, cellColours=None, cellLoc="left", edges="open", bbox=[0, 0, 1, 1])
         ax2.set_title(label=list_label, size=20)
         for _, cell in ax2_table.get_celld().items():
@@ -518,22 +579,25 @@ class Puzzle:
         plt.tight_layout()
         plt.savefig(fpath, dpi=dpi)
         plt.close()
+
     def saveProblemImage(self, fpath="problem.png", list_label="[Word List]", dpi=100):
         """
         This method generates and returns a puzzle problem with a word list
         """
         data = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height,self.width)
         self.saveImage(data, fpath, list_label, dpi)
+
     def saveAnswerImage(self, fpath="answer.png", list_label="[Word List]", dpi=100):
         """
         This method generates and returns a puzzle answer with a word list.
         """
         data = self.cell
         self.saveImage(data, fpath, list_label, dpi)
+    
     def jump(self, idx):
         tmp_puzzle = Puzzle(self.width, self.height, self.title, msg=False)
         tmp_puzzle.dic = copy.deepcopy(self.dic)
-        tmp_puzzle.plc = Placeable(tmp_puzzle.width, tmp_puzzle.height, tmp_puzzle.dic, msg=False)
+        tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
         tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
         tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
         tmp_puzzle.baseHistory = copy.deepcopy(self.baseHistory)
@@ -547,22 +611,24 @@ class Puzzle:
         for code, k, div, i, j in tmp_puzzle.baseHistory[:idx]:
             if code == 1:
                 tmp_puzzle._add(div, i, j, k)
-            elif code == 2:
-                tmp_puzzle._drop(div, i, j, k, isKick=False)
-            elif code == 3:
-                tmp_puzzle._drop(div, i, j, k, isKick=True)
+            elif code in (2,3):
+                tmp_puzzle._drop(div, i, j, k)
         tmp_puzzle.initSol = True
         return tmp_puzzle
+
     def getPrev(self, n=1):
         if len(self.history) - n < 0:
             return self.jump(0)
         return self.jump(len(self.history) - n)
+
     def getNext(self, n=1):
         if len(self.history) + n > len(self.baseHistory):
             return self.getLatest()
         return self.jump(len(self.history) + n)
+
     def getLatest(self):
         return self.jump(len(self.baseHistory))
+
     def toPickle(self, name=None, msg=True):
         """
         This method saves Puzzle object as a binary file
@@ -573,3 +639,66 @@ class Puzzle:
             pickle.dump(self, f)
         if msg is True:
             print(f"Puzzle has pickled to the path '{name}'")
+    
+    def getRect(self):
+        rows = np.any(self.cover, axis=1)
+        cols = np.any(self.cover, axis=0)
+        rmin, rmax = np.where(rows)[0][[0, -1]]
+        cmin, cmax = np.where(cols)[0][[0, -1]]
+        return rmin, rmax, cmin, cmax
+
+    def move(self, direction, n=0, limit=False):
+        rmin, rmax, cmin, cmax = self.getRect()
+        str2int= {'U':1, 'D':2, 'R':3, 'L':4}
+        if direction in ('U','D','R','L','u','d','r','l'):
+            direction=str2int[direction.upper()]
+        if direction not in (1,2,3,4):
+            raise ValueError()
+        if n < 0:
+            reverse = {'1':2, '2':1, '3':4, '4':3}
+            direction = reverse[str(direction)]
+            n = -n
+        if limit is True:
+            n2limit = {1:rmin, 2:self.height-(rmax+1), 3:cmin, 4:self.width-(cmax+1)}
+            n = n2limit[direction] 
+
+        if direction is 1:
+            if rmin < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, -n, axis=0)
+            self.cover = np.roll(self.cover, -n, axis=0)
+            self.coverDFS = np.roll(self.coverDFS, -n, axis=0)
+            self.enable = np.roll(self.enable, -n, axis=0)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p]-n, self.plc.j[p], self.plc.k[p]]
+        if direction is 2:
+            if self.height-(rmax+1) < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, n, axis=0)
+            self.cover = np.roll(self.cover, n, axis=0)
+            self.coverDFS = np.roll(self.coverDFS, n, axis=0)
+            self.enable = np.roll(self.enable, n, axis=0)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p]+n, self.plc.j[p], self.plc.k[p]]
+        if direction is 3:
+            if cmin < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, -n, axis=1)
+            self.cover = np.roll(self.cover, -n, axis=1)
+            self.coverDFS = np.roll(self.coverDFS, -n, axis=1)
+            self.enable = np.roll(self.enable, -n, axis=1)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]-n, self.plc.k[p]]
+        if direction is 4:
+            if self.width-(cmax+1) < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, n, axis=1)
+            self.cover = np.roll(self.cover, n, axis=1)
+            self.coverDFS = np.roll(self.coverDFS, n, axis=1)
+            self.enable = np.roll(self.enable, n, axis=1)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]+n, self.plc.k[p]]
+
+        self.history.append((4, direction, n))
+
+

@@ -1,5 +1,5 @@
-import numpy as np
 import itertools
+import numpy as np
 
 
 class ObjectiveFunction:
@@ -14,32 +14,37 @@ class ObjectiveFunction:
         self.registeredFuncs = []
         if msg is True:
             print("ObjectiveFunction object has made.")
+
     def __len__(self):
         return len(self.registeredFuncs)
+
     def getFuncs(self):
         return self.registeredFuncs
-
 
     def solSize(self, puzzle):
         """
         This method returns the number of words used in the solution
         """
         return puzzle.solSize
+
     def crossCount(self, puzzle):
         """
         This method returns the number of crosses of a word
         """
         return np.sum(puzzle.cover == 2)
+
     def fillCount(self, puzzle):
         """
         This method returns the number of character cells in the puzzle
         """
         return np.sum(puzzle.cover >= 1)
+
     def totalWeight(self, puzzle):
         """
         This method returns the sum of the word weights used for the solution
         """
         return puzzle.totalWeight
+
     def maxConnectedEmpties(self, puzzle):
         """
         This method returns the maximum number of concatenations for unfilled squares
@@ -52,6 +57,7 @@ class ObjectiveFunction:
                 ccl += 1
         score = puzzle.width*puzzle.height - np.max(np.bincount(puzzle.coverDFS.flatten())[1:])
         return score
+
     def register(self, funcNames, msg=True):
         """
         This method registers an objective function in an instance
@@ -63,6 +69,7 @@ class ObjectiveFunction:
                 print(f" - '{funcName}' function has registered.")
         self.registeredFuncs = funcNames
         return
+
     def getScore(self, puzzle, i=0, func=None, all=False):
         """
         This method returns any objective function value
@@ -75,3 +82,5 @@ class ObjectiveFunction:
         if func is None:
             func = self.registeredFuncs[i]
         return eval(f"self.{func}(puzzle)")
+
+
