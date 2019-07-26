@@ -402,6 +402,37 @@ class Puzzle:
                     removeFlag = False
                 if removeFlag == True:
                     self.enable[i,j+wLen] = True
+    def drop(self, word=None, divij=None):
+        if word is None and divij is None:
+            raise ValueError()
+        if word is not None: 
+            if type(word) is int:
+                k = word
+            elif type(word) is str:
+                k = self.dic.word.index(word)
+            else:
+                raise TypeError()
+            for p in self.usedPlcIdx:
+                if self.plc.k[p] == k:
+                    div = self.plc.div[p]
+                    i = self.plc.i[p]
+                    j = self.plc.j[p]
+                    break
+        else:
+            if type(divij) not in(list, tuple):
+                raise TypeError()
+            if len(divij) is not 3:
+                raise TypeError()
+            div,i,j = divij
+            print(div, i, j)
+            for p in self.usedPlcIdx:
+                _div = self.plc.div[p]
+                _i = self.plc.i[p]
+                _j = self.plc.j[p]
+                if _div == divij[0] and _i == divij[1] and _j == divij[2]:
+                    k = puzzle.plc.k[p]
+                    break
+        self._drop(div, i, j, k)
 
     def collapse(self):
         """
@@ -660,7 +691,7 @@ class Puzzle:
             direction = reverse[str(direction)]
             n = -n
         if limit is True:
-            n2limit = {1:rmin, 2:self.height-(rmax+1), 3:self.width-(cmax+1), 4:cmin}
+            n2limit = {1:rmin, 2:self.height-(rmax+1), 3:cmin, 4:self.width-(cmax+1)}
             n = n2limit[direction] 
 
         if direction is 1:
@@ -682,15 +713,6 @@ class Puzzle:
             for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
                 self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p]+n, self.plc.j[p], self.plc.k[p]]
         if direction is 3:
-            if self.width-(cmax+1) < n:
-                raise RuntimeError()
-            self.cell = np.roll(self.cell, n, axis=1)
-            self.cover = np.roll(self.cover, n, axis=1)
-            self.coverDFS = np.roll(self.coverDFS, n, axis=1)
-            self.enable = np.roll(self.enable, n, axis=1)
-            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
-                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]+n, self.plc.k[p]]
-        if direction is 4:
             if cmin < n:
                 raise RuntimeError()
             self.cell = np.roll(self.cell, -n, axis=1)
@@ -699,6 +721,15 @@ class Puzzle:
             self.enable = np.roll(self.enable, -n, axis=1)
             for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
                 self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]-n, self.plc.k[p]]
+        if direction is 4:
+            if self.width-(cmax+1) < n:
+                raise RuntimeError()
+            self.cell = np.roll(self.cell, n, axis=1)
+            self.cover = np.roll(self.cover, n, axis=1)
+            self.coverDFS = np.roll(self.coverDFS, n, axis=1)
+            self.enable = np.roll(self.enable, n, axis=1)
+            for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+                self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]+n, self.plc.k[p]]
 
         self.history.append((4, direction, n))
 

@@ -41,13 +41,17 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from IPython.display import display, HTML
+from IPython.display import Video
 import matplotlib.pyplot as plt
 import cv2
 
 sys.path.append('../python')
 from sample_package import Puzzle, Dictionary, Placeable, ObjectiveFunction, Optimizer
 
-start = time.time()
+# font setting
+from matplotlib import rcParams
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'Noto Sans CJK JP']
 
 
 # -
@@ -83,17 +87,9 @@ puzzle.add(1, 4, 2, 'コアラ')
 puzzle.add(0, 4, 3, 'アシカ')
 puzzle.add(1, 6, 3, 'カラス')
 puzzle.show()
+
+
 # -
-
-div, i, j = 0, 2, 2
-for p in puzzle.usedPlcIdx:
-    _div = puzzle.plc.div[p]
-    _i = puzzle.plc.i[p]
-    _j = puzzle.plc.j[p]
-    if _div == div and _i == i and _j == j:
-        k = puzzle.plc.k[p]
-print(k)
-
 
 # ## ユーザ用drop
 # [CrosswordBasic](CrosswordBasic.ipynb)で作成した`_drop`メソッドを拡張し、ユーザにとって扱いやすい`drop`メソッドを定義します。  
@@ -109,11 +105,19 @@ def drop(self, word=None, divij=None):
             k = self.dic.word.index(word)
         else:
             raise TypeError()
+        for p in self.usedPlcIdx:
+            if self.plc.k[p] == k:
+                div = self.plc.div[p]
+                i = self.plc.i[p]
+                j = self.plc.j[p]
+                break
     else:
         if type(divij) not in(list, tuple):
             raise TypeError()
         if len(divij) is not 3:
             raise TypeError()
+        div,i,j = divij
+        print(div, i, j)
         for p in self.usedPlcIdx:
             _div = self.plc.div[p]
             _i = self.plc.i[p]
@@ -125,9 +129,8 @@ def drop(self, word=None, divij=None):
 setattr(Puzzle, 'drop', drop)
 
 puzzle.show()
-puzzle.drop(word='ラッコ')
+puzzle.drop(word='カラス')
 puzzle.show()
-puzzle.add(0, 2, 2, 'ラッコ')
 
 
 # ---
@@ -158,7 +161,7 @@ def move(self, direction, n=0, limit=False):
         direction = reverse[str(direction)]
         n = -n
     if limit is True:
-        n2limit = {1:rmin, 2:self.height-(rmax+1), 3:self.width-(cmax+1), 4:cmin}
+        n2limit = {1:rmin, 2:self.height-(rmax+1), 3:cmin, 4:self.width-(cmax+1)}
         n = n2limit[direction] 
         
     if direction is 1:
@@ -180,15 +183,6 @@ def move(self, direction, n=0, limit=False):
         for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
             self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p]+n, self.plc.j[p], self.plc.k[p]]
     if direction is 3:
-        if self.width-(cmax+1) < n:
-            raise RuntimeError()
-        self.cell = np.roll(self.cell, n, axis=1)
-        self.cover = np.roll(self.cover, n, axis=1)
-        self.coverDFS = np.roll(self.coverDFS, n, axis=1)
-        self.enable = np.roll(self.enable, n, axis=1)
-        for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
-            self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]+n, self.plc.k[p]]
-    if direction is 4:
         if cmin < n:
             raise RuntimeError()
         self.cell = np.roll(self.cell, -n, axis=1)
@@ -197,6 +191,15 @@ def move(self, direction, n=0, limit=False):
         self.enable = np.roll(self.enable, -n, axis=1)
         for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
             self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]-n, self.plc.k[p]]
+    if direction is 4:
+        if self.width-(cmax+1) < n:
+            raise RuntimeError()
+        self.cell = np.roll(self.cell, n, axis=1)
+        self.cover = np.roll(self.cover, n, axis=1)
+        self.coverDFS = np.roll(self.coverDFS, n, axis=1)
+        self.enable = np.roll(self.enable, n, axis=1)
+        for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
+            self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]+n, self.plc.k[p]]
     
     self.history.append((4, direction, n))
 setattr(Puzzle, "move", move)
@@ -250,7 +253,6 @@ for histNum in range(len(tmpPuzzle.baseHistory)):
 # これで、fig/animation内にout.mp4という動画ファイルが作成されました。
 # 再生してみましょう。
 
-from IPython.display import Video
 Video("fig/animation/out.mp4", width=960, height=480)
 
 
