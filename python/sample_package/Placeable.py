@@ -7,7 +7,7 @@ class Placeable:
         self.width = width
         self.height = height
         self.div, self.i, self.j, self.k = [], [], [], []
-        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype="int")
+        self.invP = np.full((2, self.height, self.width, 0), np.nan, dtype="int")
         
         self._compute(dic.word)
 

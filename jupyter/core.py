@@ -402,6 +402,7 @@ class Puzzle:
                     removeFlag = False
                 if removeFlag == True:
                     self.enable[i,j+wLen] = True
+
     def drop(self, word=None, divij=None):
         if word is None and divij is None:
             raise ValueError()
@@ -424,7 +425,6 @@ class Puzzle:
             if len(divij) is not 3:
                 raise TypeError()
             div,i,j = divij
-            print(div, i, j)
             for p in self.usedPlcIdx:
                 _div = self.plc.div[p]
                 _i = self.plc.i[p]
@@ -627,9 +627,9 @@ class Puzzle:
         self.saveImage(data, fpath, list_label, dpi)
     
     def jump(self, idx):
-        tmp_puzzle = Puzzle(self.width, self.height, self.title, msg=False)
+        tmp_puzzle = self.__class__(self.width, self.height, self.title, msg=False)
         tmp_puzzle.dic = copy.deepcopy(self.dic)
-        tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
+        tmp_puzzle.plc = Placeable(self.width, self.height, tmp_puzzle.dic, msg=False)
         tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
         tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
         tmp_puzzle.baseHistory = copy.deepcopy(self.baseHistory)
@@ -862,7 +862,7 @@ class Placeable:
         self.width = width
         self.height = height
         self.div, self.i, self.j, self.k = [], [], [], []
-        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype="int")
+        self.invP = np.full((2, self.height, self.width, 0), np.nan, dtype="int")
         
         self._compute(dic.word)
 
@@ -871,8 +871,10 @@ class Placeable:
             print(f"Placeable size : {self.size}")
 
     def _compute(self, word, baseK=0):
-        if baseK is not 0:
-            ap = np.full((2, self.height, self.width, 1), np.nan, dtype="int")
+        if type(word) is str:
+            word = [word]
+        if self.size is 0 or baseK is not 0:
+            ap = np.full((2, self.height, self.width, len(word)), np.nan, dtype="int")
             self.invP = np.append(self.invP, ap, axis=3)
         for div in (0,1):
             for k,w in enumerate(word):
@@ -1120,5 +1122,3 @@ puzzle.saveAnswerImage(f"fig/{dic.name}_w{width}_h{height}_r{seed}.png")
 
 e_time = time.time() - start
 print (f"e_time: {format(e_time)} s")
-
-

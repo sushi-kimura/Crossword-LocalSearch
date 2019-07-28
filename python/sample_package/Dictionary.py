@@ -1,6 +1,6 @@
-import os
 import collections
 import numpy as np
+import os
 
 
 class Dictionary:

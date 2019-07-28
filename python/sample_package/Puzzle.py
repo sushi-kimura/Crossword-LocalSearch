@@ -1,18 +1,18 @@
-import pickle
+import matplotlib.pyplot as plt
 import pandas as pd
-from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
 import datetime
 import math
-import copy
 from IPython.display import display, HTML
 from src import utils
-import matplotlib.pyplot as plt
 import os
+import pickle
 import itertools
+from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
 import numpy as np
+import copy
 
-from sample_package.Placeable import Placeable
 from sample_package.Dictionary import Dictionary
+from sample_package.Placeable import Placeable
 
 class Puzzle:
     def __init__(self, width, height, title="スケルトンパズル", msg=True):
@@ -370,6 +370,7 @@ class Puzzle:
                     removeFlag = False
                 if removeFlag == True:
                     self.enable[i,j+wLen] = True
+
     def drop(self, word=None, divij=None):
         if word is None and divij is None:
             raise ValueError()
@@ -392,7 +393,6 @@ class Puzzle:
             if len(divij) is not 3:
                 raise TypeError()
             div,i,j = divij
-            print(div, i, j)
             for p in self.usedPlcIdx:
                 _div = self.plc.div[p]
                 _i = self.plc.i[p]
@@ -595,9 +595,9 @@ class Puzzle:
         self.saveImage(data, fpath, list_label, dpi)
     
     def jump(self, idx):
-        tmp_puzzle = Puzzle(self.width, self.height, self.title, msg=False)
+        tmp_puzzle = self.__class__(self.width, self.height, self.title, msg=False)
         tmp_puzzle.dic = copy.deepcopy(self.dic)
-        tmp_puzzle.plc = Placeable(tmp_puzzle, tmp_puzzle.dic, msg=False)
+        tmp_puzzle.plc = Placeable(self.width, self.height, tmp_puzzle.dic, msg=False)
         tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
         tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
         tmp_puzzle.baseHistory = copy.deepcopy(self.baseHistory)

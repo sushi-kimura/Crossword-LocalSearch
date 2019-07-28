@@ -54,8 +54,6 @@ class FancyPuzzle(Puzzle):
         
         super().__init__(width, height, title, msg)
 
-        self.enable = self.enable*mask
-
     def isEnabledAdd(self, div, i, j, word, wLen):
         """
         This method determines if a word can be placed
@@ -114,6 +112,31 @@ class FancyPuzzle(Puzzle):
         plt.tight_layout()
         plt.savefig(fpath, dpi=dpi)
         plt.close()
+    
+    def jump(self, idx):
+        tmp_puzzle = self.__class__(self.width, self.height, self.mask, self.title, msg=False)
+        tmp_puzzle.dic = copy.deepcopy(self.dic)
+        tmp_puzzle.plc = Placeable(self.width, self.height, tmp_puzzle.dic, msg=False)
+        tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
+        tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
+        tmp_puzzle.baseHistory = copy.deepcopy(self.baseHistory)
+        
+        if set(self.history).issubset(self.baseHistory) is False:
+            if idx <= len(self.history):
+                tmp_puzzle.baseHistory = copy.deepcopy(self.history)
+            else:
+                raise RuntimeError('This puzzle is up to date')
+
+        for code, k, div, i, j in tmp_puzzle.baseHistory[:idx]:
+            if code == 1:
+                tmp_puzzle._add(div, i, j, k)
+            elif code in (2,3):
+                tmp_puzzle._drop(div, i, j, k)
+        tmp_puzzle.initSol = True
+        return tmp_puzzle
+
+    def move(self, direction, n=0, limit=False):
+        super().move(direction, n, limit)
 
 
 # ### フォント設定
@@ -172,9 +195,11 @@ puzzle.compile(objFunc=objFunc, optimizer=optimizer)
 
 # Solve
 puzzle.firstSolve()
-puzzle.solve(epoch=1)
+puzzle.solve(epoch=10)
 print(f"SimpleSolution: {puzzle.isSimpleSol()}")
 puzzle.saveAnswerImage(f"fig/puzzle/{dic.name}_w{width}_h{height}_r{seed}.png", "【単語リスト】")
 
 e_time = time.time() - start
 print (f"e_time: {format(e_time)} s")
+
+

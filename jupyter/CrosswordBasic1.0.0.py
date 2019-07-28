@@ -376,7 +376,7 @@ class Placeable:
         self.width = width
         self.height = height
         self.div, self.i, self.j, self.k = [], [], [], []
-        self.invP = np.full((2, self.height, self.width, dic.size), np.nan, dtype="int")
+        self.invP = np.full((2, self.height, self.width, 0), np.nan, dtype="int")
         
         self._compute(dic.word)
 
@@ -385,8 +385,10 @@ class Placeable:
             print(f"Placeable size : {self.size}")
 
     def _compute(self, word, baseK=0):
-        if baseK is not 0:
-            ap = np.full((2, self.height, self.width, 1), np.nan, dtype="int")
+        if type(word) is str:
+            word = [word]
+        if self.size is 0 or baseK is not 0:
+            ap = np.full((2, self.height, self.width, len(word)), np.nan, dtype="int")
             self.invP = np.append(self.invP, ap, axis=3)
         for div in (0,1):
             for k,w in enumerate(word):
