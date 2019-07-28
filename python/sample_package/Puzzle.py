@@ -1,18 +1,18 @@
-import os
 import pickle
-import datetime
-from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
-import numpy as np
 import pandas as pd
+from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
+import datetime
 import math
-import itertools
-from IPython.display import display, HTML
-import matplotlib.pyplot as plt
-from src import utils
 import copy
+from IPython.display import display, HTML
+from src import utils
+import matplotlib.pyplot as plt
+import os
+import itertools
+import numpy as np
 
-from sample_package.Dictionary import Dictionary
 from sample_package.Placeable import Placeable
+from sample_package.Dictionary import Dictionary
 
 class Puzzle:
     def __init__(self, width, height, title="スケルトンパズル", msg=True):
@@ -41,7 +41,7 @@ class Puzzle:
         #self.fp = os.path.get_path()
         ## Message
         if msg is True:
-            print("Puzzle object has made.")
+            print(f"{self.__class__.__name__} object has made.")
             print(f" - title       : {self.title}")
             print(f" - width       : {self.width}")
             print(f" - height      : {self.height}")

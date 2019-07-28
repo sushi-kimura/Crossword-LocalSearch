@@ -137,7 +137,7 @@ class Puzzle:
         self.optimizer = None
         ## Message
         if msg is True:
-            print("Puzzle object has made.")
+            print(f"{self.__class__.__name__} object has made.")
             print(f" - title       : {self.title}")
             print(f" - width       : {self.width}")
             print(f" - height      : {self.height}")
