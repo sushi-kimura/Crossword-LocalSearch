@@ -2,9 +2,15 @@
 Crossword-LocalSearchは, クロスワード（厳密にはスケルトンパズル）の自動生成を行うプロジェクトです.
 本プロジェクトの主要言語はPythonで, 一般的に使われるライブラリのみを使用して開発されています.
 
-## Contact
-本プロジェクトの代表連絡先：
-saikoro2007(Github)
+## Instlation
+本プロジェクトのメインライブラリである`pyzzle`は以下のコマンドでインストール可能です（未対応）.
+```
+pip install pyzzle
+```
+または
+```
+conda install pyzzle
+```
 
-## Contribute
-How_to_contribute.mdをご覧ください。
+## How to Contribute
+wikiをご覧ください.
