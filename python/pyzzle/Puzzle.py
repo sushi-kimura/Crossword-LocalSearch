@@ -1,15 +1,14 @@
-from src import utils
-import datetime
-import matplotlib.pyplot as plt
-import pandas as pd
+import os
+import math
+from IPython.display import display, HTML
 import itertools
 import pickle
-from IPython.display import display, HTML
+import os, shutil
+import datetime
 import copy
 import numpy as np
-import math
-import os, shutil
-import os
+import pandas as pd
+import matplotlib.pyplot as plt
 
 from pyzzle.Placeable import Placeable
 from pyzzle.Dictionary import Dictionary
@@ -51,6 +50,9 @@ class Puzzle:
         return self.title
 
     def reinit(self, all=False):
+        """
+        This method reinitilize Puzzle informations
+        """
         if all is True:
             self.dic = None
             self.plc = None
@@ -71,8 +73,20 @@ class Puzzle:
         self.epoch = 0
         self.initSol = False
         self.initSeed = None
+    
+    def in_ipynb(self):
+        """
+        Are we in a jupyter notebook?
+        """
+        try:
+            return 'ZMQ' in get_ipython().__class__.__name__
+        except NameError:
+            return False
 
     def importDict(self, dictionary, msg=True):
+        """
+        This method imports Dictionary to Puzzle
+        """
         self.dic = dictionary
         self.plc = Placeable(self.width, self.height, self.dic, msg=msg)
 
@@ -247,7 +261,7 @@ class Puzzle:
         """
         if ndarray is None:
             ndarray = self.cell
-        if utils.in_ipynb() is True:
+        if self.in_ipynb() is True:
             styles = [
                 dict(selector="th", props=[("font-size", "90%"),
                                            ("text-align", "center"),

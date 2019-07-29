@@ -62,7 +62,6 @@ from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 
 sys.path.append("../python")
-from src import utils
 
 np.random.seed(seed = seed)
 start = time.time()
@@ -165,6 +164,12 @@ class Puzzle:
         self.epoch = 0
         self.initSol = False
         self.initSeed = None
+    def in_ipynb(self):
+        """Are we in a jupyter notebook?"""
+        try:
+            return 'ZMQ' in get_ipython().__class__.__name__
+        except NameError:
+            return False
 
 
 sample_puzzle = Puzzle(width, height, title)
@@ -686,7 +691,7 @@ def show(self, ndarray=None):
     """
     if ndarray is None:
         ndarray = self.cell
-    if utils.in_ipynb() is True:
+    if self.in_ipynb() is True:
         styles = [
             dict(selector="th", props=[("font-size", "90%"),
                                        ("text-align", "center"),
