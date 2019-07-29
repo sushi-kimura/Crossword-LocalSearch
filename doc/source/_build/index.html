@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>pyzzle 0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-pyzzle-s-documentation">
+<h1>Welcome to pyzzle’s documentation!<a class="headerlink" href="#welcome-to-pyzzle-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<span id="document-Puzzle"></span><div class="section" id="module-Puzzle">
+<span id="puzzle-module"></span><h2>Puzzle module<a class="headerlink" href="#module-Puzzle" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="Puzzle.Puzzle">
+<em class="property">class </em><code class="sig-prename descclassname">Puzzle.</code><code class="sig-name descname">Puzzle</code><span class="sig-paren">(</span><em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">title='スケルトンパズル'</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Puzzle.Puzzle.DFS">
+<code class="sig-name descname">DFS</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">j</em>, <em class="sig-param">ccl</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.DFS" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method performs a Depth-First Search and labels each connected component</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">div</em>, <em class="sig-param">i</em>, <em class="sig-param">j</em>, <em class="sig-param">word</em>, <em class="sig-param">weight=0</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.addToLimit">
+<code class="sig-name descname">addToLimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.addToLimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method adds the words as much as possible</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.collapse">
+<code class="sig-name descname">collapse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.collapse" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method collapses connectivity of the puzzle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.compile">
+<code class="sig-name descname">compile</code><span class="sig-paren">(</span><em class="sig-param">objFunc</em>, <em class="sig-param">optimizer</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method compiles the objective function and optimization method into the Puzzle instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.drop">
+<code class="sig-name descname">drop</code><span class="sig-paren">(</span><em class="sig-param">word=None</em>, <em class="sig-param">divij=None</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.drop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.firstSolve">
+<code class="sig-name descname">firstSolve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.firstSolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method creates an initial solution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.getLatest">
+<code class="sig-name descname">getLatest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.getLatest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.getNext">
+<code class="sig-name descname">getNext</code><span class="sig-paren">(</span><em class="sig-param">n=1</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.getNext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.getPrev">
+<code class="sig-name descname">getPrev</code><span class="sig-paren">(</span><em class="sig-param">n=1</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.getPrev" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.getRect">
+<code class="sig-name descname">getRect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.getRect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.importDict">
+<code class="sig-name descname">importDict</code><span class="sig-paren">(</span><em class="sig-param">dictionary</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.importDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method imports Dictionary to Puzzle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.in_ipynb">
+<code class="sig-name descname">in_ipynb</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.in_ipynb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Are we in a jupyter notebook?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.isEnabledAdd">
+<code class="sig-name descname">isEnabledAdd</code><span class="sig-paren">(</span><em class="sig-param">div</em>, <em class="sig-param">i</em>, <em class="sig-param">j</em>, <em class="sig-param">word</em>, <em class="sig-param">wLen</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.isEnabledAdd" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method determines if a word can be placed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.isSimpleSol">
+<code class="sig-name descname">isSimpleSol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.isSimpleSol" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method determines whether it is the simple solution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.jump">
+<code class="sig-name descname">jump</code><span class="sig-paren">(</span><em class="sig-param">idx</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.jump" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.kick">
+<code class="sig-name descname">kick</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.kick" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method kicks elements except largest CCL</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.logging">
+<code class="sig-name descname">logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method logs the current objective function values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.move">
+<code class="sig-name descname">move</code><span class="sig-paren">(</span><em class="sig-param">direction</em>, <em class="sig-param">n=0</em>, <em class="sig-param">limit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.reinit">
+<code class="sig-name descname">reinit</code><span class="sig-paren">(</span><em class="sig-param">all=False</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.reinit" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method reinitilize Puzzle informations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.saveAnswerImage">
+<code class="sig-name descname">saveAnswerImage</code><span class="sig-paren">(</span><em class="sig-param">fpath='answer.png'</em>, <em class="sig-param">list_label='[Word List]'</em>, <em class="sig-param">dpi=100</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.saveAnswerImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method generates and returns a puzzle answer with a word list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.saveImage">
+<code class="sig-name descname">saveImage</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">fpath</em>, <em class="sig-param">list_label='[Word List]'</em>, <em class="sig-param">dpi=100</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.saveImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method generates and returns a puzzle image with a word list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.saveProblemImage">
+<code class="sig-name descname">saveProblemImage</code><span class="sig-paren">(</span><em class="sig-param">fpath='problem.png'</em>, <em class="sig-param">list_label='[Word List]'</em>, <em class="sig-param">dpi=100</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.saveProblemImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method generates and returns a puzzle problem with a word list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><em class="sig-param">ndarray=None</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method displays a puzzle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.showLog">
+<code class="sig-name descname">showLog</code><span class="sig-paren">(</span><em class="sig-param">title=&quot;Objective Function's time series&quot;</em>, <em class="sig-param">grid=True</em>, <em class="sig-param">figsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.showLog" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method shows log of objective functions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.solve">
+<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param">epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method repeats the solution improvement by the specified number of epochs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Puzzle.Puzzle.toPickle">
+<code class="sig-name descname">toPickle</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.toPickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method saves Puzzle object as a binary file</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span id="document-Placeable"></span><div class="section" id="module-Placeable">
+<span id="placeable-module"></span><h2>Placeable module<a class="headerlink" href="#module-Placeable" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="Placeable.Placeable">
+<em class="property">class </em><code class="sig-prename descclassname">Placeable.</code><code class="sig-name descname">Placeable</code><span class="sig-paren">(</span><em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">dic</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Placeable.Placeable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</div>
+<span id="document-Dictionary"></span><div class="section" id="module-Dictionary">
+<span id="dictionary-module"></span><h2>Dictionary module<a class="headerlink" href="#module-Dictionary" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="Dictionary.Dictionary">
+<em class="property">class </em><code class="sig-prename descclassname">Dictionary.</code><code class="sig-name descname">Dictionary</code><span class="sig-paren">(</span><em class="sig-param">fpath=None</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Dictionary.Dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Dictionary.Dictionary.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">word=None</em>, <em class="sig-param">weight=None</em>, <em class="sig-param">fpath=None</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Dictionary.Dictionary.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Dictionary.Dictionary.calcWeight">
+<code class="sig-name descname">calcWeight</code><span class="sig-paren">(</span><em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Dictionary.Dictionary.calcWeight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate word weights in the dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Dictionary.Dictionary.deleteUnusableWords">
+<code class="sig-name descname">deleteUnusableWords</code><span class="sig-paren">(</span><em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Dictionary.Dictionary.deleteUnusableWords" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method checks words in the dictionary and erases words that can not cross any other words.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Dictionary.Dictionary.getK">
+<code class="sig-name descname">getK</code><span class="sig-paren">(</span><em class="sig-param">word</em><span class="sig-paren">)</span><a class="headerlink" href="#Dictionary.Dictionary.getK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Dictionary.Dictionary.include">
+<code class="sig-name descname">include</code><span class="sig-paren">(</span><em class="sig-param">word</em><span class="sig-paren">)</span><a class="headerlink" href="#Dictionary.Dictionary.include" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Dictionary.Dictionary.read">
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param">fpath</em><span class="sig-paren">)</span><a class="headerlink" href="#Dictionary.Dictionary.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<span id="document-ObjectiveFunction"></span><div class="section" id="module-ObjectiveFunction">
+<span id="objectivefunction-module"></span><h2>ObjectiveFunction module<a class="headerlink" href="#module-ObjectiveFunction" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ObjectiveFunction.ObjectiveFunction">
+<em class="property">class </em><code class="sig-prename descclassname">ObjectiveFunction.</code><code class="sig-name descname">ObjectiveFunction</code><span class="sig-paren">(</span><em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="ObjectiveFunction.ObjectiveFunction.crossCount">
+<code class="sig-name descname">crossCount</code><span class="sig-paren">(</span><em class="sig-param">puzzle</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction.crossCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns the number of crosses of a word</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ObjectiveFunction.ObjectiveFunction.fillCount">
+<code class="sig-name descname">fillCount</code><span class="sig-paren">(</span><em class="sig-param">puzzle</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction.fillCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns the number of character cells in the puzzle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ObjectiveFunction.ObjectiveFunction.getFuncs">
+<code class="sig-name descname">getFuncs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction.getFuncs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ObjectiveFunction.ObjectiveFunction.getScore">
+<code class="sig-name descname">getScore</code><span class="sig-paren">(</span><em class="sig-param">puzzle</em>, <em class="sig-param">i=0</em>, <em class="sig-param">func=None</em>, <em class="sig-param">all=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction.getScore" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns any objective function value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ObjectiveFunction.ObjectiveFunction.maxConnectedEmpties">
+<code class="sig-name descname">maxConnectedEmpties</code><span class="sig-paren">(</span><em class="sig-param">puzzle</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction.maxConnectedEmpties" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns the maximum number of concatenations for unfilled squares</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ObjectiveFunction.ObjectiveFunction.register">
+<code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">funcNames</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method registers an objective function in an instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ObjectiveFunction.ObjectiveFunction.solSize">
+<code class="sig-name descname">solSize</code><span class="sig-paren">(</span><em class="sig-param">puzzle</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction.solSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns the number of words used in the solution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ObjectiveFunction.ObjectiveFunction.totalWeight">
+<code class="sig-name descname">totalWeight</code><span class="sig-paren">(</span><em class="sig-param">puzzle</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction.totalWeight" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns the sum of the word weights used for the solution</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span id="document-Optimizer"></span><div class="section" id="module-Optimizer">
+<span id="optimizer-module"></span><h2>Optimizer module<a class="headerlink" href="#module-Optimizer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="Optimizer.Optimizer">
+<em class="property">class </em><code class="sig-prename descclassname">Optimizer.</code><code class="sig-name descname">Optimizer</code><span class="sig-paren">(</span><em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Optimizer.Optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="Optimizer.Optimizer.getNeighborSolution">
+<code class="sig-name descname">getNeighborSolution</code><span class="sig-paren">(</span><em class="sig-param">puzzle</em><span class="sig-paren">)</span><a class="headerlink" href="#Optimizer.Optimizer.getNeighborSolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gets the neighborhood solution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Optimizer.Optimizer.localSearch">
+<code class="sig-name descname">localSearch</code><span class="sig-paren">(</span><em class="sig-param">puzzle</em>, <em class="sig-param">epoch</em>, <em class="sig-param">show=True</em>, <em class="sig-param">move=False</em><span class="sig-paren">)</span><a class="headerlink" href="#Optimizer.Optimizer.localSearch" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method performs a local search</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Optimizer.Optimizer.setMethod">
+<code class="sig-name descname">setMethod</code><span class="sig-paren">(</span><em class="sig-param">methodName</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Optimizer.Optimizer.setMethod" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method sets the optimization method on the instance</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span id="document-modules"></span><div class="section" id="doc">
+<h2>doc<a class="headerlink" href="#doc" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html#document-index">pyzzle</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-Puzzle">Puzzle module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-Placeable">Placeable module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-Dictionary">Dictionary module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-ObjectiveFunction">ObjectiveFunction module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-Optimizer">Optimizer module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-modules">doc</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html#document-index">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Tsukada and Nishijima.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
