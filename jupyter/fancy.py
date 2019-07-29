@@ -38,7 +38,7 @@ from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 
 sys.path.append('../python')
-from sample_package import Puzzle, Dictionary, Placeable, ObjectiveFunction, Optimizer
+from pyzzle import Puzzle, Dictionary, Placeable, ObjectiveFunction, Optimizer
 from src import utils
 
 
@@ -82,15 +82,15 @@ class FancyPuzzle(Puzzle):
         ax2.axis("off")
         fig.set_facecolor('#EEEEEE')
         # Draw puzzle
-        ax1_table = ax1.table(cellText=df.values, cellColours=colors, cellLoc="center", bbox=[0, 0, 1, 1])
-        for _, cell in ax1_table.get_celld().items():
-            cell.set_text_props(size=20)
-        ax1.set_title(label="*** "+self.title+" ***", size=20)
+        ax1_table = ax1.table(cellText=df.values, cellColours=colors, cellLoc="center", bbox=[0, 0, 1, 1], fontsize=20)
+#         for _, cell in ax1_table.get_celld().items():
+#             cell.set_text_props(size=20)
+        ax1.set_title(label=f"*** {self.title} ***", size=20)
         
         # delete unmasked cells
-        mask = np.where(puzzle.mask== False)
-        for i,j in list(zip(mask[0], mask[1])):
-            del ax1_table._cells[i,j]
+        mask = np.where(puzzle.mask == False)
+        for i, j in list(zip(mask[0], mask[1])):
+            del ax1_table._cells[i, j]
 
         # Draw word list
         words = [word for word in self.usedWords if word != ""]
