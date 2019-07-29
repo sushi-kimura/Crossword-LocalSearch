@@ -1,19 +1,32 @@
 import math
 import itertools
-from IPython.display import display, HTML
-import pickle
-import os, shutil
 import datetime
-import copy
 import numpy as np
 import pandas as pd
+import os, shutil
+import copy
 import matplotlib.pyplot as plt
+from IPython.display import display, HTML
+import pickle
 import os
 
-from pyzzle.Dictionary import Dictionary
 from pyzzle.Placeable import Placeable
+from pyzzle.Dictionary import Dictionary
 
 class Puzzle:
+    """
+    The Almighty Puzzle Class.
+    Example usage::
+        from pyzzle import Puzzle
+        puzzle = Puzzle(8,8)
+        puzzle.add(0,0,0,'hoge')
+        puzzle.add(1,0,0,'hotel')
+        puzzle.add(1,0,2,'gateball')
+        puzzle.add(0,3,0,'elevetor')
+        puzzle.show()
+        puzzle.saveProbremImage()
+        puzzle.saveAnswerImage()
+    """
     def __init__(self, width, height, title="Criss Cross", msg=True):
         self.width = width
         self.height = height
