@@ -1,20 +1,20 @@
-import pickle
-import copy
-import os, shutil
 import math
-import matplotlib.pyplot as plt
-from IPython.display import display, HTML
-import os
 import itertools
+from IPython.display import display, HTML
+import pickle
+import os, shutil
+import datetime
+import copy
 import numpy as np
 import pandas as pd
-import datetime
+import matplotlib.pyplot as plt
+import os
 
-from pyzzle.Placeable import Placeable
 from pyzzle.Dictionary import Dictionary
+from pyzzle.Placeable import Placeable
 
 class Puzzle:
-    def __init__(self, width, height, title="スケルトンパズル", msg=True):
+    def __init__(self, width, height, title="Criss Cross", msg=True):
         self.width = width
         self.height = height
         self.totalWeight = 0
@@ -31,7 +31,7 @@ class Puzzle:
         self.log = None
         self.epoch = 0
         self.ccl = None
-        self.initSol = False
+        self.firstSolved = False
         self.initSeed = None
         self.dic = Dictionary(msg=False)
         self.plc = Placeable(self.width, self.height, self.dic, msg=False)
@@ -71,7 +71,7 @@ class Puzzle:
         self.history = []
         self.log = None
         self.epoch = 0
-        self.initSol = False
+        self.firstSolved = False
         self.initSeed = None
     
     def in_ipynb(self):
@@ -279,15 +279,15 @@ class Puzzle:
         """
         This method creates an initial solution
         """
-        # Check the initSol
-        if self.initSol:
+        # Check the firstSolved
+        if self.firstSolved:
             raise RuntimeError("'firstSolve' method has already called")
             
         # Save initial seed number
         self.initSeed = np.random.get_state()[1][0]
         # Add as much as possible
         self.addToLimit()
-        self.initSol = True
+        self.firstSolved = True
 
     def show(self, ndarray=None):
         """
@@ -528,7 +528,7 @@ class Puzzle:
         """
         This method repeats the solution improvement by the specified number of epochs
         """
-        if self.initSol is False:
+        if self.firstSolved is False:
             raise RuntimeError("'firstSolve' method has not called")
         if epoch is 0:
             raise ValueError("'epoch' must be lather than 0")
@@ -663,7 +663,7 @@ class Puzzle:
                 tmp_puzzle._drop(div, i, j, k, isKick=False)
             elif code == 3:
                 tmp_puzzle._drop(div, i, j, k, isKick=True)
-        tmp_puzzle.initSol = True
+        tmp_puzzle.firstSolved = True
         return tmp_puzzle
 
     def getPrev(self, n=1):

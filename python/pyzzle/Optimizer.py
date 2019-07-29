@@ -75,7 +75,7 @@ class Optimizer:
         puzzle.baseHistory = copy.deepcopy(_puzzle.baseHistory)
         puzzle.log = copy.deepcopy(_puzzle.log)
         puzzle.epoch = copy.deepcopy(_puzzle.epoch)
-        puzzle.initSol = copy.deepcopy(_puzzle.initSol)
+        puzzle.firstSolved = copy.deepcopy(_puzzle.firstSolved)
         puzzle.initSeed = copy.deepcopy(_puzzle.initSeed)
         puzzle.dic = copy.deepcopy(_puzzle.dic)
         puzzle.plc = copy.deepcopy(_puzzle.plc)
