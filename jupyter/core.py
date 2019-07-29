@@ -38,7 +38,6 @@ from IPython.display import display, HTML
 import matplotlib.pyplot as plt
 
 sys.path.append("../python")
-from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
 from src import utils
 
 
@@ -587,8 +586,8 @@ class Puzzle:
         fig.set_facecolor('#EEEEEE')
         # Draw puzzle
         ax1_table = ax1.table(cellText=df.values, cellColours=colors, cellLoc="center", bbox=[0, 0, 1, 1])
-        for _, cell in ax1_table.get_celld().items():
-            cell.set_text_props(size=20)
+        ax1_table.auto_set_font_size(False)
+        ax1_table.set_fontsize(18)
         ax1.set_title(label="*** "+self.title+" ***", size=20)
 
         # Draw word list
@@ -606,8 +605,8 @@ class Puzzle:
 
         ax2_table = ax2.table(cellText=words, cellColours=None, cellLoc="left", edges="open", bbox=[0, 0, 1, 1])
         ax2.set_title(label=list_label, size=20)
-        for _, cell in ax2_table.get_celld().items():
-            cell.set_text_props(size=18)
+        ax2_table.auto_set_font_size(False)
+        ax2_table.set_fontsize(18)
         plt.tight_layout()
         plt.savefig(fpath, dpi=dpi)
         plt.close()
@@ -643,8 +642,10 @@ class Puzzle:
         for code, k, div, i, j in tmp_puzzle.baseHistory[:idx]:
             if code == 1:
                 tmp_puzzle._add(div, i, j, k)
-            elif code in (2,3):
-                tmp_puzzle._drop(div, i, j, k)
+            elif code == 2:
+                tmp_puzzle._drop(div, i, j, k, isKick=False)
+            elif code == 3:
+                tmp_puzzle._drop(div, i, j, k, isKick=True)
         tmp_puzzle.initSol = True
         return tmp_puzzle
 
@@ -1116,9 +1117,23 @@ puzzle.compile(objFunc=objFunc, optimizer=optimizer)
 
 # Solve
 puzzle.firstSolve()
+
 puzzle.solve(epoch=10)
 print(f"SimpleSolution: {puzzle.isSimpleSol()}")
-puzzle.saveAnswerImage(f"fig/{dic.name}_w{width}_h{height}_r{seed}.png")
+puzzle.saveAnswerImage(f"fig/puzzle/{dic.name}_w{width}_h{height}_r{seed}.png")
 
 e_time = time.time() - start
 print (f"e_time: {format(e_time)} s")
+
+# ## Package更新
+# Jupytextによるpyファイル生成との合わせ技です。  
+# まずは先にノートブックを保存してから、次のセルを実行してください。  
+# `../python/pyzzle`ディレクトリのパッケージ情報が更新されます。
+
+import os, shutil
+# !python ../python/script/ipynbpy2py.py core.py -n pyzzle
+if os.path.exists("../python/pyzzle") is True:
+    shutil.rmtree('../python/pyzzle')
+shutil.move("pyzzle", "../python")
+
+
