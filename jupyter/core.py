@@ -117,6 +117,11 @@ class Puzzle:
     def importDict(self, dictionary, msg=True):
         """
         This method imports Dictionary to Puzzle
+
+        Parameters
+        ----------
+        dictionary : Dictionary
+            Dictionary object imported by Puzzle
         """
         self.dic = dictionary
         self.plc = Placeable(self.width, self.height, self.dic, msg=msg)
@@ -124,6 +129,35 @@ class Puzzle:
     def isEnabledAdd(self, div, i, j, word, wLen):
         """
         This method determines if a word can be placed
+
+        Parameters
+        ----------
+        div : int
+            direction of the word (0:Vertical, 1:Horizontal)
+        i : int
+            row number of the word
+        j : int
+            col number of the word
+        word : str
+            The word to be checked whether it can be added
+        wLen : int
+            length of the word
+
+        Returns
+        -------
+        result-number : int
+            number of the judgment result
+
+        Notes
+        -----
+        The result number corresponds to the judgment result
+        0. The word can be placed (only succeeded)
+        1. The preceding and succeeding cells are already filled
+        2. At least one place must cross other words
+        3. Not a correct intersection
+        4. The same word is in use
+        5. The Neighbor cells are filled except at the intersection
+        6. US/USA, DOMINICA/DOMINICAN problem
         """
         if div == 0:
             empties = self.cell[i:i+wLen, j] == ""

@@ -1,7 +1,7 @@
 import os
 import collections
-import os, shutil
 import numpy as np
+import os, shutil
 
 
 class Dictionary:
