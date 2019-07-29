@@ -19,7 +19,6 @@
 # このノートブックではクラスワード(スケルトンパズル)自動生成ツールの拡張機能について紹介します。
 
 # ***
-#
 # ## Import
 # 必要なライブラリをimportし, 日本語フォントの指定などを行う：
 
@@ -46,32 +45,16 @@ import matplotlib.pyplot as plt
 import cv2
 
 sys.path.append('../python')
-from sample_package import Puzzle, Dictionary, Placeable, ObjectiveFunction, Optimizer
+from pyzzle import Puzzle, Dictionary, Placeable, ObjectiveFunction, Optimizer
 
 # font setting
 from matplotlib import rcParams
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'Noto Sans CJK JP']
-
-
 # -
 
-# ## ユーザ用add
-# [CrosswordBasic](CrosswordBasic.ipynb)で作成した`_add`メソッドを拡張し、ユーザにとって扱いやすい`add`メソッドを定義します。  
-# `_add`メソッドと同じように辞書番号を指定することもできますが、追加する単語が文字列として指定されることを想定しています。辞書に存在しない単語が指定された場合は、辞書に単語を追加しPlaceableも再計算されます。
-
-def add(self, div, i, j, word, weight=0):
-    if type(word) is int:
-        k = word
-    elif type(word) is str:
-        if self.dic.include(word) is False:
-            self.dic.add(word, weight)
-        self.plc._compute([word], self.dic.size-1)
-        k = self.dic.word.index(word)
-    else:
-        raise TypeError()
-    self._add(div, i, j, k)
-setattr(Puzzle, 'add', add)
+# importした`pyzzle`パッケージには、[CrosswordBasic](CrosswordBasic.ipynb)での各種実装に比べ、多岐にわたる拡張機能が追加されています。  
+# ここでは、その使用法を紹介します。次のセルでそのための準備を行います：
 
 # +
 fpath = "../dict/pokemon.txt"  # countries hokkaido animals kotowaza birds dinosaurs fishes sports
@@ -82,51 +65,22 @@ seed = 1
 puzzle = Puzzle(width, height, msg=False)
 dic = Dictionary(fpath, msg=False)
 puzzle.importDict(dic, msg=False)
+# -
+
+# ## add
+# `pyzzle.Puzzle`クラスには、ユーザにとって扱いやすい`add`メソッドが定義されています。  
+# `Puzzle._add`メソッドと同じように辞書番号を指定することもできますが、追加する単語が文字列として指定されることを想定しています。  
+# 辞書に存在しない単語が指定された場合は、辞書に単語を追加しPlaceableも再計算されます。
+
 puzzle.add(0, 2, 2, 'ラッコ')
 puzzle.add(1, 4, 2, 'コアラ')
 puzzle.add(0, 4, 3, 'アシカ')
 puzzle.add(1, 6, 3, 'カラス')
 puzzle.show()
 
-
-# -
-
-# ## ユーザ用drop
-# [CrosswordBasic](CrosswordBasic.ipynb)で作成した`_drop`メソッドを拡張し、ユーザにとって扱いやすい`drop`メソッドを定義します。  
-# div, i, jの組み合わせや、削除する単語の番号または文字列を指定されることを想定しています。
-
-def drop(self, word=None, divij=None):
-    if word is None and divij is None:
-        raise ValueError()
-    if word is not None: 
-        if type(word) is int:
-            k = word
-        elif type(word) is str:
-            k = self.dic.word.index(word)
-        else:
-            raise TypeError()
-        for p in self.usedPlcIdx:
-            if self.plc.k[p] == k:
-                div = self.plc.div[p]
-                i = self.plc.i[p]
-                j = self.plc.j[p]
-                break
-    else:
-        if type(divij) not in(list, tuple):
-            raise TypeError()
-        if len(divij) is not 3:
-            raise TypeError()
-        div,i,j = divij
-        print(div, i, j)
-        for p in self.usedPlcIdx:
-            _div = self.plc.div[p]
-            _i = self.plc.i[p]
-            _j = self.plc.j[p]
-            if _div == divij[0] and _i == divij[1] and _j == divij[2]:
-                k = puzzle.plc.k[p]
-                break
-    self._drop(div, i, j, k)
-setattr(Puzzle, 'drop', drop)
+# ## drop
+# `pyzzle.Puzzle`クラスには、ユーザにとって扱いやすい`drop`メソッドが定義されています。  
+# `div`, `i`, `j`の組み合わせや、削除する単語の単語番号(`k`)または文字列そのものを指定されることを想定しています。
 
 puzzle.show()
 puzzle.drop(word='カラス')
@@ -224,8 +178,8 @@ puzzle.show()
 # そこで、今回は`pickle/sample.pickle`というpickleファイルをロードします。
 
 with open("pickle/sample.pickle", "rb") as f:
-    sample_puzzle = pickle.load(f)
-sample_puzzle.show()
+    pickled_puzzle = pickle.load(f)
+pickled_puzzle.show()
 
 # これで生成済みのパズルデータをオープンすることができました。
 
@@ -239,7 +193,7 @@ for p in glob.glob("fig/animation/*.png"):
      if os.path.isfile(p):
             os.remove(p)
 # jump to top of the frame
-tmpPuzzle = sample_puzzle.jump(0)
+tmpPuzzle = pickled_puzzle.jump(0)
 tmpPuzzle.saveAnswerImage(f"fig/animation/0000.png")
 # save all history as image file
 for histNum in range(len(tmpPuzzle.baseHistory)):
