@@ -22,7 +22,7 @@ import numpy as np
 from matplotlib.font_manager import FontProperties
 
 #os.chdir("/Users/taiga/Crossword-LocalSearch/Python")
-from sample_package import Puzzle, Dictionary, ObjectiveFunction, Optimizer
+from pyzzle import Puzzle, Dictionary, ObjectiveFunction, Optimizer
 
 # In[]
 parser = argparse.ArgumentParser(description="make a puzzle with given parameters")
