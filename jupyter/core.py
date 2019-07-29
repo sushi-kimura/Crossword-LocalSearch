@@ -45,7 +45,7 @@ sys.path.append("../python")
 # ## Puzzle
 
 class Puzzle:
-    def __init__(self, width, height, title="スケルトンパズル", msg=True):
+    def __init__(self, width, height, title="Criss Cross", msg=True):
         self.width = width
         self.height = height
         self.totalWeight = 0
@@ -62,7 +62,7 @@ class Puzzle:
         self.log = None
         self.epoch = 0
         self.ccl = None
-        self.initSol = False
+        self.firstSolved = False
         self.initSeed = None
         self.dic = Dictionary(msg=False)
         self.plc = Placeable(self.width, self.height, self.dic, msg=False)
@@ -102,7 +102,7 @@ class Puzzle:
         self.history = []
         self.log = None
         self.epoch = 0
-        self.initSol = False
+        self.firstSolved = False
         self.initSeed = None
     
     def in_ipynb(self):
@@ -310,15 +310,15 @@ class Puzzle:
         """
         This method creates an initial solution
         """
-        # Check the initSol
-        if self.initSol:
+        # Check the firstSolved
+        if self.firstSolved:
             raise RuntimeError("'firstSolve' method has already called")
             
         # Save initial seed number
         self.initSeed = np.random.get_state()[1][0]
         # Add as much as possible
         self.addToLimit()
-        self.initSol = True
+        self.firstSolved = True
 
     def show(self, ndarray=None):
         """
@@ -559,7 +559,7 @@ class Puzzle:
         """
         This method repeats the solution improvement by the specified number of epochs
         """
-        if self.initSol is False:
+        if self.firstSolved is False:
             raise RuntimeError("'firstSolve' method has not called")
         if epoch is 0:
             raise ValueError("'epoch' must be lather than 0")
@@ -694,7 +694,7 @@ class Puzzle:
                 tmp_puzzle._drop(div, i, j, k, isKick=False)
             elif code == 3:
                 tmp_puzzle._drop(div, i, j, k, isKick=True)
-        tmp_puzzle.initSol = True
+        tmp_puzzle.firstSolved = True
         return tmp_puzzle
 
     def getPrev(self, n=1):
@@ -1112,7 +1112,7 @@ class Optimizer:
         puzzle.baseHistory = copy.deepcopy(_puzzle.baseHistory)
         puzzle.log = copy.deepcopy(_puzzle.log)
         puzzle.epoch = copy.deepcopy(_puzzle.epoch)
-        puzzle.initSol = copy.deepcopy(_puzzle.initSol)
+        puzzle.firstSolved = copy.deepcopy(_puzzle.firstSolved)
         puzzle.initSeed = copy.deepcopy(_puzzle.initSeed)
         puzzle.dic = copy.deepcopy(_puzzle.dic)
         puzzle.plc = copy.deepcopy(_puzzle.plc)
@@ -1183,5 +1183,19 @@ import os, shutil
 if os.path.exists("../python/pyzzle") is True:
     shutil.rmtree('../python/pyzzle')
 shutil.move("pyzzle", "../python")
+
+# ## Sphinxドキュメントを更新
+# `conda install sphinx`と`pip install sphinx_rtd_theme`で必要ライブラリをインストールしてから次のセルを実行してください。
+
+# +
+#### 未完成 #####
+# shutil.copyfile("../python/pyzzle/Puzzle.py", "../doc/Puzzle.py")
+# shutil.copyfile("../python/pyzzle/Placeable.py", "../doc/Placeable.py")
+# shutil.copyfile("../python/pyzzle/Dictionary.py", "../doc/Dictionary.py")
+# shutil.copyfile("../python/pyzzle/ObjectiveFunction.py", "../doc/ObjectiveFunction.py")
+# shutil.copyfile("../python/pyzzle/Optimizer.py", "../doc/Optimizer.py")
+# # !sphinx-apidoc -f -o ../doc/source ../doc/
+# # !sphinx-build -b singlehtml ../doc/source ../doc/source/_build
+# -
 
 
