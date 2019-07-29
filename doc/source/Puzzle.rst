@@ -1,4 +1,4 @@
-Puzzle module
+Puzzle
 =============
 
 .. automodule:: Puzzle

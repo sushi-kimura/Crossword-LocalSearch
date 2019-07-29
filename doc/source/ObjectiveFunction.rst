@@ -1,4 +1,4 @@
-ObjectiveFunction module
+ObjectiveFunction
 ========================
 
 .. automodule:: ObjectiveFunction

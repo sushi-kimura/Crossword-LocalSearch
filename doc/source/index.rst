@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pyzzle's documentation!
+pyzzle API documentation
 ==================================
 
 .. toctree::
@@ -15,7 +15,7 @@ Welcome to pyzzle's documentation!
    Dictionary
    ObjectiveFunction
    Optimizer
-   modules
+
 
 Indices and tables
 ==================

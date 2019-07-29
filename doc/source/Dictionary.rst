@@ -1,4 +1,4 @@
-Dictionary module
+Dictionary
 =================
 
 .. automodule:: Dictionary

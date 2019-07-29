@@ -1,4 +1,4 @@
-Optimizer module
+Optimizer
 ================
 
 .. automodule:: Optimizer

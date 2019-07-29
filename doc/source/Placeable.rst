@@ -1,4 +1,4 @@
-Placeable module
+Placeable
 ================
 
 .. automodule:: Placeable

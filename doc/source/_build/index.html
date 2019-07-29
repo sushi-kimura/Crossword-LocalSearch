@@ -1,40 +1,149 @@
 
+
 <!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyzzle 0.9.0 documentation</title>
+  
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <title>pyzzle 0.9.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="index.html#document-index" class="icon icon-home"> pyzzle
+          
+
+          
+          </a>
+
+          
             
-  <div class="section" id="welcome-to-pyzzle-s-documentation">
-<h1>Welcome to pyzzle’s documentation!<a class="headerlink" href="#welcome-to-pyzzle-s-documentation" title="Permalink to this headline">¶</a></h1>
+            
+          
+
+          
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-Puzzle">Puzzle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-Placeable">Placeable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-Dictionary">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-ObjectiveFunction">ObjectiveFunction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-Optimizer">Optimizer</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html#document-index">pyzzle</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html#document-index">Docs</a> &raquo;</li>
+        
+      <li>pyzzle 0.9.0 documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pyzzle-api-documentation">
+<h1>pyzzle API documentation<a class="headerlink" href="#pyzzle-api-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <span id="document-Puzzle"></span><div class="section" id="module-Puzzle">
-<span id="puzzle-module"></span><h2>Puzzle module<a class="headerlink" href="#module-Puzzle" title="Permalink to this headline">¶</a></h2>
+<span id="puzzle"></span><h2>Puzzle<a class="headerlink" href="#module-Puzzle" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="Puzzle.Puzzle">
 <em class="property">class </em><code class="sig-prename descclassname">Puzzle.</code><code class="sig-name descname">Puzzle</code><span class="sig-paren">(</span><em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">title='スケルトンパズル'</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle" title="Permalink to this definition">¶</a></dt>
@@ -103,6 +212,11 @@
 <dt id="Puzzle.Puzzle.importDict">
 <code class="sig-name descname">importDict</code><span class="sig-paren">(</span><em class="sig-param">dictionary</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.importDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method imports Dictionary to Puzzle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dictionary</strong> (<a class="reference internal" href="index.html#Dictionary.Dictionary" title="Dictionary.Dictionary"><em>Dictionary</em></a>) – Dictionary object imported by Puzzle</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -115,6 +229,32 @@
 <dt id="Puzzle.Puzzle.isEnabledAdd">
 <code class="sig-name descname">isEnabledAdd</code><span class="sig-paren">(</span><em class="sig-param">div</em>, <em class="sig-param">i</em>, <em class="sig-param">j</em>, <em class="sig-param">word</em>, <em class="sig-param">wLen</em><span class="sig-paren">)</span><a class="headerlink" href="#Puzzle.Puzzle.isEnabledAdd" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method determines if a word can be placed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>div</strong> (<em>int</em>) – direction of the word (0:Vertical, 1:Horizontal)</p></li>
+<li><p><strong>i</strong> (<em>int</em>) – row number of the word</p></li>
+<li><p><strong>j</strong> (<em>int</em>) – col number of the word</p></li>
+<li><p><strong>word</strong> (<em>str</em>) – The word to be checked whether it can be added</p></li>
+<li><p><strong>wLen</strong> (<em>int</em>) – length of the word</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>result-number</strong> – number of the judgment result</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The result number corresponds to the judgment result
+0. The word can be placed (only succeeded)
+1. The preceding and succeeding cells are already filled
+2. At least one place must cross other words
+3. Not a correct intersection
+4. The same word is in use
+5. The Neighbor cells are filled except at the intersection
+6. US/USA, DOMINICA/DOMINICAN problem</p>
 </dd></dl>
 
 <dl class="method">
@@ -197,7 +337,7 @@
 
 </div>
 <span id="document-Placeable"></span><div class="section" id="module-Placeable">
-<span id="placeable-module"></span><h2>Placeable module<a class="headerlink" href="#module-Placeable" title="Permalink to this headline">¶</a></h2>
+<span id="placeable"></span><h2>Placeable<a class="headerlink" href="#module-Placeable" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="Placeable.Placeable">
 <em class="property">class </em><code class="sig-prename descclassname">Placeable.</code><code class="sig-name descname">Placeable</code><span class="sig-paren">(</span><em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">dic</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Placeable.Placeable" title="Permalink to this definition">¶</a></dt>
@@ -206,7 +346,7 @@
 
 </div>
 <span id="document-Dictionary"></span><div class="section" id="module-Dictionary">
-<span id="dictionary-module"></span><h2>Dictionary module<a class="headerlink" href="#module-Dictionary" title="Permalink to this headline">¶</a></h2>
+<span id="dictionary"></span><h2>Dictionary<a class="headerlink" href="#module-Dictionary" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="Dictionary.Dictionary">
 <em class="property">class </em><code class="sig-prename descclassname">Dictionary.</code><code class="sig-name descname">Dictionary</code><span class="sig-paren">(</span><em class="sig-param">fpath=None</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Dictionary.Dictionary" title="Permalink to this definition">¶</a></dt>
@@ -247,7 +387,7 @@
 
 </div>
 <span id="document-ObjectiveFunction"></span><div class="section" id="module-ObjectiveFunction">
-<span id="objectivefunction-module"></span><h2>ObjectiveFunction module<a class="headerlink" href="#module-ObjectiveFunction" title="Permalink to this headline">¶</a></h2>
+<span id="objectivefunction"></span><h2>ObjectiveFunction<a class="headerlink" href="#module-ObjectiveFunction" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="ObjectiveFunction.ObjectiveFunction">
 <em class="property">class </em><code class="sig-prename descclassname">ObjectiveFunction.</code><code class="sig-name descname">ObjectiveFunction</code><span class="sig-paren">(</span><em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#ObjectiveFunction.ObjectiveFunction" title="Permalink to this definition">¶</a></dt>
@@ -303,7 +443,7 @@
 
 </div>
 <span id="document-Optimizer"></span><div class="section" id="module-Optimizer">
-<span id="optimizer-module"></span><h2>Optimizer module<a class="headerlink" href="#module-Optimizer" title="Permalink to this headline">¶</a></h2>
+<span id="optimizer"></span><h2>Optimizer<a class="headerlink" href="#module-Optimizer" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="Optimizer.Optimizer">
 <em class="property">class </em><code class="sig-prename descclassname">Optimizer.</code><code class="sig-name descname">Optimizer</code><span class="sig-paren">(</span><em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="headerlink" href="#Optimizer.Optimizer" title="Permalink to this definition">¶</a></dt>
@@ -329,11 +469,6 @@
 </dd></dl>
 
 </div>
-<span id="document-modules"></span><div class="section" id="doc">
-<h2>doc<a class="headerlink" href="#doc" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-</div>
-</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -346,62 +481,43 @@
 </div>
 
 
+           </div>
+           
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html#document-index">pyzzle</a></h1>
+          <footer>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tsukada and Nishijima
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="index.html#document-Puzzle">Puzzle module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="index.html#document-Placeable">Placeable module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="index.html#document-Dictionary">Dictionary module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="index.html#document-ObjectiveFunction">ObjectiveFunction module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="index.html#document-Optimizer">Optimizer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="index.html#document-modules">doc</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html#document-index">Documentation overview</a><ul>
-  </ul></li>
-</ul>
-</div>
-
-
-
-
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2019, Tsukada and Nishijima.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
 
-    
+    </section>
 
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>
