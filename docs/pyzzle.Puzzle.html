@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Puzzle &mdash; pyzzle 0.9.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Puzzle" href="_gen/pyzzle.Puzzle.Puzzle.html" />
+    <link rel="prev" title="pyzzle" href="pyzzle.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pyzzle
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="pyzzle.html">pyzzle</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Puzzle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_gen/pyzzle.Puzzle.Puzzle.html">Puzzle</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyzzle.Placeable.html">Placeable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyzzle.Dictionary.html">Dictionary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyzzle.ObjectiveFunction.html">ObjectiveFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyzzle.Optimizer.html">Optimizer</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyzzle</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="pyzzle.html">pyzzle</a> &raquo;</li>
+        
+      <li>Puzzle</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/pyzzle.Puzzle.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pyzzle.Puzzle">
+<span id="puzzle"></span><h1>Puzzle<a class="headerlink" href="#module-pyzzle.Puzzle" title="Permalink to this headline">¶</a></h1>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyzzle.Puzzle.Puzzle" title="pyzzle.Puzzle.Puzzle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Puzzle</span></code></a>(width, height[, title, msg])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pyzzle.Puzzle.Puzzle">
+<em class="property">class </em><code class="sig-prename descclassname">pyzzle.Puzzle.</code><code class="sig-name descname">Puzzle</code><span class="sig-paren">(</span><em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">title='Criss Cross'</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.DFS">
+<code class="sig-name descname">DFS</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">j</em>, <em class="sig-param">ccl</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.DFS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.DFS" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method performs a Depth-First Search and labels each connected component</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">div</em>, <em class="sig-param">i</em>, <em class="sig-param">j</em>, <em class="sig-param">word</em>, <em class="sig-param">weight=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.addToLimit">
+<code class="sig-name descname">addToLimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.addToLimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.addToLimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method adds the words as much as possible</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.collapse">
+<code class="sig-name descname">collapse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.collapse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.collapse" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method collapses connectivity of the puzzle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.compile">
+<code class="sig-name descname">compile</code><span class="sig-paren">(</span><em class="sig-param">objFunc</em>, <em class="sig-param">optimizer</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.compile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method compiles the objective function and optimization method into the Puzzle instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.drop">
+<code class="sig-name descname">drop</code><span class="sig-paren">(</span><em class="sig-param">word=None</em>, <em class="sig-param">divij=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.drop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.firstSolve">
+<code class="sig-name descname">firstSolve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.firstSolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.firstSolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method creates an initial solution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.getLatest">
+<code class="sig-name descname">getLatest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.getLatest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.getLatest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.getNext">
+<code class="sig-name descname">getNext</code><span class="sig-paren">(</span><em class="sig-param">n=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.getNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.getNext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.getPrev">
+<code class="sig-name descname">getPrev</code><span class="sig-paren">(</span><em class="sig-param">n=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.getPrev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.getPrev" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.getRect">
+<code class="sig-name descname">getRect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.getRect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.getRect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.importDict">
+<code class="sig-name descname">importDict</code><span class="sig-paren">(</span><em class="sig-param">dictionary</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.importDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.importDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method imports Dictionary to Puzzle</p>
+<dl class="simple">
+<dt>dictionary<span class="classifier">Dictionary</span></dt><dd><p>Dictionary object imported by Puzzle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.in_ipynb">
+<code class="sig-name descname">in_ipynb</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.in_ipynb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.in_ipynb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Are we in a jupyter notebook?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.isEnabledAdd">
+<code class="sig-name descname">isEnabledAdd</code><span class="sig-paren">(</span><em class="sig-param">div</em>, <em class="sig-param">i</em>, <em class="sig-param">j</em>, <em class="sig-param">word</em>, <em class="sig-param">wLen</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.isEnabledAdd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.isEnabledAdd" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method determines if a word can be placed</p>
+<dl class="simple">
+<dt>div<span class="classifier">int</span></dt><dd><p>direction of the word (0:Vertical, 1:Horizontal)</p>
+</dd>
+<dt>i<span class="classifier">int</span></dt><dd><p>row number of the word</p>
+</dd>
+<dt>j<span class="classifier">int</span></dt><dd><p>col number of the word</p>
+</dd>
+<dt>word<span class="classifier">str</span></dt><dd><p>The word to be checked whether it can be added</p>
+</dd>
+<dt>wLen<span class="classifier">int</span></dt><dd><p>length of the word</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>result-number<span class="classifier">int</span></dt><dd><p>number of the judgment result</p>
+</dd>
+</dl>
+<p>The result number corresponds to the judgment result
+0. The word can be placed (only succeeded)
+1. The preceding and succeeding cells are already filled
+2. At least one place must cross other words
+3. Not a correct intersection
+4. The same word is in use
+5. The Neighbor cells are filled except at the intersection
+6. US/USA, DOMINICA/DOMINICAN problem</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.isSimpleSol">
+<code class="sig-name descname">isSimpleSol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.isSimpleSol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.isSimpleSol" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method determines whether it is the simple solution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.jump">
+<code class="sig-name descname">jump</code><span class="sig-paren">(</span><em class="sig-param">idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.jump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.jump" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.kick">
+<code class="sig-name descname">kick</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.kick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.kick" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method kicks elements except largest CCL</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.logging">
+<code class="sig-name descname">logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method logs the current objective function values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.move">
+<code class="sig-name descname">move</code><span class="sig-paren">(</span><em class="sig-param">direction</em>, <em class="sig-param">n=0</em>, <em class="sig-param">limit=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.reinit">
+<code class="sig-name descname">reinit</code><span class="sig-paren">(</span><em class="sig-param">all=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.reinit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.reinit" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method reinitilize Puzzle informations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.saveAnswerImage">
+<code class="sig-name descname">saveAnswerImage</code><span class="sig-paren">(</span><em class="sig-param">fpath='answer.png'</em>, <em class="sig-param">list_label='[Word List]'</em>, <em class="sig-param">dpi=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.saveAnswerImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.saveAnswerImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method generates and returns a puzzle answer with a word list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.saveImage">
+<code class="sig-name descname">saveImage</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">fpath</em>, <em class="sig-param">list_label='[Word List]'</em>, <em class="sig-param">dpi=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.saveImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.saveImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method generates and returns a puzzle image with a word list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.saveProblemImage">
+<code class="sig-name descname">saveProblemImage</code><span class="sig-paren">(</span><em class="sig-param">fpath='problem.png'</em>, <em class="sig-param">list_label='[Word List]'</em>, <em class="sig-param">dpi=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.saveProblemImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.saveProblemImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method generates and returns a puzzle problem with a word list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><em class="sig-param">ndarray=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method displays a puzzle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.showLog">
+<code class="sig-name descname">showLog</code><span class="sig-paren">(</span><em class="sig-param">title=&quot;Objective Function's time series&quot;</em>, <em class="sig-param">grid=True</em>, <em class="sig-param">figsize=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.showLog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.showLog" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method shows log of objective functions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.solve">
+<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param">epoch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method repeats the solution improvement by the specified number of epochs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyzzle.Puzzle.Puzzle.toPickle">
+<code class="sig-name descname">toPickle</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyzzle/Puzzle.html#Puzzle.toPickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.toPickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method saves Puzzle object as a binary file</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="_gen/pyzzle.Puzzle.Puzzle.html" class="btn btn-neutral float-right" title="Puzzle" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pyzzle.html" class="btn btn-neutral float-left" title="pyzzle" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Tsukada and Nishijima
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
