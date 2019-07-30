@@ -14,6 +14,7 @@ ipynbファイルから変換したpyファイルを, 指定したパッケー�
 
 import os
 import argparse
+from pathlib import Path
 
 # In[]
 parser = argparse.ArgumentParser(description="convert ipynb.py to .py with given package_name")
@@ -29,9 +30,11 @@ args = parser.parse_args()
 
 # settings
 ipynbpy = args.ipynbpy
-package_name = args.name
+package_path = args.name
 additional_ipynbpy = args.add
 not_ignore = args.notignore
+
+package_name = Path(package_path).name
 
 # open
 with open(ipynbpy, encoding='utf-8') as f:
@@ -138,19 +141,19 @@ for class_num in range(len(class_names)):
     import_lines[class_num].append("\n")
 
 ## output
-os.makedirs(package_name, exist_ok=True)
+os.makedirs(package_path, exist_ok=True)
 # __init__.py
-with open(f'{package_name}/__init__.py', 'w', encoding='utf-8') as of:
+with open(f'{package_path}/__init__.py', 'w', encoding='utf-8') as of:
     for class_name in class_names:
         of.write(f"from {package_name}.{class_name} import {class_name}\n")
 # class_name.py
 for class_num, class_name in enumerate(class_names):
-    with open(f'{package_name}/{class_name}.py', 'w', encoding='utf-8') as of:
+    with open(f'{package_path}/{class_name}.py', 'w', encoding='utf-8') as of:
         for import_line in import_lines[class_num]:
             of.write(import_line)
         for class_line in class_lines[class_num]:
             of.write(class_line)
 # .gitignore
 if not_ignore is False:
-    with open(f'{package_name}/.gitignore', 'w', encoding='utf-8') as of:
+    with open(f'{package_path}/.gitignore', 'w', encoding='utf-8') as of:
         of.write(f"__pycache__/\n")
