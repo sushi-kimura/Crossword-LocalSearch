@@ -65,6 +65,11 @@ class Puzzle:
     def reinit(self, all=False):
         """
         This method reinitilize Puzzle informations
+
+        Parameters
+        ----------
+        all : bool default False
+            Reinitilize completely if all is True
         """
         if all is True:
             self.dic = None
@@ -86,7 +91,7 @@ class Puzzle:
         self.epoch = 0
         self.firstSolved = False
         self.initSeed = None
-    
+
     def in_ipynb(self):
         """
         Are we in a jupyter notebook?
@@ -115,11 +120,11 @@ class Puzzle:
         Parameters
         ----------
         div : int
-            direction of the word (0:Vertical, 1:Horizontal)
+            Direction of the word (0:Vertical, 1:Horizontal)
         i : int
-            row number of the word
+            Row number of the word
         j : int
-            col number of the word
+            Col number of the word
         word : str
             The word to be checked whether it can be added
         wLen : int
@@ -127,8 +132,8 @@ class Puzzle:
 
         Returns
         -------
-        result-number : int
-            number of the judgment result
+        result : int
+            Number of the judgment result
 
         Notes
         -----
@@ -145,7 +150,7 @@ class Puzzle:
             empties = self.cell[i:i+wLen, j] == ""
         if div == 1:
             empties = self.cell[i, j:j+wLen] == ""
-            
+
         # If 0 words used, return True
         if self.solSize is 0:
             return 0
@@ -161,11 +166,11 @@ class Puzzle:
                 return 1
             if j+wLen < self.width and self.cell[i, j+wLen] != "":
                 return 1
-            
+
         # At least one place must cross other words
         if np.all(empties == True):
             return 2
-            
+
         # Judge whether correct intersection
         where = np.where(empties == False)[0]
         if div == 0:
@@ -176,7 +181,7 @@ class Puzzle:
             iall = np.full(where.size, i, dtype="int")
             if np.any(self.cell[iall, where+j] != np.array(list(word))[where]):
                 return 3
-            
+
         # If the same word is in use, return False
         if word in self.usedWords:
             return 4
@@ -199,7 +204,7 @@ class Puzzle:
             # Lower
             if i < self.height-1 and np.any(self.cell[iall+1, where+j] != ""):
                 return 5
-        
+
         # US/USA, DOMINICA/DOMINICAN problem
         if div == 0:
             if np.any(self.enable[i:i+wLen, j] == False) or np.all(empties == False):
@@ -213,7 +218,19 @@ class Puzzle:
 
     def _add(self, div, i, j, k):
         """
-        This method places a word at arbitrary positions. If it can not be arranged, nothing is done.
+        This internal method places a word at arbitrary positions.
+        If it can not be arranged, nothing is done.
+
+        Parameters
+        ----------
+        div : int
+            Direction of the word (0:Vertical, 1:Horizontal)
+        i : int
+            Row number of the word
+        j : int
+            Col number of the word
+        k : int
+            The number of the word registered in Placeable
         """
         word = self.dic.word[k]
         weight = self.dic.weight[k]
@@ -223,7 +240,7 @@ class Puzzle:
         code = self.isEnabledAdd(div, i, j, word, wLen)
         if code is not 0:
             return code
-        
+
         # Put the word to puzzle
         if div == 0:
             self.cell[i:i+wLen, j] = list(word)[0:wLen]
@@ -241,13 +258,13 @@ class Puzzle:
                 self.enable[i, j-1] = False
             if j+wLen < self.width:
                 self.enable[i, j+wLen] = False
-        
+
         # Update cover array
         if div == 0:
             self.cover[i:i+wLen, j] += 1
         if div == 1:
             self.cover[i, j:j+wLen] += 1
-        
+
         # Update properties
         wordIdx = self.dic.word.index(word)
         self.usedPlcIdx[self.solSize] = self.plc.invP[div, i, j, wordIdx]
@@ -256,7 +273,7 @@ class Puzzle:
         self.totalWeight += weight
         self.history.append((1, wordIdx, div, i, j))
         return 0
-    
+
     def add(self, div, i, j, word, weight=0):
         if type(word) is int:
             k = word
@@ -270,12 +287,12 @@ class Puzzle:
 
     def addToLimit(self):
         """
-        This method adds the words as much as possible 
+        This method adds the words as much as possible
         """
         # Make a random index of plc
         randomIndex = np.arange(self.plc.size)
         np.random.shuffle(randomIndex)
-        
+
         # Add as much as possible
         solSizeTmp = None
         while self.solSize != solSizeTmp:
@@ -295,7 +312,7 @@ class Puzzle:
         # Check the firstSolved
         if self.firstSolved:
             raise RuntimeError("'firstSolve' method has already called")
-            
+
         # Save initial seed number
         self.initSeed = np.random.get_state()[1][0]
         # Add as much as possible
@@ -305,6 +322,12 @@ class Puzzle:
     def show(self, ndarray=None):
         """
         This method displays a puzzle
+
+        Parameters
+        ----------
+        ndarray : ndarray, optional
+            A Numpy.ndarray for display.
+            If not specified, it thought to slef.cell
         """
         if ndarray is None:
             ndarray = self.cell
@@ -328,14 +351,24 @@ class Puzzle:
             ]
             df = pd.DataFrame(ndarray)
             df = (df.style.set_table_styles(styles).set_caption(f"Puzzle({self.width},{self.height}), solSize:{self.solSize}, Dictionary:[{self.dic.fpath}]"))
-            display(df) 
+            display(df)
         else:
             ndarray = np.where(ndarray=="", "  ", ndarray)
             print(ndarray)
 
     def DFS(self, i, j, ccl):
         """
-        This method performs a Depth-First Search and labels each connected component
+        This method performs a Depth-First Search and
+        labelseach connected component.
+
+        Parameters
+        ----------
+        i : int
+            Row number of the word.
+        j : int
+            Col number of the word.
+        ccl : int
+            The first connected component label.
         """
         self.coverDFS[i,j] = ccl
         if i>0 and self.coverDFS[i-1, j] == 1:
@@ -361,13 +394,32 @@ class Puzzle:
 
     def _drop(self, div, i, j, k, isKick=False):
         """
-        This method removes the specified word from the puzzle.
-        Note: This method pulls out the specified word without taking it into consideration, which may break the connectivity of the puzzle or cause LAOS / US / USA problems.
+        This internal method removes the specified word from the puzzle.
+
+        Parametes
+        ----------
+        div : int
+            Direction of the word (0:Vertical, 1:Horizontal)
+        i : int
+            Row number of the word
+        j : int
+            Col number of the word
+        k : int
+            The number of the word registered in Placeable
+        isKick : bool default False
+            If this dropping is in the kick process, it should be True.
+            This information is used in making ``history``.
+
+        Notes
+        -----
+        This method pulls out the specified word without taking it
+        into consideration, which may break the connectivity of the puzzle
+        or cause LAOS / US / USA problems.
         """
         # Get p, pidx
         p = self.plc.invP[div, i, j, k]
         pidx = np.where(self.usedPlcIdx == p)[0][0]
-        
+
         wLen = self.dic.wLen[k]
         weight = self.dic.weight[k]
         # Pull out a word
@@ -433,27 +485,42 @@ class Puzzle:
                     self.enable[i,j+wLen] = True
 
     def drop(self, word=None, divij=None):
+        """
+        This method removes the specified word from the puzzle.
+
+        Parametes
+        ----------
+        word : int or str
+            The word number or word in the puzlle to drop.
+        divij : tuple of int, optional
+            Tuple indicating a specific word to drop.
+
+        Notes
+        -----
+        This method pulls out the specified word without taking it
+        into consideration, which may break the connectivity of the puzzle
+        or cause LAOS / US / USA problems.
+        """
         if word is None and divij is None:
-            raise ValueError()
-        if word is not None: 
+            raise ValueError("'word' or 'divij' must be specified")
+        if word is not None:
             if type(word) is int:
                 k = word
             elif type(word) is str:
                 k = self.dic.word.index(word)
             else:
-                raise TypeError()
+                raise TypeError("'word' must be int or str")
             for p in self.usedPlcIdx:
                 if self.plc.k[p] == k:
                     div = self.plc.div[p]
                     i = self.plc.i[p]
                     j = self.plc.j[p]
                     break
-        else:
-            if type(divij) not in(list, tuple):
-                raise TypeError()
+        if divij is not None:
+            if type(divij) not in (list, tuple):
+                raise TypeError(f"divij must be list or tuple")
             if len(divij) is not 3:
-                raise TypeError()
-            div,i,j = divij
+                raise ValueError(f"Length of 'divij' must be 3, not {len(divij)}")
             for p in self.usedPlcIdx:
                 _div = self.plc.div[p]
                 _i = self.plc.i[p]
@@ -461,20 +528,20 @@ class Puzzle:
                 if _div == divij[0] and _i == divij[1] and _j == divij[2]:
                     k = puzzle.plc.k[p]
                     break
-        self._drop(div, i, j, k)
+        self._drop(divij[0], divij[1], divij[2], k)
 
     def collapse(self):
         """
-        This method collapses connectivity of the puzzle
+        This method collapses connectivity of the puzzle.
         """
         # If solSize = 0, return
         if self.solSize == 0:
             return
-        
-        # Make a random index of solSize  
+
+        # Make a random index of solSize
         randomIndex = np.arange(self.solSize)
         np.random.shuffle(randomIndex)
-        
+
         # Drop words until connectivity collapses
         tmpUsedPlcIdx = copy.deepcopy(self.usedPlcIdx)
         for r, p in enumerate(tmpUsedPlcIdx[randomIndex]):
@@ -491,7 +558,7 @@ class Puzzle:
             if div == 1:
                 if not np.any(np.diff(np.where(self.cover[i,j:j+wLen] == 2)[0]) == 1):
                     self._drop(div, i, j, k)
-            
+
             # End with connectivity breakdown
             self.coverDFS = np.where(self.cover >= 1, 1, 0)
             self.ccl = 2
@@ -504,7 +571,7 @@ class Puzzle:
 
     def kick(self):
         """
-        This method kicks elements except largest CCL
+        This method kicks elements except largest CCL.
         """
         # If solSize = 0, return
         if self.solSize == 0:
@@ -515,7 +582,7 @@ class Puzzle:
         for c in range(self.ccl-2):
             cclScores[c] = np.sum(np.where(self.coverDFS == c+2, self.cover, 0))
         largestCCL = np.argmax(cclScores) + 2
-        
+
         # Erase elements except CCL ('kick' in C-program)
         for idx, p in enumerate(self.usedPlcIdx[:self.solSize]):
             if p == -1:
@@ -525,11 +592,19 @@ class Puzzle:
 
     def compile(self, objFunc, optimizer, msg=True):
         """
-        This method compiles the objective function and optimization method into the Puzzle instance
+        This method compiles the objective function and
+        optimization method into the Puzzle instance.
+
+        Parameters
+        ----------
+        objFunc : ObjectiveFunction
+            ObjectiveFunction object for compile to Puzzle
+        optimizer : Optimizer
+            Optimizer object for compile to Puzzle
         """
         self.objFunc = objFunc
         self.optimizer = optimizer
-        
+
         if msg is True:
             print("compile succeeded.")
             print(" --- objective functions:")
@@ -539,7 +614,13 @@ class Puzzle:
 
     def solve(self, epoch):
         """
-        This method repeats the solution improvement by the specified number of epochs
+        This method repeats the solution improvement by
+        the specified number of epoch.
+
+        Parameters
+        ----------
+        epoch : int
+            The number of epoch
         """
         if self.firstSolved is False:
             raise RuntimeError("'firstSolve' method has not called")
@@ -548,13 +629,29 @@ class Puzzle:
         exec(f"self.optimizer.{self.optimizer.method}(self, {epoch})")
         print(" --- done")
 
-    def showLog(self, title="Objective Function's time series", grid=True, figsize=None):
+    def showLog(self, title="Objective Function's time series", grid=True, **kwargs):
         """
-        This method shows log of objective functions
+        This method shows log of objective functions.
+
+        Parameters
+        ----------
+        title : str default "Objective Function's time series"
+            title of figure
+        grid : bool default True
+            grid on/off
+
+        Returns
+        -------
+        ax : Axes
+            Axes object plotted logs Pandas.DataFrame.plot
+
+        See Also
+        --------
+        Pandas.DataFrame.plot
         """
         if self.log is None:
             raise RuntimeError("Puzzle has no log")
-        return self.log.plot(subplots=True, title=title, grid=grid, figsize=figsize)
+        return self.log.plot(subplots=True, title=title, grid=grid, figsize=figsize, **kwargs)
 
     def isSimpleSol(self):
         """
@@ -654,7 +751,7 @@ class Puzzle:
         """
         data = self.cell
         self.saveImage(data, fpath, list_label, dpi)
-    
+
     def jump(self, idx):
         tmp_puzzle = self.__class__(self.width, self.height, self.title, msg=False)
         tmp_puzzle.dic = copy.deepcopy(self.dic)
@@ -662,7 +759,7 @@ class Puzzle:
         tmp_puzzle.optimizer = copy.deepcopy(self.optimizer)
         tmp_puzzle.objFunc = copy.deepcopy(self.objFunc)
         tmp_puzzle.baseHistory = copy.deepcopy(self.baseHistory)
-        
+
         if set(self.history).issubset(self.baseHistory) is False:
             if idx <= len(self.history):
                 tmp_puzzle.baseHistory = copy.deepcopy(self.history)
@@ -702,7 +799,7 @@ class Puzzle:
             pickle.dump(self, f)
         if msg is True:
             print(f"Puzzle has pickled to the path '{name}'")
-    
+
     def getRect(self):
         rows = np.any(self.cover, axis=1)
         cols = np.any(self.cover, axis=0)
@@ -723,7 +820,7 @@ class Puzzle:
             n = -n
         if limit is True:
             n2limit = {1:rmin, 2:self.height-(rmax+1), 3:cmin, 4:self.width-(cmax+1)}
-            n = n2limit[direction] 
+            n = n2limit[direction]
 
         if direction is 1:
             if rmin < n:
@@ -763,5 +860,3 @@ class Puzzle:
                 self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]+n, self.plc.k[p]]
 
         self.history.append((4, direction, n))
-
-

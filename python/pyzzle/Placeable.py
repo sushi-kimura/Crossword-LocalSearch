@@ -8,7 +8,7 @@ class Placeable:
         self.height = height
         self.div, self.i, self.j, self.k = [], [], [], []
         self.invP = np.full((2, self.height, self.width, 0), np.nan, dtype="int")
-        
+
         self._compute(dic.word)
 
         if msg is True:
@@ -46,5 +46,3 @@ class Placeable:
             return {"div": self.div[key], "i": self.i[key], "j": self.j[key], "k": self.k[key]}
         if type(key) is str:
             return eval(f"self.{key}")
-
-

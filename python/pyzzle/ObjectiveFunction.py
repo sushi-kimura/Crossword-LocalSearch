@@ -82,5 +82,3 @@ class ObjectiveFunction:
         if func is None:
             func = self.registeredFuncs[i]
         return eval(f"self.{func}(puzzle)")
-
-

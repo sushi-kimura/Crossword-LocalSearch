@@ -27,16 +27,17 @@ class Dictionary:
 
     def __getitem__(self, key):
         return {'word': self.word[key], 'weight': self.weight[key], 'len': self.wLen[key]}
-    
+
     def __str__(self):
         return self.name
-    
+
     def __len__(self):
         return self.size
 
     def getK(self, word):
+
         return np.where(self.word == word)[0][0]
-    
+
     def include(self, word):
         return word in self.word
 
@@ -120,5 +121,3 @@ class Dictionary:
             idx = sorted(range(self.size), key=lambda k: self.weight[k], reverse=True)[:5]
             print("TOP 5 words:")
             print(np.array(self.word)[idx])
-
-

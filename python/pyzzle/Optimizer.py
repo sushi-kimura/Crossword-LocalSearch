@@ -8,7 +8,7 @@ class Optimizer:
         if msg is True:
             print("Optimizer object has made.")
 
-    def getNeighborSolution(self, puzzle):   
+    def getNeighborSolution(self, puzzle):
         """
         This method gets the neighborhood solution
         """
@@ -18,7 +18,7 @@ class Optimizer:
         _puzzle.collapse()
         # Kick
         _puzzle.kick()
-        # Add as much as possible 
+        # Add as much as possible
         _puzzle.addToLimit()
         return _puzzle
 
@@ -40,7 +40,7 @@ class Optimizer:
             print(f">>> Epoch {_puzzle.epoch}/{goalEpoch}")
             # Get neighbor solution by drop->kick->add
             newPuzzle = self.getNeighborSolution(_puzzle)
-            
+
             # Repeat if the score is high
             for funcNum in range(len(_puzzle.objFunc)):
                 prevScore = _puzzle.objFunc.getScore(_puzzle, funcNum)
@@ -89,5 +89,3 @@ class Optimizer:
         if msg is True:
             print(f" - '{methodName}' method has registered.")
         self.method = methodName
-
-
