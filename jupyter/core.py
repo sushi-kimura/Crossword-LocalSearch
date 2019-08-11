@@ -96,6 +96,11 @@ class Puzzle:
     def reinit(self, all=False):
         """
         This method reinitilize Puzzle informations
+        
+        Parameters
+        ----------
+        all : bool default False
+            Reinitilize completely if all is True
         """
         if all is True:
             self.dic = None
@@ -146,11 +151,11 @@ class Puzzle:
         Parameters
         ----------
         div : int
-            direction of the word (0:Vertical, 1:Horizontal)
+            Direction of the word (0:Vertical, 1:Horizontal)
         i : int
-            row number of the word
+            Row number of the word
         j : int
-            col number of the word
+            Col number of the word
         word : str
             The word to be checked whether it can be added
         wLen : int
@@ -159,7 +164,7 @@ class Puzzle:
         Returns
         -------
         result-number : int
-            number of the judgment result
+            Number of the judgment result
 
         Notes
         -----
@@ -244,7 +249,19 @@ class Puzzle:
 
     def _add(self, div, i, j, k):
         """
-        This method places a word at arbitrary positions. If it can not be arranged, nothing is done.
+        This internal method places a word at arbitrary positions.
+        If it can not be arranged, nothing is done.
+        
+        Parameters
+        ----------
+        div : int
+            Direction of the word (0:Vertical, 1:Horizontal)
+        i : int
+            Row number of the word
+        j : int
+            Col number of the word
+        k : int
+            The number of the word registered in Placeable
         """
         word = self.dic.word[k]
         weight = self.dic.weight[k]
@@ -301,7 +318,7 @@ class Puzzle:
 
     def addToLimit(self):
         """
-        This method adds the words as much as possible 
+        This method adds the words as much as possible
         """
         # Make a random index of plc
         randomIndex = np.arange(self.plc.size)
@@ -336,6 +353,12 @@ class Puzzle:
     def show(self, ndarray=None):
         """
         This method displays a puzzle
+        
+        Parameters
+        ----------
+        ndarray : ndarray, optional
+            A Numpy.ndarray for display.
+            If not specified, it thought to slef.cell
         """
         if ndarray is None:
             ndarray = self.cell
@@ -366,7 +389,17 @@ class Puzzle:
 
     def DFS(self, i, j, ccl):
         """
-        This method performs a Depth-First Search and labels each connected component
+        This method performs a Depth-First Search and
+        labelseach connected component.
+        
+        Parameters
+        ----------
+        i : int
+            Row number of the word.
+        j : int
+            Col number of the word.
+        ccl : int
+            The first connected component label.
         """
         self.coverDFS[i,j] = ccl
         if i>0 and self.coverDFS[i-1, j] == 1:
@@ -392,8 +425,27 @@ class Puzzle:
 
     def _drop(self, div, i, j, k, isKick=False):
         """
-        This method removes the specified word from the puzzle.
-        Note: This method pulls out the specified word without taking it into consideration, which may break the connectivity of the puzzle or cause LAOS / US / USA problems.
+        This internal method removes the specified word from the puzzle.
+        
+        Parametes
+        ----------
+        div : int
+            Direction of the word (0:Vertical, 1:Horizontal)
+        i : int
+            Row number of the word
+        j : int
+            Col number of the word
+        k : int
+            The number of the word registered in Placeable
+        isKick : bool default False
+            If this dropping is in the kick process, it should be True.
+            This information is used in making ``history``.
+    
+        Notes
+        -----
+        This method pulls out the specified word without taking it
+        into consideration, which may break the connectivity of the puzzle 
+        or cause LAOS / US / USA problems.
         """
         # Get p, pidx
         p = self.plc.invP[div, i, j, k]
@@ -464,6 +516,16 @@ class Puzzle:
                     self.enable[i,j+wLen] = True
 
     def drop(self, word=None, divij=None):
+        """
+        This method removes the specified word from the puzzle.
+        
+        
+        Notes
+        -----
+        This method pulls out the specified word without taking it
+        into consideration, which may break the connectivity of the puzzle 
+        or cause LAOS / US / USA problems.
+        """
         if word is None and divij is None:
             raise ValueError()
         if word is not None: 
