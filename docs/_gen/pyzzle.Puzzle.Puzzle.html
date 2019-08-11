@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Puzzle &mdash; pyzzle 0.9.0 documentation</title>
+  <title>pyzzle.Puzzle.Puzzle &mdash; pyzzle 0.9.0 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Placeable" href="../pyzzle.Placeable.html" />
-    <link rel="prev" title="Puzzle" href="../pyzzle.Puzzle.html" /> 
+    <link rel="next" title="pyzzle.Placeable module" href="../pyzzle.Placeable.html" />
+    <link rel="prev" title="pyzzle.Puzzle module" href="../pyzzle.Puzzle.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,14 +83,15 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../pyzzle.html">pyzzle</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../pyzzle.Puzzle.html">Puzzle</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Puzzle</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../pyzzle.Puzzle.html">pyzzle.Puzzle module</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyzzle.Puzzle.Puzzle</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../pyzzle.Placeable.html">Placeable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pyzzle.Dictionary.html">Dictionary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pyzzle.ObjectiveFunction.html">ObjectiveFunction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pyzzle.Optimizer.html">Optimizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pyzzle.Placeable.html">pyzzle.Placeable module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pyzzle.Dictionary.html">pyzzle.Dictionary module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pyzzle.ObjectiveFunction.html">pyzzle.ObjectiveFunction module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pyzzle.Optimizer.html">pyzzle.Optimizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pyzzle.html#module-pyzzle">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -140,9 +141,9 @@
         
           <li><a href="../pyzzle.html">pyzzle</a> &raquo;</li>
         
-          <li><a href="../pyzzle.Puzzle.html">Puzzle</a> &raquo;</li>
+          <li><a href="../pyzzle.Puzzle.html">pyzzle.Puzzle module</a> &raquo;</li>
         
-      <li>Puzzle</li>
+      <li>pyzzle.Puzzle.Puzzle</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -161,12 +162,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="puzzle">
-<h1>Puzzle<a class="headerlink" href="#puzzle" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pyzzle-puzzle-puzzle">
+<h1>pyzzle.Puzzle.Puzzle<a class="headerlink" href="#pyzzle-puzzle-puzzle" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pyzzle.Puzzle.Puzzle">
 <em class="property">class </em><code class="sig-prename descclassname">pyzzle.Puzzle.</code><code class="sig-name descname">Puzzle</code><span class="sig-paren">(</span><em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">title='Criss Cross'</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyzzle/Puzzle.html#Puzzle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>The Almighty Puzzle Class.
+Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyzzle</span> <span class="k">import</span> <span class="n">Puzzle</span>
+<span class="n">puzzle</span> <span class="o">=</span> <span class="n">Puzzle</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">puzzle</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;hoge&#39;</span><span class="p">)</span>
+<span class="n">puzzle</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;hotel&#39;</span><span class="p">)</span>
+<span class="n">puzzle</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="s1">&#39;gateball&#39;</span><span class="p">)</span>
+<span class="n">puzzle</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;elevetor&#39;</span><span class="p">)</span>
+<span class="n">puzzle</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">puzzle</span><span class="o">.</span><span class="n">saveProbremImage</span><span class="p">()</span>
+<span class="n">puzzle</span><span class="o">.</span><span class="n">saveAnswerImage</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
 <dt id="pyzzle.Puzzle.Puzzle.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">title='Criss Cross'</em>, <em class="sig-param">msg=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyzzle/Puzzle.html#Puzzle.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyzzle.Puzzle.Puzzle.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
@@ -180,7 +194,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.DFS" title="pyzzle.Puzzle.Puzzle.DFS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFS</span></code></a>(i, j, ccl)</p></td>
-<td><p>This method performs a Depth-First Search and labels each connected component</p></td>
+<td><p>This method performs a Depth-First Search and labelseach connected component.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyzzle.Puzzle.Puzzle.__init__" title="pyzzle.Puzzle.Puzzle.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(width, height[, title, msg])</p></td>
 <td><p>Initialize self.</p></td>
@@ -192,13 +206,13 @@
 <td><p>This method adds the words as much as possible</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.collapse" title="pyzzle.Puzzle.Puzzle.collapse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collapse</span></code></a>()</p></td>
-<td><p>This method collapses connectivity of the puzzle</p></td>
+<td><p>This method collapses connectivity of the puzzle.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.compile" title="pyzzle.Puzzle.Puzzle.compile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compile</span></code></a>(objFunc, optimizer[, msg])</p></td>
-<td><p>This method compiles the objective function and optimization method into the Puzzle instance</p></td>
+<td><p>This method compiles the objective function and optimization method into the Puzzle instance.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.drop" title="pyzzle.Puzzle.Puzzle.drop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop</span></code></a>([word, divij])</p></td>
-<td><p></p></td>
+<td><p>This method removes the specified word from the puzzle.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.firstSolve" title="pyzzle.Puzzle.Puzzle.firstSolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">firstSolve</span></code></a>()</p></td>
 <td><p>This method creates an initial solution</p></td>
@@ -231,7 +245,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.kick" title="pyzzle.Puzzle.Puzzle.kick"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kick</span></code></a>()</p></td>
-<td><p>This method kicks elements except largest CCL</p></td>
+<td><p>This method kicks elements except largest CCL.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.logging" title="pyzzle.Puzzle.Puzzle.logging"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logging</span></code></a>()</p></td>
 <td><p>This method logs the current objective function values</p></td>
@@ -254,11 +268,11 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.show" title="pyzzle.Puzzle.Puzzle.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a>([ndarray])</p></td>
 <td><p>This method displays a puzzle</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.showLog" title="pyzzle.Puzzle.Puzzle.showLog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showLog</span></code></a>([title, grid, figsize])</p></td>
-<td><p>This method shows log of objective functions</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.showLog" title="pyzzle.Puzzle.Puzzle.showLog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showLog</span></code></a>([title, grid])</p></td>
+<td><p>This method shows log of objective functions.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.solve" title="pyzzle.Puzzle.Puzzle.solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve</span></code></a>(epoch)</p></td>
-<td><p>This method repeats the solution improvement by the specified number of epochs</p></td>
+<td><p>This method repeats the solution improvement by the specified number of epoch.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.toPickle" title="pyzzle.Puzzle.Puzzle.toPickle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">toPickle</span></code></a>([name, msg])</p></td>
 <td><p>This method saves Puzzle object as a binary file</p></td>
@@ -277,10 +291,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../pyzzle.Placeable.html" class="btn btn-neutral float-right" title="Placeable" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../pyzzle.Placeable.html" class="btn btn-neutral float-right" title="pyzzle.Placeable module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../pyzzle.Puzzle.html" class="btn btn-neutral float-left" title="Puzzle" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../pyzzle.Puzzle.html" class="btn btn-neutral float-left" title="pyzzle.Puzzle module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

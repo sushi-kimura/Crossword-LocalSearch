@@ -1,4 +1,4 @@
-Placeable
+pyzzle.Placeable module
 =======================
 
 .. automodule:: pyzzle.Placeable

@@ -1,4 +1,4 @@
-Puzzle
+pyzzle.Puzzle module
 ====================
 
 .. automodule:: pyzzle.Puzzle

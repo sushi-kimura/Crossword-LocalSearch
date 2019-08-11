@@ -9,6 +9,9 @@ pyzzle
    pyzzle.ObjectiveFunction
    pyzzle.Optimizer
 
+Module contents
+---------------
+
 .. automodule:: pyzzle
    :members:
    :undoc-members:

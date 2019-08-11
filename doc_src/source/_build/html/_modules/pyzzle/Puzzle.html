@@ -144,22 +144,35 @@
            <div itemprop="articleBody">
             
   <h1>Source code for pyzzle.Puzzle</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">pyzzle.Placeable</span> <span class="k">import</span> <span class="n">Placeable</span>
 <span class="kn">from</span> <span class="nn">pyzzle.Dictionary</span> <span class="k">import</span> <span class="n">Dictionary</span>
 
 <div class="viewcode-block" id="Puzzle"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle">[docs]</a><span class="k">class</span> <span class="nc">Puzzle</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Almighty Puzzle Class.</span>
+<span class="sd">    Example usage::</span>
+<span class="sd">        from pyzzle import Puzzle</span>
+<span class="sd">        puzzle = Puzzle(8,8)</span>
+<span class="sd">        puzzle.add(0,0,0,&#39;hoge&#39;)</span>
+<span class="sd">        puzzle.add(1,0,0,&#39;hotel&#39;)</span>
+<span class="sd">        puzzle.add(1,0,2,&#39;gateball&#39;)</span>
+<span class="sd">        puzzle.add(0,3,0,&#39;elevetor&#39;)</span>
+<span class="sd">        puzzle.show()</span>
+<span class="sd">        puzzle.saveProbremImage()</span>
+<span class="sd">        puzzle.saveAnswerImage()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Puzzle.__init__"><a class="viewcode-back" href="../../_gen/pyzzle.Puzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Criss Cross&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
@@ -198,6 +211,11 @@
 <div class="viewcode-block" id="Puzzle.reinit"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.reinit">[docs]</a>    <span class="k">def</span> <span class="nf">reinit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">all</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method reinitilize Puzzle informations</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        all : bool default False</span>
+<span class="sd">            Reinitilize completely if all is True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">all</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dic</span> <span class="o">=</span> <span class="kc">None</span>
@@ -219,7 +237,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">firstSolved</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initSeed</span> <span class="o">=</span> <span class="kc">None</span></div>
-    
+
 <div class="viewcode-block" id="Puzzle.in_ipynb"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.in_ipynb">[docs]</a>    <span class="k">def</span> <span class="nf">in_ipynb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Are we in a jupyter notebook?</span>
@@ -248,11 +266,11 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        div : int</span>
-<span class="sd">            direction of the word (0:Vertical, 1:Horizontal)</span>
+<span class="sd">            Direction of the word (0:Vertical, 1:Horizontal)</span>
 <span class="sd">        i : int</span>
-<span class="sd">            row number of the word</span>
+<span class="sd">            Row number of the word</span>
 <span class="sd">        j : int</span>
-<span class="sd">            col number of the word</span>
+<span class="sd">            Col number of the word</span>
 <span class="sd">        word : str</span>
 <span class="sd">            The word to be checked whether it can be added</span>
 <span class="sd">        wLen : int</span>
@@ -260,8 +278,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        result-number : int</span>
-<span class="sd">            number of the judgment result</span>
+<span class="sd">        result : int</span>
+<span class="sd">            Number of the judgment result</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -278,7 +296,7 @@
             <span class="n">empties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">wLen</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">div</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">empties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="n">wLen</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span>
-            
+
         <span class="c1"># If 0 words used, return True</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solSize</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -294,11 +312,11 @@
                 <span class="k">return</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">j</span><span class="o">+</span><span class="n">wLen</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="n">wLen</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="mi">1</span>
-            
+
         <span class="c1"># At least one place must cross other words</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">empties</span> <span class="o">==</span> <span class="kc">True</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">2</span>
-            
+
         <span class="c1"># Judge whether correct intersection</span>
         <span class="n">where</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">empties</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">div</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -309,7 +327,7 @@
             <span class="n">iall</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">where</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="p">[</span><span class="n">iall</span><span class="p">,</span> <span class="n">where</span><span class="o">+</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">word</span><span class="p">))[</span><span class="n">where</span><span class="p">]):</span>
                 <span class="k">return</span> <span class="mi">3</span>
-            
+
         <span class="c1"># If the same word is in use, return False</span>
         <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">usedWords</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">4</span>
@@ -332,7 +350,7 @@
             <span class="c1"># Lower</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="p">[</span><span class="n">iall</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">where</span><span class="o">+</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
                 <span class="k">return</span> <span class="mi">5</span>
-        
+
         <span class="c1"># US/USA, DOMINICA/DOMINICAN problem</span>
         <span class="k">if</span> <span class="n">div</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">wLen</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">empties</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
@@ -346,7 +364,19 @@
 
     <span class="k">def</span> <span class="nf">_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method places a word at arbitrary positions. If it can not be arranged, nothing is done.</span>
+<span class="sd">        This internal method places a word at arbitrary positions.</span>
+<span class="sd">        If it can not be arranged, nothing is done.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        div : int</span>
+<span class="sd">            Direction of the word (0:Vertical, 1:Horizontal)</span>
+<span class="sd">        i : int</span>
+<span class="sd">            Row number of the word</span>
+<span class="sd">        j : int</span>
+<span class="sd">            Col number of the word</span>
+<span class="sd">        k : int</span>
+<span class="sd">            The number of the word registered in Placeable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">word</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dic</span><span class="o">.</span><span class="n">word</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="n">weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dic</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
@@ -356,7 +386,7 @@
         <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isEnabledAdd</span><span class="p">(</span><span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">wLen</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">code</span>
-        
+
         <span class="c1"># Put the word to puzzle</span>
         <span class="k">if</span> <span class="n">div</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cell</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">wLen</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">word</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="n">wLen</span><span class="p">]</span>
@@ -374,13 +404,13 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">j</span><span class="o">+</span><span class="n">wLen</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="n">wLen</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-        
+
         <span class="c1"># Update cover array</span>
         <span class="k">if</span> <span class="n">div</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cover</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">wLen</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">div</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cover</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="n">wLen</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-        
+
         <span class="c1"># Update properties</span>
         <span class="n">wordIdx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dic</span><span class="o">.</span><span class="n">word</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">usedPlcIdx</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">solSize</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">invP</span><span class="p">[</span><span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">wordIdx</span><span class="p">]</span>
@@ -389,7 +419,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">totalWeight</span> <span class="o">+=</span> <span class="n">weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">wordIdx</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
         <span class="k">return</span> <span class="mi">0</span>
-    
+
 <div class="viewcode-block" id="Puzzle.add"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
             <span class="n">k</span> <span class="o">=</span> <span class="n">word</span>
@@ -403,12 +433,12 @@
 
 <div class="viewcode-block" id="Puzzle.addToLimit"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.addToLimit">[docs]</a>    <span class="k">def</span> <span class="nf">addToLimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method adds the words as much as possible </span>
+<span class="sd">        This method adds the words as much as possible</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Make a random index of plc</span>
         <span class="n">randomIndex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">randomIndex</span><span class="p">)</span>
-        
+
         <span class="c1"># Add as much as possible</span>
         <span class="n">solSizeTmp</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">solSize</span> <span class="o">!=</span> <span class="n">solSizeTmp</span><span class="p">:</span>
@@ -428,7 +458,7 @@
         <span class="c1"># Check the firstSolved</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstSolved</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;&#39;firstSolve&#39; method has already called&quot;</span><span class="p">)</span>
-            
+
         <span class="c1"># Save initial seed number</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initSeed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">get_state</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># Add as much as possible</span>
@@ -438,6 +468,12 @@
 <div class="viewcode-block" id="Puzzle.show"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method displays a puzzle</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ndarray : ndarray, optional</span>
+<span class="sd">            A Numpy.ndarray for display.</span>
+<span class="sd">            If not specified, it thought to slef.cell</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">ndarray</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span>
@@ -461,14 +497,24 @@
             <span class="p">]</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ndarray</span><span class="p">)</span>
             <span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">set_table_styles</span><span class="p">(</span><span class="n">styles</span><span class="p">)</span><span class="o">.</span><span class="n">set_caption</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Puzzle(</span><span class="si">{self.width}</span><span class="s2">,</span><span class="si">{self.height}</span><span class="s2">), solSize:</span><span class="si">{self.solSize}</span><span class="s2">, Dictionary:[</span><span class="si">{self.dic.fpath}</span><span class="s2">]&quot;</span><span class="p">))</span>
-            <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> 
+            <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ndarray</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;  &quot;</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">ndarray</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Puzzle.DFS"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.DFS">[docs]</a>    <span class="k">def</span> <span class="nf">DFS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ccl</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method performs a Depth-First Search and labels each connected component</span>
+<span class="sd">        This method performs a Depth-First Search and</span>
+<span class="sd">        labelseach connected component.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        i : int</span>
+<span class="sd">            Row number of the word.</span>
+<span class="sd">        j : int</span>
+<span class="sd">            Col number of the word.</span>
+<span class="sd">        ccl : int</span>
+<span class="sd">            The first connected component label.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coverDFS</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccl</span>
         <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coverDFS</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -494,13 +540,32 @@
 
     <span class="k">def</span> <span class="nf">_drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">isKick</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method removes the specified word from the puzzle.</span>
-<span class="sd">        Note: This method pulls out the specified word without taking it into consideration, which may break the connectivity of the puzzle or cause LAOS / US / USA problems.</span>
+<span class="sd">        This internal method removes the specified word from the puzzle.</span>
+
+<span class="sd">        Parametes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        div : int</span>
+<span class="sd">            Direction of the word (0:Vertical, 1:Horizontal)</span>
+<span class="sd">        i : int</span>
+<span class="sd">            Row number of the word</span>
+<span class="sd">        j : int</span>
+<span class="sd">            Col number of the word</span>
+<span class="sd">        k : int</span>
+<span class="sd">            The number of the word registered in Placeable</span>
+<span class="sd">        isKick : bool default False</span>
+<span class="sd">            If this dropping is in the kick process, it should be True.</span>
+<span class="sd">            This information is used in making ``history``.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method pulls out the specified word without taking it</span>
+<span class="sd">        into consideration, which may break the connectivity of the puzzle</span>
+<span class="sd">        or cause LAOS / US / USA problems.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get p, pidx</span>
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">invP</span><span class="p">[</span><span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
         <span class="n">pidx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">usedPlcIdx</span> <span class="o">==</span> <span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        
+
         <span class="n">wLen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dic</span><span class="o">.</span><span class="n">wLen</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="n">weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dic</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="c1"># Pull out a word</span>
@@ -566,27 +631,42 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="n">wLen</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="Puzzle.drop"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.drop">[docs]</a>    <span class="k">def</span> <span class="nf">drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">divij</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method removes the specified word from the puzzle.</span>
+
+<span class="sd">        Parametes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        word : int or str</span>
+<span class="sd">            The word number or word in the puzlle to drop.</span>
+<span class="sd">        divij : tuple of int, optional</span>
+<span class="sd">            Tuple indicating a specific word to drop.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method pulls out the specified word without taking it</span>
+<span class="sd">        into consideration, which may break the connectivity of the puzzle</span>
+<span class="sd">        or cause LAOS / US / USA problems.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">word</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">divij</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">word</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;word&#39; or &#39;divij&#39; must be specified&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">word</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
                 <span class="n">k</span> <span class="o">=</span> <span class="n">word</span>
             <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
                 <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dic</span><span class="o">.</span><span class="n">word</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;word&#39; must be int or str&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">usedPlcIdx</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">==</span> <span class="n">k</span><span class="p">:</span>
                     <span class="n">div</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">div</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
                     <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
                     <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">j</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
                     <span class="k">break</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">divij</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">divij</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">divij</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;divij must be list or tuple&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">divij</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
-            <span class="n">div</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">divij</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Length of &#39;divij&#39; must be 3, not {len(divij)}&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">usedPlcIdx</span><span class="p">:</span>
                 <span class="n">_div</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">div</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
                 <span class="n">_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
@@ -594,20 +674,20 @@
                 <span class="k">if</span> <span class="n">_div</span> <span class="o">==</span> <span class="n">divij</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">_i</span> <span class="o">==</span> <span class="n">divij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">_j</span> <span class="o">==</span> <span class="n">divij</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
                     <span class="n">k</span> <span class="o">=</span> <span class="n">puzzle</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
                     <span class="k">break</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_drop</span><span class="p">(</span><span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drop</span><span class="p">(</span><span class="n">divij</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">divij</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">divij</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">k</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Puzzle.collapse"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.collapse">[docs]</a>    <span class="k">def</span> <span class="nf">collapse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method collapses connectivity of the puzzle</span>
+<span class="sd">        This method collapses connectivity of the puzzle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If solSize = 0, return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solSize</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
-        
-        <span class="c1"># Make a random index of solSize  </span>
+
+        <span class="c1"># Make a random index of solSize</span>
         <span class="n">randomIndex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solSize</span><span class="p">)</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">randomIndex</span><span class="p">)</span>
-        
+
         <span class="c1"># Drop words until connectivity collapses</span>
         <span class="n">tmpUsedPlcIdx</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">usedPlcIdx</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tmpUsedPlcIdx</span><span class="p">[</span><span class="n">randomIndex</span><span class="p">]):</span>
@@ -624,7 +704,7 @@
             <span class="k">if</span> <span class="n">div</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cover</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="n">wLen</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_drop</span><span class="p">(</span><span class="n">div</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
-            
+
             <span class="c1"># End with connectivity breakdown</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">coverDFS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cover</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ccl</span> <span class="o">=</span> <span class="mi">2</span>
@@ -637,7 +717,7 @@
 
 <div class="viewcode-block" id="Puzzle.kick"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.kick">[docs]</a>    <span class="k">def</span> <span class="nf">kick</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method kicks elements except largest CCL</span>
+<span class="sd">        This method kicks elements except largest CCL.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If solSize = 0, return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solSize</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -648,7 +728,7 @@
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ccl</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
             <span class="n">cclScores</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coverDFS</span> <span class="o">==</span> <span class="n">c</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cover</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="n">largestCCL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">cclScores</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
-        
+
         <span class="c1"># Erase elements except CCL (&#39;kick&#39; in C-program)</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">usedPlcIdx</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">solSize</span><span class="p">]):</span>
             <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
@@ -658,11 +738,19 @@
 
 <div class="viewcode-block" id="Puzzle.compile"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.compile">[docs]</a>    <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objFunc</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method compiles the objective function and optimization method into the Puzzle instance</span>
+<span class="sd">        This method compiles the objective function and</span>
+<span class="sd">        optimization method into the Puzzle instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        objFunc : ObjectiveFunction</span>
+<span class="sd">            ObjectiveFunction object for compile to Puzzle</span>
+<span class="sd">        optimizer : Optimizer</span>
+<span class="sd">            Optimizer object for compile to Puzzle</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">objFunc</span> <span class="o">=</span> <span class="n">objFunc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
-        
+
         <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;compile succeeded.&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; --- objective functions:&quot;</span><span class="p">)</span>
@@ -672,7 +760,13 @@
 
 <div class="viewcode-block" id="Puzzle.solve"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.solve">[docs]</a>    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method repeats the solution improvement by the specified number of epochs</span>
+<span class="sd">        This method repeats the solution improvement by</span>
+<span class="sd">        the specified number of epoch.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        epoch : int</span>
+<span class="sd">            The number of epoch</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">firstSolved</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;&#39;firstSolve&#39; method has not called&quot;</span><span class="p">)</span>
@@ -681,13 +775,29 @@
         <span class="n">exec</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;self.optimizer.</span><span class="si">{self.optimizer.method}</span><span class="s2">(self, </span><span class="si">{epoch}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; --- done&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Puzzle.showLog"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.showLog">[docs]</a>    <span class="k">def</span> <span class="nf">showLog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Objective Function&#39;s time series&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Puzzle.showLog"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.showLog">[docs]</a>    <span class="k">def</span> <span class="nf">showLog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Objective Function&#39;s time series&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method shows log of objective functions</span>
+<span class="sd">        This method shows log of objective functions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        title : str default &quot;Objective Function&#39;s time series&quot;</span>
+<span class="sd">            title of figure</span>
+<span class="sd">        grid : bool default True</span>
+<span class="sd">            grid on/off</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : Axes</span>
+<span class="sd">            Axes object plotted logs Pandas.DataFrame.plot</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        Pandas.DataFrame.plot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Puzzle has no log&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Puzzle.isSimpleSol"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.isSimpleSol">[docs]</a>    <span class="k">def</span> <span class="nf">isSimpleSol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -787,7 +897,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">saveImage</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fpath</span><span class="p">,</span> <span class="n">list_label</span><span class="p">,</span> <span class="n">dpi</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="Puzzle.jump"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.jump">[docs]</a>    <span class="k">def</span> <span class="nf">jump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="n">tmp_puzzle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">tmp_puzzle</span><span class="o">.</span><span class="n">dic</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dic</span><span class="p">)</span>
@@ -795,7 +905,7 @@
         <span class="n">tmp_puzzle</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
         <span class="n">tmp_puzzle</span><span class="o">.</span><span class="n">objFunc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objFunc</span><span class="p">)</span>
         <span class="n">tmp_puzzle</span><span class="o">.</span><span class="n">baseHistory</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseHistory</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseHistory</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">):</span>
                 <span class="n">tmp_puzzle</span><span class="o">.</span><span class="n">baseHistory</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
@@ -835,7 +945,7 @@
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Puzzle has pickled to the path &#39;</span><span class="si">{name}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="Puzzle.getRect"><a class="viewcode-back" href="../../pyzzle.Puzzle.html#pyzzle.Puzzle.Puzzle.getRect">[docs]</a>    <span class="k">def</span> <span class="nf">getRect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cover</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cover</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -856,7 +966,7 @@
             <span class="n">n</span> <span class="o">=</span> <span class="o">-</span><span class="n">n</span>
         <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">n2limit</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span><span class="n">rmin</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="o">-</span><span class="p">(</span><span class="n">rmax</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="mi">3</span><span class="p">:</span><span class="n">cmin</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="o">-</span><span class="p">(</span><span class="n">cmax</span><span class="o">+</span><span class="mi">1</span><span class="p">)}</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="n">n2limit</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span> 
+            <span class="n">n</span> <span class="o">=</span> <span class="n">n2limit</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">direction</span> <span class="ow">is</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">rmin</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
@@ -896,8 +1006,6 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">usedPlcIdx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">invP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">div</span><span class="p">[</span><span class="n">p</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">p</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">j</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">+</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plc</span><span class="o">.</span><span class="n">k</span><span class="p">[</span><span class="n">p</span><span class="p">]]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span></div></div>
-
-
 </pre></div>
 
            </div>

@@ -1,4 +1,4 @@
-ObjectiveFunction
+pyzzle.ObjectiveFunction module
 ===============================
 
 .. automodule:: pyzzle.ObjectiveFunction

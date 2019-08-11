@@ -1,18 +1,18 @@
-Puzzle
+pyzzle.Puzzle.Puzzle
 ====================
 
 .. currentmodule:: pyzzle.Puzzle
 
 .. autoclass:: Puzzle
 
-
+   
    .. automethod:: __init__
 
-
+   
    .. rubric:: Methods
 
    .. autosummary::
-
+   
       ~Puzzle.DFS
       ~Puzzle.__init__
       ~Puzzle.add
@@ -41,3 +41,9 @@ Puzzle
       ~Puzzle.showLog
       ~Puzzle.solve
       ~Puzzle.toPickle
+   
+   
+
+   
+   
+   

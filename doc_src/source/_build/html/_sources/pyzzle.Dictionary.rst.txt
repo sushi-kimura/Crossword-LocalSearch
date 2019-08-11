@@ -1,4 +1,4 @@
-Dictionary
+pyzzle.Dictionary module
 ========================
 
 .. automodule:: pyzzle.Dictionary
