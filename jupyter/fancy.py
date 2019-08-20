@@ -81,10 +81,9 @@ class FancyPuzzle(Puzzle):
         ax1.axis("off")
         ax2.axis("off")
         fig.set_facecolor('#EEEEEE')
+        
         # Draw puzzle
         ax1_table = ax1.table(cellText=df.values, cellColours=colors, cellLoc="center", bbox=[0, 0, 1, 1], fontsize=20)
-#         for _, cell in ax1_table.get_celld().items():
-#             cell.set_text_props(size=20)
         ax1.set_title(label=f"*** {self.title} ***", size=20)
         
         # delete unmasked cells
