@@ -1,5 +1,6 @@
 import itertools
 import numpy as np
+from scipy import ndimage
 
 
 class ObjectiveFunction:
@@ -49,13 +50,11 @@ class ObjectiveFunction:
         """
         This method returns the maximum number of concatenations for unfilled squares
         """
-        ccl = 2
-        puzzle.coverDFS = np.where(puzzle.cover == 0, 1, 0)
-        for i, j in itertools.product(range(puzzle.height), range(puzzle.width)):
-            if puzzle.coverDFS[i, j] == 1:
-                puzzle.DFS(i, j, ccl)
-                ccl += 1
-        score = puzzle.width*puzzle.height - np.max(np.bincount(puzzle.coverDFS.flatten())[1:])
+        reverse_cover = puzzle.cover < 1
+        zero_label, nlbl = ndimage.label(reverse_cover)
+        mask = zero_label > 0
+        sizes = ndimage.sum(mask, zero_label, range(nlbl+1))
+        score = puzzle.width*puzzle.height - sizes.max()
         return score
 
     def register(self, funcNames, msg=True):

@@ -104,7 +104,6 @@ print (f"e_time: {format(e_time)} s")
 # ## Sphinxドキュメントを更新
 # `conda install sphinx`と`pip install sphinx_rtd_theme`で必要ライブラリをインストールしてから次のセルを実行してください。
 
-# +
 ###開発中### nbsphinxの利用を検討中
 # os.chdir('../doc')
 # # !sphinx-build -b html ./source ./source/_build

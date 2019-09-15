@@ -67,7 +67,7 @@ class Optimizer:
         puzzle.enable = copy.deepcopy(_puzzle.enable)
         puzzle.cell = copy.deepcopy(_puzzle.cell)
         puzzle.cover = copy.deepcopy(_puzzle.cover)
-        puzzle.coverDFS = copy.deepcopy(_puzzle.coverDFS)
+        puzzle.label = copy.deepcopy(_puzzle.label)
         puzzle.usedWords = copy.deepcopy(_puzzle.usedWords)
         puzzle.usedPlcIdx = copy.deepcopy(_puzzle.usedPlcIdx)
         puzzle.solSize = copy.deepcopy(_puzzle.solSize)

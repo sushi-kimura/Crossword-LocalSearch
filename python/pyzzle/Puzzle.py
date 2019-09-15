@@ -1,14 +1,16 @@
-import math
-import itertools
+import os
+import copy
 import datetime
+import itertools
+import math
+import shutil
+
 import numpy as np
 import pandas as pd
-import os, shutil
-import copy
+from scipy import ndimage
 import matplotlib.pyplot as plt
 from IPython.display import display, HTML
 import pickle
-import os
 
 from pyzzle.Placeable import Placeable
 from pyzzle.Dictionary import Dictionary
@@ -34,7 +36,7 @@ class Puzzle:
         self.title = title
         self.cell = np.full(width * height, "", dtype="unicode").reshape(height, width)
         self.cover = np.zeros(width * height, dtype="int").reshape(height, width)
-        self.coverDFS = np.zeros(width * height, dtype="int").reshape(height, width)
+        self.label = np.zeros(width * height, dtype="int").reshape(height, width)
         self.enable = np.ones(width * height, dtype="bool").reshape(height, width)
         self.usedWords = np.full(width * height, "", dtype=f"U{max(width, height)}")
         self.usedPlcIdx = np.full(width * height, -1, dtype="int")
@@ -43,7 +45,7 @@ class Puzzle:
         self.baseHistory = []
         self.log = None
         self.epoch = 0
-        self.ccl = None
+        self.nlabel = None
         self.firstSolved = False
         self.initSeed = None
         self.dic = Dictionary(msg=False)
@@ -80,7 +82,7 @@ class Puzzle:
         self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
         self.cell = np.full(self.width*self.height, "", dtype="unicode").reshape(self.height, self.width)
         self.cover = np.zeros(self.width*self.height, dtype="int").reshape(self.height, self.width)
-        self.coverDFS = np.zeros(self.width*self.height, dtype="int").reshape(self.height, self.width)
+        self.label = np.zeros(self.width*self.height, dtype="int").reshape(self.height, self.width)
         self.enable = np.ones(self.width*self.height, dtype="bool").reshape(self.height, self.width)
         self.usedWords = np.full(self.width*self.height, "", dtype=f"U{max(self.width, self.height)}")
         self.usedPlcIdx = np.full(self.width*self.height, -1, dtype="int")
@@ -356,30 +358,6 @@ class Puzzle:
             ndarray = np.where(ndarray=="", "  ", ndarray)
             print(ndarray)
 
-    def DFS(self, i, j, ccl):
-        """
-        This method performs a Depth-First Search and
-        labelseach connected component.
-
-        Parameters
-        ----------
-        i : int
-            Row number of the word.
-        j : int
-            Col number of the word.
-        ccl : int
-            The first connected component label.
-        """
-        self.coverDFS[i,j] = ccl
-        if i>0 and self.coverDFS[i-1, j] == 1:
-            self.DFS(i-1, j, ccl)
-        if i<self.height-1 and self.coverDFS[i+1, j] == 1:
-            self.DFS(i+1, j, ccl)
-        if j>0 and self.coverDFS[i, j-1] == 1:
-            self.DFS(i, j-1, ccl)
-        if j<self.width-1 and self.coverDFS[i, j+1] == 1:
-            self.DFS(i, j+1, ccl)
-
     def logging(self):
         """
         This method logs the current objective function values
@@ -559,14 +537,8 @@ class Puzzle:
                 if not np.any(np.diff(np.where(self.cover[i,j:j+wLen] == 2)[0]) == 1):
                     self._drop(div, i, j, k)
 
-            # End with connectivity breakdown
-            self.coverDFS = np.where(self.cover >= 1, 1, 0)
-            self.ccl = 2
-            for i, j in itertools.product(range(self.height), range(self.width)):
-                if self.coverDFS[i,j] == 1:
-                    self.DFS(i, j, self.ccl)
-                    self.ccl += 1
-            if self.ccl-2 >= 2:
+            self.label, self.nlabel = ndimage.label(self.cover)
+            if self.nlabel >= 2:
                 break
 
     def kick(self):
@@ -577,17 +549,16 @@ class Puzzle:
         if self.solSize == 0:
             return
 
-        # Define 'largestCCL' witch has the largest score(fillCount+crossCount)
-        cclScores = np.zeros(self.ccl-2, dtype="int")
-        for c in range(self.ccl-2):
-            cclScores[c] = np.sum(np.where(self.coverDFS == c+2, self.cover, 0))
-        largestCCL = np.argmax(cclScores) + 2
+        mask = self.cover > 0
+        self.label, self.nlabel = ndimage.label(mask)
+        sizes = ndimage.sum(mask, self.label, range(self.nlabel+1))
+        largestCCL = sizes.argmax()
 
         # Erase elements except CCL ('kick' in C-program)
         for idx, p in enumerate(self.usedPlcIdx[:self.solSize]):
             if p == -1:
                 continue
-            if self.coverDFS[self.plc.i[p], self.plc.j[p]] != largestCCL:
+            if self.label[self.plc.i[p], self.plc.j[p]] != largestCCL:
                 self._drop(self.plc.div[p], self.plc.i[p], self.plc.j[p], self.plc.k[p], isKick=True)
 
     def compile(self, objFunc, optimizer, msg=True):
@@ -827,7 +798,7 @@ class Puzzle:
                 raise RuntimeError()
             self.cell = np.roll(self.cell, -n, axis=0)
             self.cover = np.roll(self.cover, -n, axis=0)
-            self.coverDFS = np.roll(self.coverDFS, -n, axis=0)
+            self.label = np.roll(self.label, -n, axis=0)
             self.enable = np.roll(self.enable, -n, axis=0)
             for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
                 self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p]-n, self.plc.j[p], self.plc.k[p]]
@@ -836,7 +807,7 @@ class Puzzle:
                 raise RuntimeError()
             self.cell = np.roll(self.cell, n, axis=0)
             self.cover = np.roll(self.cover, n, axis=0)
-            self.coverDFS = np.roll(self.coverDFS, n, axis=0)
+            self.label = np.roll(self.label, n, axis=0)
             self.enable = np.roll(self.enable, n, axis=0)
             for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
                 self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p]+n, self.plc.j[p], self.plc.k[p]]
@@ -845,7 +816,7 @@ class Puzzle:
                 raise RuntimeError()
             self.cell = np.roll(self.cell, -n, axis=1)
             self.cover = np.roll(self.cover, -n, axis=1)
-            self.coverDFS = np.roll(self.coverDFS, -n, axis=1)
+            self.label = np.roll(self.label, -n, axis=1)
             self.enable = np.roll(self.enable, -n, axis=1)
             for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
                 self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]-n, self.plc.k[p]]
@@ -854,7 +825,7 @@ class Puzzle:
                 raise RuntimeError()
             self.cell = np.roll(self.cell, n, axis=1)
             self.cover = np.roll(self.cover, n, axis=1)
-            self.coverDFS = np.roll(self.coverDFS, n, axis=1)
+            self.label = np.roll(self.label, n, axis=1)
             self.enable = np.roll(self.enable, n, axis=1)
             for i,p in enumerate(self.usedPlcIdx[:self.solSize]):
                 self.usedPlcIdx[i] = self.plc.invP[self.plc.div[p], self.plc.i[p], self.plc.j[p]+n, self.plc.k[p]]
